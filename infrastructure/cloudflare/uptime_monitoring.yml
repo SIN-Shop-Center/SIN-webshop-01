@@ -1,0 +1,24 @@
+monitors:
+  - id: "shop-health"
+    name: "delqhi.com Shop Health"
+    url: "https://delqhi.com/health"
+    method: "GET"
+    interval: 60
+    timeout: 5
+    locations:
+      - "eu-central-1"
+      - "us-east-1"
+    alerts:
+      slack: "#alerts-shop"
+      email: "ops@delqhi.com"
+
+  - id: "a2a-sin-logistic"
+    name: "SIN-Shop-Logistic A2A Health"
+    url: "https://ssl-a2a.delqhi.com/health"
+    method: "GET"
+    interval: 300
+    timeout: 10
+    locations:
+      - "eu-central-1"
+    alerts:
+      slack: "#alerts-a2a"

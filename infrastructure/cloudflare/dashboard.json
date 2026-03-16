@@ -1,0 +1,35 @@
+{
+  "title": "Shop Metrics Dashboard",
+  "panels": [
+    {
+      "title": "Umsatz",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(stripe_checkout_success_total[5m])) * sum(rate(stripe_checkout_revenue_total[5m]))",
+          "legendFormat": "Revenue"
+        }
+      ]
+    },
+    {
+      "title": "Conversion Rate",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(rate(checkout_completed_total[5m])) / sum(rate(page_view_total{path=\"/checkout\"}[5m])) * 100",
+          "legendFormat": "CR %"
+        }
+      ]
+    },
+    {
+      "title": "Abandoned Carts",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(cart_items_added) - sum(checkout_completed_total)",
+          "legendFormat": "Abandoned"
+        }
+      ]
+    }
+  ]
+}
