@@ -1,6 +1,6 @@
 package suppliers
 
-type webhookPayload struct {
+type WebhookPayload struct {
 	EventID         string
 	OrderID         string
 	Status          string

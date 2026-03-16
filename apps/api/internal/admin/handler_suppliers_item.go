@@ -26,7 +26,7 @@ func (h *Handler) UpdateSupplier(c *gin.Context) {
 		return
 	}
 
-	item, err := h.store.UpdateSupplier(c.Request.Context(), c.Param("id"), body)
+	item, err := h.store.UpdateSupplier(c.Request.Context(), c.Param("id"), body, actorUserID(c), actorRole(c), requestID(c))
 	if err != nil {
 		switch {
 		case err == errEmptyPatch:
@@ -43,7 +43,7 @@ func (h *Handler) UpdateSupplier(c *gin.Context) {
 }
 
 func (h *Handler) DeleteSupplier(c *gin.Context) {
-	err := h.store.DeleteSupplier(c.Request.Context(), c.Param("id"))
+	err := h.store.DeleteSupplier(c.Request.Context(), c.Param("id"), actorUserID(c), actorRole(c), requestID(c))
 	if err != nil {
 		switch {
 		case err == errBlocked:

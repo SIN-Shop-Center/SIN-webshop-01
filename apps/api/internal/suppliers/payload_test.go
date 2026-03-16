@@ -12,7 +12,7 @@ func TestDecodeWebhookPayloadSupportsSnakeAndCamelCase(t *testing.T) {
   "externalOrderId":"sup-789"
 }`)
 
-	payload, err := decodeWebhookPayload(raw)
+	payload, err := DecodeWebhookPayload(raw)
 	if err != nil {
 		t.Fatalf("unexpected decode error: %v", err)
 	}
@@ -31,10 +31,10 @@ func TestDecodeWebhookPayloadSupportsSnakeAndCamelCase(t *testing.T) {
 }
 
 func TestDecodeWebhookPayloadRequiresOrderAndStatus(t *testing.T) {
-	if _, err := decodeWebhookPayload([]byte(`{"status":"shipped"}`)); err == nil {
+	if _, err := DecodeWebhookPayload([]byte(`{"status":"shipped"}`)); err == nil {
 		t.Fatalf("expected missing order_id validation error")
 	}
-	if _, err := decodeWebhookPayload([]byte(`{"order_id":"x"}`)); err == nil {
+	if _, err := DecodeWebhookPayload([]byte(`{"order_id":"x"}`)); err == nil {
 		t.Fatalf("expected missing status validation error")
 	}
 }

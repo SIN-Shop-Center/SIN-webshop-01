@@ -9,7 +9,9 @@ import (
 func (s *Store) ListSupplierOrdersByOrder(ctx context.Context, orderID string) ([]SupplierOrderSummary, error) {
 	const query = `
 select id::text, order_id::text, supplier_id::text, status, channel,
-       external_order_id, attempt_count, last_error, placed_at, updated_at
+       external_order_id, attempt_count, last_error, placed_at,
+       due_at, discount_until, discount_pct, paid_at, cost_amount, cost_currency,
+       updated_at
 from public.supplier_orders
 where order_id::text = $1
 order by updated_at desc
@@ -34,6 +36,12 @@ order by updated_at desc
 			&row.AttemptCount,
 			&row.LastError,
 			&row.PlacedAt,
+			&row.DueAt,
+			&row.DiscountUntil,
+			&row.DiscountPct,
+			&row.PaidAt,
+			&row.CostAmount,
+			&row.CostCurrency,
 			&row.UpdatedAt,
 		); err != nil {
 			return nil, err

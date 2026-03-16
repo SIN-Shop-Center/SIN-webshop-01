@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-func decodeWebhookPayload(raw []byte) (webhookPayload, error) {
+func DecodeWebhookPayload(raw []byte) (WebhookPayload, error) {
 	input := map[string]any{}
 	if err := json.Unmarshal(raw, &input); err != nil {
-		return webhookPayload{}, err
+		return WebhookPayload{}, err
 	}
 
-	payload := webhookPayload{
+	payload := WebhookPayload{
 		EventID:         firstValue(input, "event_id", "eventId", "id"),
 		OrderID:         firstValue(input, "order_id", "orderId"),
 		Status:          firstValue(input, "status"),
@@ -23,10 +23,10 @@ func decodeWebhookPayload(raw []byte) (webhookPayload, error) {
 	}
 
 	if strings.TrimSpace(payload.OrderID) == "" {
-		return webhookPayload{}, fmt.Errorf("missing_order_id")
+		return WebhookPayload{}, fmt.Errorf("missing_order_id")
 	}
 	if strings.TrimSpace(payload.Status) == "" {
-		return webhookPayload{}, fmt.Errorf("missing_status")
+		return WebhookPayload{}, fmt.Errorf("missing_status")
 	}
 	return payload, nil
 }

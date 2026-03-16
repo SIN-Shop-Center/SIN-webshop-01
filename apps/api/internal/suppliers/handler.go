@@ -34,12 +34,29 @@ func (h *Handler) Webhook(c *gin.Context) {
 		c.GetHeader("X-Simone-Signature"),
 		c.GetHeader("X-Supplier-Signature"),
 	)
-	if !verifySignature(h.options.WebhookSecret, rawBody, signature) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid_signature"})
+	apiKey := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+
+	validAuth := false
+	if signature != "" && verifySignature(h.options.WebhookSecret, rawBody, signature) {
+		validAuth = true
+	} else if apiKey != "" {
+		supplierID, scopes, err := h.store.ValidateAPIKey(c.Request.Context(), apiKey)
+		if err == nil && supplierID != "" {
+			for _, s := range scopes {
+				if s == "webhook" || s == "all" {
+					validAuth = true
+					break
+				}
+			}
+		}
+	}
+
+	if !validAuth {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	payload, err := decodeWebhookPayload(rawBody)
+	payload, err := DecodeWebhookPayload(rawBody)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_payload"})
 		return

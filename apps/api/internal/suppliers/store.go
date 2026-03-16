@@ -2,6 +2,8 @@ package suppliers
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"strings"
 
@@ -17,7 +19,7 @@ func NewStore(pool *pgxpool.Pool) *Store {
 	return &Store{pool: pool}
 }
 
-func (s *Store) ProcessWebhook(ctx context.Context, supplierSlug string, payload webhookPayload) (bool, error) {
+func (s *Store) ProcessWebhook(ctx context.Context, supplierSlug string, payload WebhookPayload) (bool, error) {
 	eventType := eventTypeForStatus(payload.Status)
 	eventPayload, err := json.Marshal(map[string]any{
 		"supplier":          strings.TrimSpace(supplierSlug),
@@ -74,6 +76,42 @@ where id::text = $1
 	}
 
 	return false, tx.Commit(ctx)
+}
+
+func (s *Store) ValidateAPIKey(ctx context.Context, apiKey string) (string, []string, error) {
+	if !strings.HasPrefix(apiKey, "sup_") {
+		return "", nil, nil
+	}
+	parts := strings.Split(apiKey, "_")
+	if len(parts) != 3 {
+		return "", nil, nil
+	}
+	prefix := parts[1]
+	secret := parts[2]
+
+	hash := sha256.Sum256([]byte(prefix + "." + secret))
+	hashHex := hex.EncodeToString(hash[:])
+
+	var supplierID string
+	var scopes []string
+	err := s.pool.QueryRow(ctx, `
+select supplier_id::text, scopes
+from public.supplier_api_keys
+where key_prefix = $1
+  and key_hash = $2
+  and revoked_at is null
+limit 1
+`, prefix, hashHex).Scan(&supplierID, &scopes)
+	if err == pgx.ErrNoRows {
+		return "", nil, nil
+	}
+	if err != nil {
+		return "", nil, err
+	}
+
+	_, _ = s.pool.Exec(ctx, `update public.supplier_api_keys set last_used_at = now() where key_prefix = $1 and key_hash = $2`, prefix, hashHex)
+
+	return supplierID, scopes, nil
 }
 
 func eventTypeForStatus(status string) string {
