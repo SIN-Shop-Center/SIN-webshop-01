@@ -8,7 +8,7 @@ const RESET_DEFAULT_CONFIG = {
   model: 'grok-code',
   personality: 'friendly',
   language: 'de',
-  systemPrompt: 'Du bist der freundliche KI-Assistent fuer den Shop.',
+  systemPrompt: 'Du bist der freundliche KI-Assistent für den Shop.',
   temperature: 0.7,
   maxTokens: 500,
   welcomeMessage: 'Hallo! Wie kann ich helfen?',
