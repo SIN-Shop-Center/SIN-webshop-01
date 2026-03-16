@@ -25,6 +25,10 @@ try {
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     fail('API_BASE_URL must use http:// or https://')
   }
+  const host = parsed.hostname.toLowerCase()
+  if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+    fail('API_BASE_URL must not point to localhost for go-live smoke checks')
+  }
   const normalizedPath = parsed.pathname && parsed.pathname !== '/' ? parsed.pathname.replace(/\/$/, '') : ''
   baseURL = `${parsed.origin}${normalizedPath}`
 } catch (error) {
@@ -34,6 +38,46 @@ try {
 const checks = [
   { name: 'health', path: '/health', statuses: [200], auth: false },
   { name: 'ready', path: '/ready', statuses: [200], auth: false },
+  {
+    name: 'catalog.products.ready',
+    path: '/api/v1/catalog/products?limit=1',
+    statuses: [200],
+    auth: false,
+    validate: async (response) => {
+      const payload = await response.json().catch(() => null)
+      const items = Array.isArray(payload?.items) ? payload.items : []
+      if (items.length < 1) {
+        return 'catalog returned 0 live-ready products'
+      }
+      return null
+    },
+  },
+  {
+    name: 'admin.suppliers.ready',
+    path: '/api/v1/admin/suppliers?status=approved&onboarding_status=connected&compliance_state=approved&limit=20',
+    statuses: [200],
+    auth: true,
+    validate: async (response) => {
+      const payload = await response.json().catch(() => null)
+      const items = Array.isArray(payload?.data?.items) ? payload.data.items : []
+      const readySuppliers = items.filter((item) => {
+        if (!item || item.auto_fulfill_enabled !== true) {
+          return false
+        }
+        if (item.fulfillment_mode === 'api') {
+          return Boolean(String(item.api_endpoint || '').trim()) && item.has_secret === true
+        }
+        if (item.fulfillment_mode === 'email') {
+          return Boolean(String(item.contact_email || item.email || '').trim())
+        }
+        return false
+      })
+      if (readySuppliers.length < 1) {
+        return 'admin returned 0 connected suppliers that are fulfillable'
+      }
+      return null
+    },
+  },
   { name: 'admin.automation.health', path: '/api/v1/admin/automation/health', statuses: [200], auth: true },
   { name: 'admin.kpi.scorecard', path: '/api/v1/admin/kpi/scorecard', statuses: [200], auth: true },
   { name: 'admin.revenue.forecast', path: '/api/v1/admin/revenue/forecast?scenario=base', statuses: [200], auth: true },
@@ -54,8 +98,17 @@ async function runCheck(item) {
   try {
     const res = await fetch(`${baseURL}${item.path}`, { method: 'GET', headers, signal: controller.signal })
     const elapsed = Date.now() - started
-    const ok = item.statuses.includes(res.status)
-    return { name: item.name, ok, status: res.status, elapsed }
+    const okStatus = item.statuses.includes(res.status)
+    if (!okStatus) {
+      return { name: item.name, ok: false, status: res.status, elapsed }
+    }
+    if (typeof item.validate === 'function') {
+      const validationError = await item.validate(res.clone())
+      if (validationError) {
+        return { name: item.name, ok: false, status: res.status, elapsed, error: validationError }
+      }
+    }
+    return { name: item.name, ok: true, status: res.status, elapsed }
   } catch (err) {
     const elapsed = Date.now() - started
     const reason = err instanceof Error && err.name === 'AbortError'

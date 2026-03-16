@@ -1,24 +1,10 @@
 #!/usr/bin/env node
 
+import { FEATURE_TIKTOK_SHOP_KEYS, PLACEHOLDER_SNIPPETS, REQUIRED_RUNTIME_KEYS, REQUIRED_SMOKE_KEYS } from './live-env-schema.mjs'
+
 const withSmoke = process.argv.includes('--with-smoke')
 const failures = []
 const warnings = []
-
-const PLACEHOLDER_SNIPPETS = [
-  'CHANGE_ME',
-  'YOUR_PROJECT',
-  'YOUR_DOMAIN',
-  'your-project',
-  'your-domain',
-  '<admin_jwt>',
-  'sk_live_xxx',
-  'pk_live_xxx',
-  'whsec_xxx',
-  'oc_live_xxx',
-  'BASE64_ENCODED_SERVICE_ACCOUNT_JSON',
-  'n8n.example.com',
-  'example.com',
-]
 
 function valueOf(name) {
   return String(process.env[name] || '').trim()
@@ -34,6 +20,17 @@ function requireValue(name) {
     pushFailure(`${name} is required`)
   }
   return value
+}
+
+function requireExplicitFalse(name) {
+  const value = valueOf(name)
+  if (!value) {
+    pushFailure(`${name} must be set explicitly for go-live`)
+    return
+  }
+  if (value !== 'false') {
+    pushFailure(`${name} must be false for go-live`)
+  }
 }
 
 function validateNoPlaceholder(name, value) {
@@ -92,7 +89,7 @@ function validateDatabaseURL(value) {
 
 function validateCSVOrigins(name, value) {
   if (!value) {
-    return
+    return []
   }
   const origins = value
     .split(',')
@@ -101,12 +98,14 @@ function validateCSVOrigins(name, value) {
 
   if (origins.length === 0) {
     pushFailure(`${name} must contain at least one origin`)
-    return
+    return []
   }
 
   for (const origin of origins) {
     validateURL(`${name} origin "${origin}"`, origin, { disallowLocalhost: true })
   }
+
+  return origins
 }
 
 function validateEmailish(name, value) {
@@ -118,33 +117,105 @@ function validateEmailish(name, value) {
   }
 }
 
-const databaseURL = requireValue('DATABASE_URL')
-validateNoPlaceholder('DATABASE_URL', databaseURL)
+function validateTikTokShopFeatureSet() {
+  const values = Object.fromEntries(FEATURE_TIKTOK_SHOP_KEYS.map((key) => [key, valueOf(key)]))
+  const anyConfigured = Object.values(values).some(Boolean)
+  if (!anyConfigured) {
+    return
+  }
+
+  const requiredWhenEnabled = [
+    'TIKTOK_SHOP_CLIENT_KEY',
+    'TIKTOK_SHOP_CLIENT_SECRET',
+    'TIKTOK_SHOP_REDIRECT_URI',
+    'TIKTOK_SHOP_CONNECT_SCOPES',
+    'TIKTOK_SHOP_CALLBACK_SECRET',
+  ]
+
+  for (const key of requiredWhenEnabled) {
+    if (!values[key]) {
+      pushFailure(`${key} is required when TikTok Shop browser connect is enabled`)
+    }
+    validateNoPlaceholder(key, values[key])
+  }
+
+  if (!values.TIKTOK_SHOP_CODE_VERIFIER && !values.TIKTOK_SHOP_CODE_CHALLENGE) {
+    pushFailure('Provide TIKTOK_SHOP_CODE_VERIFIER or TIKTOK_SHOP_CODE_CHALLENGE when TikTok Shop browser connect is enabled')
+  }
+
+  if (values.TIKTOK_SHOP_REDIRECT_URI) {
+    validateURL('TIKTOK_SHOP_REDIRECT_URI', values.TIKTOK_SHOP_REDIRECT_URI, { disallowLocalhost: true })
+  }
+
+  if (values.TIKTOK_SHOP_CONNECT_SCOPES) {
+    const scopes = values.TIKTOK_SHOP_CONNECT_SCOPES
+      .split(/[,\s]+/)
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+    if (scopes.length === 0) {
+      pushFailure('TIKTOK_SHOP_CONNECT_SCOPES must contain at least one explicit merchant scope')
+    }
+    if (scopes.includes('user.info.basic')) {
+      pushFailure('TIKTOK_SHOP_CONNECT_SCOPES must not fall back to generic user.info.basic for TikTok Shop go-live')
+    }
+  }
+}
+
+const runtimeValues = Object.fromEntries(REQUIRED_RUNTIME_KEYS.map((key) => [key, requireValue(key)]))
+for (const key of REQUIRED_RUNTIME_KEYS) {
+  validateNoPlaceholder(key, runtimeValues[key])
+}
+
+const databaseURL = runtimeValues.DATABASE_URL
 validateDatabaseURL(databaseURL)
 
-const corsAllowlist = requireValue('CORS_ALLOWLIST')
-validateNoPlaceholder('CORS_ALLOWLIST', corsAllowlist)
-validateCSVOrigins('CORS_ALLOWLIST', corsAllowlist)
+function normalizeComparableURL(parsed) {
+  return `${parsed.origin}${parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '')}`
+}
 
-const siteURL = requireValue('SITE_URL')
-validateNoPlaceholder('SITE_URL', siteURL)
-validateURL('SITE_URL', siteURL, { disallowLocalhost: true })
+const corsAllowlist = runtimeValues.CORS_ALLOWLIST
+const corsOrigins = validateCSVOrigins('CORS_ALLOWLIST', corsAllowlist)
 
-const supplierWebhookSecret = requireValue('SUPPLIER_WEBHOOK_SECRET')
-validateNoPlaceholder('SUPPLIER_WEBHOOK_SECRET', supplierWebhookSecret)
+const siteURL = runtimeValues.SITE_URL
+const siteURLParsed = validateURL('SITE_URL', siteURL, { disallowLocalhost: true })
 
-const stripeSecret = requireValue('STRIPE_SECRET_KEY')
-validateNoPlaceholder('STRIPE_SECRET_KEY', stripeSecret)
+const publicAppURL = runtimeValues.NEXT_PUBLIC_APP_URL
+const publicAppURLParsed = validateURL('NEXT_PUBLIC_APP_URL', publicAppURL, { disallowLocalhost: true })
+if (siteURLParsed && publicAppURLParsed) {
+  const normalizedSiteURL = normalizeComparableURL(siteURLParsed)
+  const normalizedPublicAppURL = normalizeComparableURL(publicAppURLParsed)
+  if (normalizedSiteURL !== normalizedPublicAppURL) {
+    pushFailure('NEXT_PUBLIC_APP_URL must match SITE_URL for go-live')
+  }
+}
+if (siteURLParsed) {
+  const siteOrigin = siteURLParsed.origin
+  if (!corsOrigins.includes(siteOrigin)) {
+    pushFailure('CORS_ALLOWLIST must include the SITE_URL origin for go-live')
+  }
+}
 
-const stripeWebhookSecret = requireValue('STRIPE_WEBHOOK_SECRET')
-validateNoPlaceholder('STRIPE_WEBHOOK_SECRET', stripeWebhookSecret)
-
-const apiProxyURL = valueOf('INTERNAL_API_URL') || valueOf('NEXT_PUBLIC_API_URL')
+const internalAPIURL = valueOf('INTERNAL_API_URL')
+const publicAPIURL = valueOf('NEXT_PUBLIC_API_URL')
+const apiProxyURL = internalAPIURL || publicAPIURL
 if (!apiProxyURL) {
   pushFailure('INTERNAL_API_URL or NEXT_PUBLIC_API_URL is required for web API proxy routes')
 } else {
-  validateURL('INTERNAL_API_URL/NEXT_PUBLIC_API_URL', apiProxyURL)
+  const internalAPIURLParsed = internalAPIURL
+    ? validateURL('INTERNAL_API_URL', internalAPIURL, { disallowLocalhost: true })
+    : null
+  const publicAPIURLParsed = publicAPIURL
+    ? validateURL('NEXT_PUBLIC_API_URL', publicAPIURL, { disallowLocalhost: true })
+    : null
   validateNoPlaceholder('INTERNAL_API_URL/NEXT_PUBLIC_API_URL', apiProxyURL)
+
+  if (internalAPIURLParsed && publicAPIURLParsed) {
+    const normalizedInternalAPIURL = normalizeComparableURL(internalAPIURLParsed)
+    const normalizedPublicAPIURL = normalizeComparableURL(publicAPIURLParsed)
+    if (normalizedInternalAPIURL !== normalizedPublicAPIURL) {
+      pushFailure('NEXT_PUBLIC_API_URL must match INTERNAL_API_URL when both are set')
+    }
+  }
 }
 
 const supabaseURL = valueOf('SUPABASE_URL')
@@ -172,42 +243,49 @@ if (!gsaJSONB64 && !gsaFile) {
 }
 validateNoPlaceholder('GOOGLE_SERVICE_ACCOUNT_JSON_B64', gsaJSONB64)
 
-const gmailDelegatedUser = requireValue('GMAIL_DELEGATED_USER')
-validateNoPlaceholder('GMAIL_DELEGATED_USER', gmailDelegatedUser)
+const gmailDelegatedUser = runtimeValues.GMAIL_DELEGATED_USER
 validateEmailish('GMAIL_DELEGATED_USER', gmailDelegatedUser)
 
-const gmailSenderFrom = requireValue('GMAIL_SENDER_FROM')
-validateNoPlaceholder('GMAIL_SENDER_FROM', gmailSenderFrom)
+const gmailSenderFrom = runtimeValues.GMAIL_SENDER_FROM
 validateEmailish('GMAIL_SENDER_FROM', gmailSenderFrom)
-
-const billingCompany = requireValue('BILLING_COMPANY_NAME')
-validateNoPlaceholder('BILLING_COMPANY_NAME', billingCompany)
-
-const billingAddress = requireValue('BILLING_ADDRESS')
-validateNoPlaceholder('BILLING_ADDRESS', billingAddress)
-
-const billingTaxID = requireValue('BILLING_TAX_ID')
-validateNoPlaceholder('BILLING_TAX_ID', billingTaxID)
-
-const billingVATID = requireValue('BILLING_VAT_ID')
-validateNoPlaceholder('BILLING_VAT_ID', billingVATID)
 
 const gmailAPIBase = valueOf('GMAIL_API_BASE_URL')
 if (gmailAPIBase) {
   validateURL('GMAIL_API_BASE_URL', gmailAPIBase)
 }
 
-if (withSmoke) {
-  const apiBase = requireValue('API_BASE_URL')
-  validateNoPlaceholder('API_BASE_URL', apiBase)
-  validateURL('API_BASE_URL', apiBase)
+requireExplicitFalse('NEXT_PUBLIC_WEB_CATALOG_FALLBACK_ENABLED')
+requireExplicitFalse('NEXT_PUBLIC_WEB_ACCOUNT_FALLBACK_ENABLED')
 
-  const adminBearerToken = requireValue('ADMIN_BEARER_TOKEN')
+if (withSmoke) {
+  const smokeValues = Object.fromEntries(REQUIRED_SMOKE_KEYS.map((key) => [key, requireValue(key)]))
+  const apiBase = smokeValues.API_BASE_URL
+  validateNoPlaceholder('API_BASE_URL', apiBase)
+  const apiBaseParsed = validateURL('API_BASE_URL', apiBase, { disallowLocalhost: true })
+
+  if (apiBaseParsed) {
+    const normalizedAPIBase = normalizeComparableURL(apiBaseParsed)
+    if (internalAPIURL) {
+      const internalAPIURLParsed = validateURL('INTERNAL_API_URL', internalAPIURL, { disallowLocalhost: true })
+      if (internalAPIURLParsed && normalizeComparableURL(internalAPIURLParsed) !== normalizedAPIBase) {
+        pushFailure('API_BASE_URL must match INTERNAL_API_URL for go-live smoke checks')
+      }
+    } else if (publicAPIURL) {
+      const publicAPIURLParsed = validateURL('NEXT_PUBLIC_API_URL', publicAPIURL, { disallowLocalhost: true })
+      if (publicAPIURLParsed && normalizeComparableURL(publicAPIURLParsed) !== normalizedAPIBase) {
+        pushFailure('API_BASE_URL must match NEXT_PUBLIC_API_URL for go-live smoke checks')
+      }
+    }
+  }
+
+  const adminBearerToken = smokeValues.ADMIN_BEARER_TOKEN
   validateNoPlaceholder('ADMIN_BEARER_TOKEN', adminBearerToken)
   if (adminBearerToken && adminBearerToken.length < 20) {
     warnings.push('ADMIN_BEARER_TOKEN looks unusually short')
   }
 }
+
+validateTikTokShopFeatureSet()
 
 if (warnings.length > 0) {
   console.warn('Live environment warnings:')

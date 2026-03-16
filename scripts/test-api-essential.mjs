@@ -12,11 +12,22 @@ const dockerFallback = String(process.env.GO_TEST_DOCKER_FALLBACK || '1') !== '0
 const rootDir = process.cwd()
 const apiAbsDir = path.join(rootDir, API_DIR)
 const goTmpDir = process.env.GOTMPDIR || path.join(apiAbsDir, '.go-tmp-exec')
+const goCacheDir = process.env.GOCACHE || path.join(rootDir, 'tmp', 'go-cache')
+const goModCacheDir = process.env.GOMODCACHE || path.join(rootDir, 'tmp', 'go-mod-cache')
 
 function listPackagesWithTests() {
   const listedWithTests = execSync(
     "go list -f '{{.ImportPath}} {{if or (gt (len .TestGoFiles) 0) (gt (len .XTestGoFiles) 0)}}test{{end}}' ./...",
-    { cwd: API_DIR, encoding: 'utf8' },
+    {
+      cwd: API_DIR,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        GOTMPDIR: goTmpDir,
+        GOCACHE: goCacheDir,
+        GOMODCACHE: goModCacheDir,
+      },
+    },
   )
     .split('\n')
     .map((line) => line.trim())
@@ -38,6 +49,8 @@ function runGo(args, cwd = API_DIR, extraEnv = {}, timeoutMs = maxWallTimeMs) {
     env: {
       ...process.env,
       GOTMPDIR: goTmpDir,
+      GOCACHE: goCacheDir,
+      GOMODCACHE: goModCacheDir,
       ...extraEnv,
     },
   })
@@ -95,6 +108,12 @@ function runDockerFallback(targets) {
 
 if (!fs.existsSync(goTmpDir)) {
   fs.mkdirSync(goTmpDir, { recursive: true })
+}
+if (!fs.existsSync(goCacheDir)) {
+  fs.mkdirSync(goCacheDir, { recursive: true })
+}
+if (!fs.existsSync(goModCacheDir)) {
+  fs.mkdirSync(goModCacheDir, { recursive: true })
 }
 
 const targets = listPackagesWithTests()
