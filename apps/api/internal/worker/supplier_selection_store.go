@@ -112,7 +112,7 @@ select distinct on (s.id)
   coalesce(s.fulfillment_mode, 'email'),
   coalesce(nullif(s.contact_email, ''), nullif(s.email, ''), ''),
   coalesce(s.api_endpoint, ''),
-  coalesce(s.api_key, ''),
+  coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), s.api_key, ''),
   coalesce(s.sla_hours, 48),
   coalesce(ss.priority, 1000),
   coalesce(ss.is_primary, false),
@@ -121,6 +121,16 @@ from source_suppliers ss
 join public.suppliers s on s.id = ss.supplier_id
 where s.auto_fulfill_enabled = true
   and s.status = any($2::text[])
+  and s.onboarding_status = 'connected'
+  and s.compliance_state = 'approved'
+  and (
+    (coalesce(s.fulfillment_mode, 'email') = 'api'
+      and coalesce(nullif(s.api_endpoint, ''), '') <> ''
+      and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
+    or
+    (coalesce(s.fulfillment_mode, 'email') = 'email'
+      and coalesce(nullif(s.contact_email, ''), nullif(s.email, '')) <> '')
+  )
 order by s.id, ss.is_primary desc, ss.priority asc
 `
 	statuses := []string{"approved", "active"}

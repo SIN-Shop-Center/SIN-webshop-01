@@ -58,10 +58,13 @@ where channel = $1
 
 	token := extractToken(auth)
 	catalogEndpoint := asString(auth["catalog_sync_endpoint"])
+	if channel == "tiktok" && catalogEndpoint == "" {
+		catalogEndpoint = asString(auth["product_save_endpoint"])
+	}
 	campaignEndpoint := asString(auth["campaign_publish_endpoint"])
 	healthy := (status == "connected" || status == "degraded") && failures24h < 10
 
-	return map[string]any{
+	out := map[string]any{
 		"channel":                channel,
 		"status":                 status,
 		"connection_mode":        mode,
@@ -77,12 +80,37 @@ where channel = $1
 		"catalog_endpoint":       catalogEndpoint,
 		"campaign_endpoint":      campaignEndpoint,
 		"healthy":                healthy,
-	}, nil
+	}
+	if channel == "tiktok" {
+		auth, out = enrichTikTokSnapshotsWithA2A(ctx, auth, out)
+		out["provider"] = defaultString(auth["provider"], "tiktok_shop")
+		out["auth_method"] = defaultString(auth["auth_method"], "sin_a2a_broker_oauth")
+		out["provider_mode"] = defaultString(auth["provider_mode"], "sin_a2a_tiktok_shop")
+		out["merchant_id"] = firstNonEmpty(asString(auth["merchant_id"]), asString(auth["seller_id"]))
+		out["seller_id"] = asString(auth["seller_id"])
+		out["shop_id"] = firstNonEmpty(asString(auth["shop_id"]), asString(auth["shop_cipher"]))
+		out["shop_cipher"] = asString(auth["shop_cipher"])
+		out["shop_region"] = asString(auth["shop_region"])
+		out["shop_name"] = asString(auth["shop_name"])
+		out["shop_code"] = asString(auth["shop_code"])
+		out["available_shop_count"] = len(asItemsFromAny(auth["available_shops"]))
+		out["metadata_refreshed_at"] = asString(auth["metadata_refreshed_at"])
+		out["browser_session_ref"] = asString(auth["browser_session_ref"])
+		out["browser_catalog_target_url"] = asString(auth["browser_catalog_target_url"])
+		out["browser_reply_target_url"] = asString(auth["browser_reply_target_url"])
+		out["catalog_browser_recipe"] = asMap(auth["catalog_browser_recipe"])
+		out["community_reply_browser_recipe"] = asMap(auth["community_reply_browser_recipe"])
+		out["browser_catalog_recipe_present"] = len(asMap(auth["catalog_browser_recipe"])) > 0
+		out["browser_reply_recipe_present"] = len(asMap(auth["community_reply_browser_recipe"])) > 0
+		out["community_mode"] = "crm_inbox"
+	}
+	return out, nil
 }
 
 func extractToken(auth map[string]any) string {
 	candidates := []string{
 		asString(auth["access_token"]),
+		asString(auth["merchant_access_token"]),
 		asString(auth["api_token"]),
 		asString(auth["api_key"]),
 	}

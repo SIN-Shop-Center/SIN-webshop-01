@@ -28,7 +28,14 @@ func (p *Processor) executeChannelSync(ctx context.Context, channel, syncType, r
 		"requested_payload": requestedPayload,
 		"requested_at":      time.Now().UTC().Format(time.RFC3339),
 	}
-	return p.dispatchChannelRequest(ctx, account, syncType, request)
+	if syncType == "catalog" {
+		mirrorPayload, err := p.buildChannelCatalogMirrorPayload(ctx, channel, requestedPayload, account.AuthSnapshot)
+		if err != nil {
+			return nil, err
+		}
+		request["catalog"] = mirrorPayload
+	}
+	return p.dispatchChannelRequest(ctx, channel, account, syncType, request)
 }
 
 func (p *Processor) publishTrendLaunch(ctx context.Context, channel, launchID, candidateID string, spendCapDaily float64) (map[string]any, string, error) {
@@ -44,7 +51,7 @@ func (p *Processor) publishTrendLaunch(ctx context.Context, channel, launchID, c
 		"spend_cap_daily":    spendCapDaily,
 		"requested_at":       time.Now().UTC().Format(time.RFC3339),
 	}
-	response, err := p.dispatchChannelRequest(ctx, account, "campaign_publish", request)
+	response, err := p.dispatchChannelRequest(ctx, channel, account, "campaign_publish", request)
 	if err != nil {
 		return nil, "", err
 	}
@@ -52,8 +59,39 @@ func (p *Processor) publishTrendLaunch(ctx context.Context, channel, launchID, c
 	return response, externalID, nil
 }
 
-func (p *Processor) dispatchChannelRequest(ctx context.Context, account *channelAccountRuntime, syncType string, request map[string]any) (map[string]any, error) {
-	endpoint := resolveChannelEndpoint(syncType, account.AuthSnapshot)
+func (p *Processor) dispatchChannelRequest(ctx context.Context, channel string, account *channelAccountRuntime, syncType string, request map[string]any) (map[string]any, error) {
+	if channel == "tiktok" && syncType == "catalog" && p.shouldUseTikTokBrowserRuntime(channel, account.AuthSnapshot) {
+		browserPayload := map[string]any{
+			"browser_session_ref": asString(account.AuthSnapshot["browser_session_ref"]),
+			"target_url": firstNonEmptyWorker(
+				asString(asMap(request["requested_payload"])["target_url"]),
+				asString(account.AuthSnapshot["browser_catalog_target_url"]),
+			),
+			"candidate_urls": firstNonEmptySlice(
+				workerStringSlice(asMap(request["requested_payload"])["candidate_urls"]),
+				workerStringSlice(account.AuthSnapshot["browser_catalog_candidate_urls"]),
+			),
+			"browser_recipe": firstNonEmptyMap(
+				asMap(asMap(request["requested_payload"])["browser_recipe"]),
+				asMap(account.AuthSnapshot["catalog_browser_recipe"]),
+			),
+			"request_payload": asMap(request["requested_payload"]),
+			"merchant_id":     firstNonEmptyWorker(asString(account.AuthSnapshot["merchant_id"]), asString(account.AuthSnapshot["seller_id"])),
+			"shop_id":         firstNonEmptyWorker(asString(account.AuthSnapshot["shop_id"]), asString(account.AuthSnapshot["shop_cipher"])),
+			"catalog":         asMap(request["catalog"]),
+		}
+		response, err := p.dispatchTikTokBrowserAction(ctx, "/api/automation/tiktok-shop/catalog-sync", browserPayload)
+		if err == nil {
+			return map[string]any{
+				"connection_mode": account.ConnectionMode,
+				"provider_result": response,
+				"processed_at":    time.Now().UTC().Format(time.RFC3339),
+				"dispatch_mode":   "browser_runner",
+			}, nil
+		}
+	}
+
+	endpoint := resolveChannelEndpoint(channel, syncType, account.AuthSnapshot)
 	if endpoint == "" {
 		return nil, fmt.Errorf("%w: channel_endpoint_missing", ErrPermanent)
 	}
@@ -98,4 +136,13 @@ func (p *Processor) dispatchChannelRequest(ctx context.Context, account *channel
 		"provider_result": response,
 		"processed_at":    time.Now().UTC().Format(time.RFC3339),
 	}, nil
+}
+
+func firstNonEmptySlice(values ...[]string) []string {
+	for _, value := range values {
+		if len(value) > 0 {
+			return value
+		}
+	}
+	return []string{}
 }

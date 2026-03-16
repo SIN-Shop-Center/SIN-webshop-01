@@ -10,6 +10,7 @@ import (
 )
 
 func (s *Store) CompleteChannelConnect(ctx context.Context, channel, stateToken, accountExternalID string, authSnapshot, healthSnapshot map[string]any) (*ChannelAccountSummary, error) {
+	var err error
 	normalized := normalizeChannels([]string{channel})
 	if len(normalized) == 0 {
 		return nil, errInvalidInput
@@ -18,7 +19,20 @@ func (s *Store) CompleteChannelConnect(ctx context.Context, channel, stateToken,
 	if asString(stateToken) == "" {
 		return nil, errInvalidInput
 	}
-	authSnapshot, err := normalizeChannelAuthSnapshot(channel, authSnapshot)
+
+	session, err := s.loadChannelConnectSession(ctx, channel, stateToken)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errBlocked
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	authSnapshot, err = s.completeChannelAuthSnapshot(ctx, channel, authSnapshot, session.CallbackPayload)
+	if err != nil {
+		return nil, err
+	}
+	authSnapshot, err = normalizeChannelAuthSnapshot(channel, authSnapshot)
 	if err != nil {
 		return nil, err
 	}
@@ -83,21 +97,23 @@ limit 1
 func (s *Store) upsertChannelAccount(ctx context.Context, tx pgx.Tx, channel, accountName, accountExternalID, authBlob, healthBlob string) (*ChannelAccountSummary, string, error) {
 	row := &ChannelAccountSummary{}
 	var accountID string
+	connectionMode := channelConnectMode(channel)
 	err := tx.QueryRow(ctx, `
 insert into public.channel_accounts (
   channel, account_name, account_external_id, status, connection_mode, auth_snapshot, health_snapshot, last_connected_at, last_health_at
 )
-values ($1, $2, nullif($3, ''), 'connected', 'oauth', $4::jsonb, $5::jsonb, now(), now())
+values ($1, $2, nullif($3, ''), 'connected', $4, $5::jsonb, $6::jsonb, now(), now())
 on conflict (channel, account_name) do update
 set account_external_id = excluded.account_external_id,
     status = 'connected',
+    connection_mode = excluded.connection_mode,
     auth_snapshot = excluded.auth_snapshot,
     health_snapshot = excluded.health_snapshot,
     last_connected_at = now(),
     last_health_at = now(),
     updated_at = now()
 returning id::text, id::text, channel, account_name, status, connection_mode, last_connected_at, last_health_at, updated_at
-`, channel, accountName, accountExternalID, authBlob, healthBlob).Scan(
+`, channel, accountName, accountExternalID, connectionMode, authBlob, healthBlob).Scan(
 		&accountID,
 		&row.ID,
 		&row.Channel,

@@ -54,3 +54,18 @@ func asFloat(v any) float64 {
 		return 0
 	}
 }
+
+func asBool(v any, fallback bool) bool {
+	switch value := v.(type) {
+	case bool:
+		return value
+	case string:
+		switch strings.ToLower(strings.TrimSpace(value)) {
+		case "true":
+			return true
+		case "false":
+			return false
+		}
+	}
+	return fallback
+}

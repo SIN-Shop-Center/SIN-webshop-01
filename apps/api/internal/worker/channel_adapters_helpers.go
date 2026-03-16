@@ -2,7 +2,19 @@ package worker
 
 import "strings"
 
-func resolveChannelEndpoint(syncType string, auth map[string]any) string {
+func resolveChannelEndpoint(channel, syncType string, auth map[string]any) string {
+	if channel == "tiktok" {
+		if syncType == "catalog" {
+			if endpoint := strings.TrimSpace(asString(auth["product_save_endpoint"])); endpoint != "" {
+				return endpoint
+			}
+		}
+		if syncType == "campaign_publish" {
+			if endpoint := strings.TrimSpace(asString(auth["content_post_endpoint"])); endpoint != "" {
+				return endpoint
+			}
+		}
+	}
 	byType := map[string]string{
 		"catalog":          asString(auth["catalog_sync_endpoint"]),
 		"campaign_publish": asString(auth["campaign_publish_endpoint"]),

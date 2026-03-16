@@ -42,9 +42,9 @@ func (s *Store) StartChannelConnect(ctx context.Context, channel string) (map[st
 	redirect := "/admin/channels?channel=" + channel + "&state=" + stateToken
 	_, err := s.pool.Exec(ctx, `
 insert into public.channel_accounts (channel, account_name, status, connection_mode)
-values ($1, 'default', 'disconnected', 'oauth')
+values ($1, 'default', 'disconnected', $2)
 on conflict (channel, account_name) do nothing
-`, channel)
+`, channel, channelConnectMode(channel))
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +57,7 @@ on conflict (channel, account_name) do nothing
 		"required_auth_fields": channelProfile(channel).RequiredAuthFields,
 		"optional_auth_fields": channelProfile(channel).OptionalAuthFields,
 	}
+	payload = enrichChannelConnectPayload(channel, payload)
 	body, err := json.Marshal(map[string]any{"redirect_url": redirect})
 	if err != nil {
 		return nil, err

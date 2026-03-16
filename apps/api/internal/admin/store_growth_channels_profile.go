@@ -30,7 +30,33 @@ func channelProfile(channel string) channelConnectProfile {
 	}
 	switch channel {
 	case "tiktok":
-		base.OptionalAuthFields = append(base.OptionalAuthFields, "shop_id", "catalog_id", "ad_account_id")
+		base.RequiredAuthFields = []string{
+			"official_browser_oauth_access_token",
+			"merchant_id_or_seller_id",
+			"shop_id_or_shop_cipher",
+		}
+		base.OptionalAuthFields = append(base.OptionalAuthFields,
+			"auth_method",
+			"provider_mode",
+			"merchant_id",
+			"seller_id",
+			"shop_id",
+			"shop_cipher",
+			"shop_region",
+			"catalog_id",
+			"ad_account_id",
+			"refresh_token",
+			"refresh_token_expires_at",
+			"access_token_expires_at",
+			"product_save_endpoint",
+			"product_sync_mode",
+			"browser_session_ref",
+			"seller_center_region",
+			"catalog_browser_recipe",
+			"community_reply_browser_recipe",
+			"browser_catalog_target_url",
+			"browser_reply_target_url",
+		)
 	case "meta":
 		base.OptionalAuthFields = append(base.OptionalAuthFields, "business_id", "catalog_id", "ad_account_id", "pixel_id")
 	case "youtube_google":
@@ -57,12 +83,17 @@ func normalizeChannelAuthSnapshot(channel string, input map[string]any) (map[str
 	}
 	accountName := asString(out["account_name"])
 	if accountName == "" {
-		accountName = "default"
+		if channel == "tiktok" {
+			accountName = "tiktok-shop"
+		} else {
+			accountName = "default"
+		}
 	}
 	out["account_name"] = accountName
 
 	token := firstNonEmpty(
 		asString(out["access_token"]),
+		asString(out["merchant_access_token"]),
 		asString(out["api_token"]),
 		asString(out["api_key"]),
 	)
@@ -76,6 +107,41 @@ func normalizeChannelAuthSnapshot(channel string, input map[string]any) (map[str
 	apiBaseURL := normalizeURL(asString(out["api_base_url"]))
 	catalogEndpoint := normalizeURL(asString(out["catalog_sync_endpoint"]))
 	campaignEndpoint := normalizeURL(asString(out["campaign_publish_endpoint"]))
+
+	if channel == "tiktok" {
+		merchantID := firstNonEmpty(asString(out["merchant_id"]), asString(out["seller_id"]))
+		shopID := firstNonEmpty(asString(out["shop_id"]), asString(out["shop_cipher"]))
+		if merchantID == "" {
+			return nil, fmt.Errorf("%w: missing_channel_merchant", errInvalidInput)
+		}
+		if shopID == "" {
+			return nil, fmt.Errorf("%w: missing_channel_shop", errInvalidInput)
+		}
+		out["merchant_id"] = merchantID
+		if asString(out["seller_id"]) == "" {
+			out["seller_id"] = merchantID
+		}
+		out["shop_id"] = shopID
+		out["auth_method"] = defaultString(out["auth_method"], "official_browser_oauth")
+		out["provider_mode"] = defaultString(out["provider_mode"], "tiktok_shop_browser")
+		if apiBaseURL != "" {
+			out["api_base_url"] = apiBaseURL
+		}
+		if catalogEndpoint != "" && !isValidHTTPSURL(catalogEndpoint) {
+			return nil, fmt.Errorf("%w: invalid_channel_endpoint", errInvalidInput)
+		}
+		if campaignEndpoint != "" && !isValidHTTPSURL(campaignEndpoint) {
+			return nil, fmt.Errorf("%w: invalid_channel_endpoint", errInvalidInput)
+		}
+		if catalogEndpoint != "" {
+			out["catalog_sync_endpoint"] = catalogEndpoint
+		}
+		if campaignEndpoint != "" {
+			out["campaign_publish_endpoint"] = campaignEndpoint
+		}
+		out["channel"] = channel
+		return out, nil
+	}
 
 	if apiBaseURL == "" && (catalogEndpoint == "" || campaignEndpoint == "") {
 		return nil, fmt.Errorf("%w: missing_channel_endpoints", errInvalidInput)

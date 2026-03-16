@@ -1,5 +1,11 @@
 package worker
 
+import (
+	"time"
+
+	"simone-webshop/apps/api/internal/objectstore"
+)
+
 type Options struct {
 	GoogleServiceAccountJSONB64 string
 	GoogleServiceAccountFile    string
@@ -13,6 +19,23 @@ type Options struct {
 	BillingVATID       string
 	InvoiceOutputDir   string
 
-	N8NWebhookURL   string
-	N8NSharedSecret string
+	SiteURL                  string
+	N8NWebhookURL            string
+	N8NSharedSecret          string
+	TikTokBrowserRunnerToken string
+
+	NVIDIAAPIKey                string
+	NVIDIAReasonURL             string
+	NVIDIAPredictURL            string
+	NVIDIATransferURL           string
+	NVIDIAMaxLiveVariantsPerRun int
+	NVIDIAMinRequestInterval    time.Duration
+	ModalAPIToken               string
+	ModalRenderURL              string
+	ModalStatusURL              string
+	ModalPollInterval           time.Duration
+	ModalRequestTimeout         time.Duration
+	ModalMaxVariantsPerRun      int
+
+	R2Client *objectstore.R2Client
 }

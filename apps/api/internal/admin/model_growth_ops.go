@@ -10,9 +10,11 @@ type TrendSignalsIngestResult struct {
 }
 
 type ChannelEventsIngestResult struct {
-	Channel    string    `json:"channel"`
-	Received   int       `json:"received"`
-	Inserted   int       `json:"inserted"`
-	Duplicates int       `json:"duplicates"`
-	At         time.Time `json:"at"`
+	Channel          string    `json:"channel"`
+	Received         int       `json:"received"`
+	Inserted         int       `json:"inserted"`
+	Duplicates       int       `json:"duplicates"`
+	Projected        int       `json:"projected"`
+	ProjectionErrors int       `json:"projection_errors"`
+	At               time.Time `json:"at"`
 }
