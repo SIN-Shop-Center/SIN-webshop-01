@@ -62,7 +62,7 @@ export default function SinA2AAgentPage({ params }: { params: { slug: string } }
         <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <GuideStat icon={ShieldCheck} label="Team" value={team?.name || agent.teamId} />
           <GuideStat icon={GitBranch} label="Repo" value={agent.repo.name} />
-          <GuideStat icon={Cloud} label="HF Space" value={`${agent.huggingFaceSpace.owner}/${agent.huggingFaceSpace.slug}`} />
+          <GuideStat icon={Cloud} label="HF Space" value={agent.huggingFaceSpace ? `${agent.huggingFaceSpace.owner}/${agent.huggingFaceSpace.slug}` : '—'} />
           <GuideStat icon={FileText} label="Docs Tab" value={agent.googleDocs.agentTabId} />
         </div>
       </section>
