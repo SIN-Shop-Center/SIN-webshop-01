@@ -1,0 +1,290 @@
+{
+  "workspace": {
+    "name": "SIN Silicon Workforce",
+    "description": "Öffentliche Team- und Agentenoberfläche für alle SIN A2A Agents, Guides, Cards und Runtime-Endpunkte.",
+    "indexHost": "a2a.delqhi.com",
+    "indexRoute": "/a2a",
+    "documentId": "1RtoHn4I0GntuEEOHHkqoh_dMuGzgMwQz7_8oxAOpQbw",
+    "referenceTabId": "t.m4146wq7h87z",
+    "teamsRootTabId": "t.93gdhv1dh74"
+  },
+  "teams": [
+    {
+      "id": "team-infrastructur",
+      "name": "Team - Infrastructur",
+      "docTabId": "t.hzp3hc5sub65",
+      "departmentPath": "a2a/team-infrastructur"
+    },
+    {
+      "id": "coding",
+      "name": "Team - Coding",
+      "docTabId": "t.71rk0lld8zkq",
+      "departmentPath": "departments/coding/sub-agents"
+    },
+    {
+      "id": "creator",
+      "name": "Team - Creator",
+      "docTabId": "t.kiie4zq2nije",
+      "departmentPath": "departments/creator/sub-agents"
+    },
+    {
+      "id": "marketing",
+      "name": "Team - Marketing",
+      "docTabId": "t.wau78yc7om9c",
+      "departmentPath": "departments/marketing/sub-agents"
+    },
+    {
+      "id": "shop",
+      "name": "Team - Shop",
+      "docTabId": "t.4ldzbgjj6taf",
+      "departmentPath": "a2a/team-shop"
+    }
+  ],
+  "agents": [
+    {
+      "id": "sin-tiktok",
+      "slug": "sin-tiktok",
+      "shortName": "STK",
+      "name": "SIN-TikTok",
+      "teamId": "creator",
+      "status": "active",
+      "description": "Spezialisierter TikTok-Agent fuer Creator-Identity, OAuth/Broker-Connect, Creator-Info und TikTok Posting-Workflows fuer die Simone Content- und Shop-Surface.",
+      "repo": {
+        "name": "sin-tiktok",
+        "status": "active"
+      },
+      "guide": {
+        "host": "sin-solver.delqhi.com",
+        "route": "/agents/sin-tiktok"
+      },
+      "a2a": {
+        "host": "sin-solver.delqhi.com",
+        "baseUrl": "http://127.0.0.1:0",
+        "jsonRpcPath": "/agents/sin-tiktok/a2a/v1",
+        "restPath": "/agents/sin-tiktok/a2a/rest",
+        "agentCardWellKnownPath": "/agents/sin-tiktok/.well-known/agent-card.json",
+        "cardPath": "/agents/sin-tiktok/.well-known/agent.json",
+        "oauthClientPath": "/agents/sin-tiktok/.well-known/oauth-client.json",
+        "port": 0
+      },
+      "mcp": {
+        "host": "sin-solver.delqhi.com",
+        "baseUrl": "http://127.0.0.1:0",
+        "path": "/agents/sin-tiktok/mcp",
+        "transport": [
+          "stdio"
+        ],
+        "port": 0
+      },
+      "huggingFaceSpace": {
+        "owner": "delqhi",
+        "slug": "sin-tiktok",
+        "sdk": "docker",
+        "hardware": "cpu-basic",
+        "status": "runtime-local"
+      },
+      "cloudflare": {
+        "directoryHostname": "sin-solver.delqhi.com",
+        "a2aHostname": "sin-solver.delqhi.com",
+        "mcpHostname": "sin-solver.delqhi.com"
+      },
+      "googleDocs": {
+        "documentId": "1RtoHn4I0GntuEEOHHkqoh_dMuGzgMwQz7_8oxAOpQbw",
+        "referenceTabId": "t.2ss64q1deilv",
+        "teamsRootTabId": "t.93gdhv1dh74",
+        "teamTabId": "t.kiie4zq2nije",
+        "agentTabId": "t.me325rh5mquf"
+      },
+      "paths": {
+        "agentRoot": "~/.a2a/SIN-Solver/team-infratructur/A2A-SIN-TikTok",
+        "a2aRuntime": "~/.a2a/SIN-Solver/team-infratructur/A2A-SIN-TikTok",
+        "mcpRuntime": "~/.a2a/SIN-Solver/team-infratructur/A2A-SIN-TikTok",
+        "core": "~/.a2a/SIN-Solver/team-infratructur/A2A-SIN-TikTok"
+      },
+      "skills": [
+        "creator-oauth",
+        "creator-info-query",
+        "video-upload",
+        "video-publish",
+        "developer-capture"
+      ],
+      "commands": [
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok run-action '{\"action\":\"sin.tiktok.connect.status\"}'",
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok run-action '{\"action\":\"sin.tiktok.user.info.query\"}'",
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok run-action '{\"action\":\"sin.tiktok.creator_info.query\"}'"
+      ],
+      "apiEndpoints": [
+        "run-action sin.tiktok.connect.status",
+        "run-action sin.tiktok.user.info.query",
+        "run-action sin.tiktok.creator_info.query"
+      ]
+    },
+    {
+      "id": "sin-tiktok-shop",
+      "slug": "sin-tiktok-shop",
+      "shortName": "STS",
+      "name": "SIN-TikTok-Shop",
+      "teamId": "shop",
+      "status": "active",
+      "description": "Spezialisierter TikTok-Shop-Agent fuer Seller-/Partner-Center-Bootstrap, lokale Seller-Session-Reuse, Shop-Metadaten, OAuth-/Merchant-Token-Anbindung und Shop-Runtime-Funktionen.",
+      "repo": {
+        "name": "sin-tiktok-shop",
+        "status": "active"
+      },
+      "guide": {
+        "host": "sin-solver.delqhi.com",
+        "route": "/agents/sin-tiktok-shop"
+      },
+      "a2a": {
+        "host": "sin-solver.delqhi.com",
+        "baseUrl": "http://127.0.0.1:0",
+        "jsonRpcPath": "/agents/sin-tiktok-shop/a2a/v1",
+        "restPath": "/agents/sin-tiktok-shop/a2a/rest",
+        "agentCardWellKnownPath": "/agents/sin-tiktok-shop/.well-known/agent-card.json",
+        "cardPath": "/agents/sin-tiktok-shop/.well-known/agent.json",
+        "oauthClientPath": "/agents/sin-tiktok-shop/.well-known/oauth-client.json",
+        "port": 0
+      },
+      "mcp": {
+        "host": "sin-solver.delqhi.com",
+        "baseUrl": "http://127.0.0.1:0",
+        "path": "/agents/sin-tiktok-shop/mcp",
+        "transport": [
+          "stdio"
+        ],
+        "port": 0
+      },
+      "huggingFaceSpace": {
+        "owner": "delqhi",
+        "slug": "sin-tiktok-shop",
+        "sdk": "docker",
+        "hardware": "cpu-basic",
+        "status": "runtime-local"
+      },
+      "cloudflare": {
+        "directoryHostname": "sin-solver.delqhi.com",
+        "a2aHostname": "sin-solver.delqhi.com",
+        "mcpHostname": "sin-solver.delqhi.com"
+      },
+      "googleDocs": {
+        "documentId": "1RtoHn4I0GntuEEOHHkqoh_dMuGzgMwQz7_8oxAOpQbw",
+        "referenceTabId": "t.2ss64q1deilv",
+        "teamsRootTabId": "t.93gdhv1dh74",
+        "teamTabId": "t.4ldzbgjj6taf",
+        "agentTabId": "t.jlwvzsgk9njg"
+      },
+      "paths": {
+        "agentRoot": "~/.a2a/SIN-Solver/team-shop/A2A-SIN-TikTok-Shop",
+        "a2aRuntime": "~/.a2a/SIN-Solver/team-shop/A2A-SIN-TikTok-Shop",
+        "mcpRuntime": "~/.a2a/SIN-Solver/team-shop/A2A-SIN-TikTok-Shop",
+        "core": "~/.a2a/SIN-Solver/team-shop/A2A-SIN-TikTok-Shop"
+      },
+      "skills": [
+        "seller-session-reuse",
+        "partner-center-capture",
+        "merchant-oauth",
+        "shop-query",
+        "seller-onboarding"
+      ],
+      "commands": [
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok-shop run-action '{\"action\":\"sin.tiktok_shop.connect.status\"}'",
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok-shop run-action '{\"action\":\"sin.tiktok_shop.session.status\"}'",
+        "cd /Users/jeremy/dev/SIN-Solver && ./bin/sin-tiktok-shop run-action '{\"action\":\"sin.tiktok_shop.onboarding.status\"}'"
+      ],
+      "apiEndpoints": [
+        "run-action sin.tiktok_shop.connect.status",
+        "run-action sin.tiktok_shop.session.status",
+        "run-action sin.tiktok_shop.onboarding.status",
+        "run-action sin.tiktok_shop.shops.query"
+      ]
+    },
+    {
+      "id": "sin-passwordmanager",
+      "slug": "sin-passwordmanager",
+      "shortName": "SPM",
+      "name": "SIN-Passwordmanager",
+      "teamId": "team-infrastructur",
+      "status": "active",
+      "description": "Zentrale Secret-Authority für Simone-Infrastruktur. Verwaltet Secrets über A2A und synchronisiert sie deterministisch nach GitHub Actions, Cloudflare Workers, Vercel und Hugging Face Spaces.",
+      "repo": {
+        "name": "sin-passwordmanager",
+        "status": "scaffolded"
+      },
+      "guide": {
+        "host": "sin-passwordmanager.delqhi.com",
+        "route": "/a2a/sin-passwordmanager"
+      },
+      "a2a": {
+        "host": "spm-a2a.delqhi.com",
+        "baseUrl": "http://127.0.0.1:4646",
+        "jsonRpcPath": "/a2a/jsonrpc",
+        "restPath": "/a2a/rest",
+        "agentCardWellKnownPath": "/.well-known/agent-card.json",
+        "cardPath": "/.well-known/agent.json",
+        "oauthClientPath": "/.well-known/oauth-client.json",
+        "port": 4646
+      },
+      "mcp": {
+        "host": "spm-mcp.delqhi.com",
+        "baseUrl": "http://127.0.0.1:8650",
+        "path": "/secret-sync-http",
+        "transport": [
+          "stdio",
+          "streamable_http"
+        ],
+        "port": 8650
+      },
+      "huggingFaceSpace": {
+        "owner": "delqhi",
+        "slug": "sin-passwordmanager",
+        "sdk": "docker",
+        "hardware": "cpu-basic",
+        "status": "scaffolded"
+      },
+      "cloudflare": {
+        "directoryHostname": "sin-passwordmanager.delqhi.com",
+        "a2aHostname": "spm-a2a.delqhi.com",
+        "mcpHostname": "spm-mcp.delqhi.com"
+      },
+      "googleDocs": {
+        "documentId": "1RtoHn4I0GntuEEOHHkqoh_dMuGzgMwQz7_8oxAOpQbw",
+        "referenceTabId": "t.m4146wq7h87z",
+        "teamsRootTabId": "t.93gdhv1dh74",
+        "teamTabId": "t.hzp3hc5sub65",
+        "agentTabId": "t.75f1s05cbasi"
+      },
+      "paths": {
+        "agentRoot": "~/.a2a/SIN-Solver/team-infratructur/A2A-SIN-Passwordmanager",
+        "a2aRuntime": "workers/spm-a2a",
+        "mcpRuntime": "workers/spm-secret-sync-mcp",
+        "core": "packages/spm-core"
+      },
+      "skills": [
+        "store-secret",
+        "sync-github-actions",
+        "sync-cloudflare-worker",
+        "sync-vercel-env",
+        "sync-huggingface-space",
+        "sync-fanout"
+      ],
+      "commands": [
+        "pnpm spm:bootstrap",
+        "pnpm spm:agent",
+        "pnpm spm:ctl -- list",
+        "pnpm spm:ctl -- send '{\"action\":\"sync_all_secrets\"}'",
+        "pnpm spm:mcp"
+      ],
+      "apiEndpoints": [
+        "GET /.well-known/agent-card.json",
+        "GET /.well-known/agent.json",
+        "GET /.well-known/oauth-client.json",
+        "POST /a2a/jsonrpc",
+        "POST /a2a/rest",
+        "GET /health",
+        "POST /secret-sync-http",
+        "GET /secret-sync-http",
+        "DELETE /secret-sync-http"
+      ]
+    }
+  ]
+}
