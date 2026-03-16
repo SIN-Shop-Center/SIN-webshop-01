@@ -1,6 +1,7 @@
 package checkout
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -40,12 +41,22 @@ func (h *Handler) CreateSession(c *gin.Context) {
 	}
 	pricedItems, subtotal, err := buildPricedItems(in.Items, products)
 	if err != nil {
-		c.JSON(400, gin.H{"error": errInvalidItemPayload.Error()})
+		switch {
+		case errors.Is(err, errProductUnavailable):
+			c.JSON(409, gin.H{"error": errProductUnavailable.Error()})
+		default:
+			c.JSON(400, gin.H{"error": errInvalidItemPayload.Error()})
+		}
 		return
 	}
 	shippingAmount := shippingAmountForSubtotal(subtotal)
 	totalAmount := subtotal + shippingAmount
 	orderID := orderIDFromIdempotencyKey(idempotencyKey)
+	siteURL, err := ResolveSiteURL(h.options.SiteURL)
+	if err != nil {
+		c.JSON(503, gin.H{"error": err.Error()})
+		return
+	}
 
 	err = h.store.EnsurePendingOrder(c.Request.Context(), CreateOrderInput{
 		OrderID:          orderID,
@@ -75,7 +86,7 @@ func (h *Handler) CreateSession(c *gin.Context) {
 		Currency:       in.Currency,
 		Items:          pricedItems,
 		ShippingAmount: shippingAmount,
-		SiteURL:        fallbackSiteURL(h.options.SiteURL),
+		SiteURL:        siteURL,
 	})
 	if err != nil {
 		c.JSON(500, gin.H{"error": "stripe_checkout_session_failed"})

@@ -34,6 +34,10 @@ func queueForEvent(eventType string) string {
 		"supplier.order.requested",
 		"supplier.order.placed",
 		"supplier.order.failed",
+		"supplier.registration.requested",
+		"supplier.registration.step.completed",
+		"supplier.registration.completed",
+		"supplier.registration.failed",
 		"trend.candidate.launch.requested",
 		"channel.catalog.sync.requested",
 		"channel.campaign.publish.requested",
@@ -42,6 +46,7 @@ func queueForEvent(eventType string) string {
 		"shipment.updated",
 		"trend.analysis.requested",
 		"supplier.research.requested",
+		"supplier.catalog.sync.requested",
 		"inventory.low",
 		"ops.weekly.report.requested":
 		return "automation"

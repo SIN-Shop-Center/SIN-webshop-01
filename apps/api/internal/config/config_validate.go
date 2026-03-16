@@ -21,8 +21,27 @@ func (c Config) ValidateAPI() error {
 			problems = append(problems, fmt.Sprintf("invalid CORS origin %q", origin))
 			continue
 		}
-		if c.Environment == "production" && strings.Contains(parsed.Host, "localhost") {
-			problems = append(problems, fmt.Sprintf("localhost origin not allowed in production: %q", origin))
+		if c.Environment == "production" {
+			host := strings.ToLower(parsed.Hostname())
+			if host == "localhost" || host == "127.0.0.1" || host == "::1" {
+				problems = append(problems, fmt.Sprintf("localhost origin not allowed in production: %q", origin))
+			}
+		}
+	}
+	if c.Environment == "production" && strings.TrimSpace(c.SiteURL) != "" {
+		siteParsed, err := url.Parse(c.SiteURL)
+		if err == nil && siteParsed.Scheme != "" && siteParsed.Host != "" {
+			siteOrigin := siteParsed.Scheme + "://" + siteParsed.Host
+			found := false
+			for _, origin := range c.CORSAllowlist {
+				if strings.EqualFold(strings.TrimSpace(origin), siteOrigin) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				problems = append(problems, "CORS_ALLOWLIST must include the SITE_URL origin in production")
+			}
 		}
 	}
 
@@ -40,13 +59,26 @@ func (c Config) ValidateAPI() error {
 
 	if c.Environment == "production" {
 		required := map[string]string{
-			"STRIPE_SECRET_KEY":     c.StripeSecretKey,
-			"STRIPE_WEBHOOK_SECRET": c.StripeWebhookKey,
-			"SITE_URL":              c.SiteURL,
+			"STRIPE_SECRET_KEY":       c.StripeSecretKey,
+			"STRIPE_WEBHOOK_SECRET":   c.StripeWebhookKey,
+			"SITE_URL":                c.SiteURL,
 			"SUPPLIER_WEBHOOK_SECRET": c.SupplierWebhookSecret,
 		}
 		appendMissing(&problems, required)
+		if strings.TrimSpace(c.SiteURL) != "" {
+			parsed, err := url.Parse(c.SiteURL)
+			if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+				problems = append(problems, "SITE_URL must be a valid URL in production")
+			} else {
+				host := strings.ToLower(parsed.Hostname())
+				if host == "localhost" || host == "127.0.0.1" || host == "::1" {
+					problems = append(problems, "SITE_URL must not point to localhost in production")
+				}
+			}
+		}
 	}
+	appendOptionalR2Problems(&problems, c)
+	appendOptionalModalProblems(&problems, c)
 
 	return validateProblems("API", problems)
 }
@@ -75,7 +107,79 @@ func (c Config) ValidateWorker() error {
 			problems = append(problems, "GMAIL_API_BASE_URL must be a valid URL")
 		}
 	}
+	appendOptionalR2Problems(&problems, c)
+	appendOptionalModalProblems(&problems, c)
 	return validateProblems("worker", problems)
+}
+
+func appendOptionalR2Problems(problems *[]string, c Config) {
+	values := []string{
+		strings.TrimSpace(c.R2AccountID),
+		strings.TrimSpace(c.R2AccessKeyID),
+		strings.TrimSpace(c.R2SecretAccessKey),
+		strings.TrimSpace(c.R2Bucket),
+	}
+	setCount := 0
+	for _, value := range values {
+		if value != "" {
+			setCount++
+		}
+	}
+	if setCount == 0 {
+		return
+	}
+	if strings.TrimSpace(c.R2AccountID) == "" {
+		*problems = append(*problems, "R2_ACCOUNT_ID is required when R2 is configured")
+	}
+	if strings.TrimSpace(c.R2AccessKeyID) == "" {
+		*problems = append(*problems, "R2_ACCESS_KEY_ID is required when R2 is configured")
+	}
+	if strings.TrimSpace(c.R2SecretAccessKey) == "" {
+		*problems = append(*problems, "R2_SECRET_ACCESS_KEY is required when R2 is configured")
+	}
+	if strings.TrimSpace(c.R2Bucket) == "" {
+		*problems = append(*problems, "R2_BUCKET is required when R2 is configured")
+	}
+}
+
+func appendOptionalModalProblems(problems *[]string, c Config) {
+	values := []string{
+		strings.TrimSpace(c.ModalAPIToken),
+		strings.TrimSpace(c.ModalRenderURL),
+		strings.TrimSpace(c.ModalStatusURL),
+	}
+	setCount := 0
+	for _, value := range values {
+		if value != "" {
+			setCount++
+		}
+	}
+	if setCount == 0 {
+		return
+	}
+	if strings.TrimSpace(c.ModalRenderURL) == "" {
+		*problems = append(*problems, "MODAL_RENDER_URL is required when Modal is configured")
+	}
+	for key, raw := range map[string]string{
+		"MODAL_RENDER_URL": c.ModalRenderURL,
+		"MODAL_STATUS_URL": c.ModalStatusURL,
+	} {
+		if strings.TrimSpace(raw) == "" {
+			continue
+		}
+		if parsed, err := url.Parse(raw); err != nil || parsed.Scheme == "" || parsed.Host == "" {
+			*problems = append(*problems, fmt.Sprintf("%s must be a valid URL", key))
+		}
+	}
+	if c.ModalPollIntervalMS < 1000 {
+		*problems = append(*problems, "MODAL_POLL_INTERVAL_MS must be at least 1000")
+	}
+	if c.ModalRequestTimeoutSeconds < 30 {
+		*problems = append(*problems, "MODAL_REQUEST_TIMEOUT_SECONDS must be at least 30")
+	}
+	if c.ModalMaxVariantsPerRun < 1 {
+		*problems = append(*problems, "MODAL_MAX_VARIANTS_PER_RUN must be at least 1")
+	}
 }
 
 func appendMissing(problems *[]string, required map[string]string) {

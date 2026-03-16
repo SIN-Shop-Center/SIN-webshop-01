@@ -23,12 +23,12 @@ type PatchOrderInput struct {
 }
 
 type AutomationPolicy struct {
-	CatalogEnabled            bool `json:"catalog_enabled"`
-	CheckoutEnabled           bool `json:"checkout_enabled"`
+	CatalogEnabled             bool `json:"catalog_enabled"`
+	CheckoutEnabled            bool `json:"checkout_enabled"`
 	SupplierFulfillmentEnabled bool `json:"supplier_fulfillment_enabled"`
-	MailingEnabled            bool `json:"mailing_enabled"`
-	MaxRetryAttempts          int  `json:"max_retry_attempts"`
-	AlertThresholdMinutes     int  `json:"alert_threshold_minutes"`
+	MailingEnabled             bool `json:"mailing_enabled"`
+	MaxRetryAttempts           int  `json:"max_retry_attempts"`
+	AlertThresholdMinutes      int  `json:"alert_threshold_minutes"`
 }
 
 type SupplierOrderSummary struct {
@@ -41,6 +41,12 @@ type SupplierOrderSummary struct {
 	AttemptCount    int        `json:"attempt_count"`
 	LastError       *string    `json:"last_error,omitempty"`
 	PlacedAt        *time.Time `json:"placed_at,omitempty"`
+	DueAt           *time.Time `json:"due_at,omitempty"`
+	DiscountUntil   *time.Time `json:"discount_until,omitempty"`
+	DiscountPct     *float64   `json:"discount_pct,omitempty"`
+	PaidAt          *time.Time `json:"paid_at,omitempty"`
+	CostAmount      *int       `json:"cost_amount,omitempty"`
+	CostCurrency    string     `json:"cost_currency"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 }
 

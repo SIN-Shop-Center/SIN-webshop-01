@@ -58,5 +58,5 @@ func queryJSONObject(ctx context.Context, pool jsonRowQuerier, query string, arg
 }
 
 func notFound(err error) bool {
-	return err == pgx.ErrNoRows
+	return err == pgx.ErrNoRows || err == errNotFound
 }

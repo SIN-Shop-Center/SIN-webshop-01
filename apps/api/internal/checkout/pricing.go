@@ -11,19 +11,22 @@ var (
 	errInvalidCustomerType    = errors.New("invalid_customer_type")
 	errInvalidB2BFields       = errors.New("invalid_b2b_fields")
 	errInvalidCurrency        = errors.New("invalid_currency")
+	errInvalidEmail           = errors.New("invalid_email")
 	errInvalidShippingAddress = errors.New("invalid_shipping_address")
 	errInvalidItemPayload     = errors.New("invalid_item_payload")
+	errProductUnavailable     = errors.New("product_unavailable_for_checkout")
 )
 
 type CatalogProduct struct {
-	ID              string
-	SKU             string
-	Name            string
-	UnitPriceAmount int
+	ID               string
+	SKU              string
+	Name             string
+	UnitPriceAmount  int
+	ReadyForCheckout bool
 }
 
 func normalizeAndValidateSessionRequest(in *SessionRequest) error {
-	in.Email = strings.TrimSpace(strings.ToLower(in.Email))
+	in.Email = normalizeEmail(in.Email)
 	in.Currency = strings.ToUpper(strings.TrimSpace(in.Currency))
 	if in.Currency == "" {
 		in.Currency = "EUR"
@@ -37,6 +40,9 @@ func normalizeAndValidateSessionRequest(in *SessionRequest) error {
 	if in.Email == "" || len(in.Items) == 0 {
 		return errMissingRequiredFields
 	}
+	if !validCheckoutEmail(in.Email) {
+		return errInvalidEmail
+	}
 	if in.Currency != "EUR" {
 		return errInvalidCurrency
 	}
@@ -48,11 +54,15 @@ func normalizeAndValidateSessionRequest(in *SessionRequest) error {
 			return errInvalidB2BFields
 		}
 	}
-	if missingAddress(in.ShippingAddress) {
+	if !normalizeAndValidateAddress(&in.ShippingAddress) {
 		return errInvalidShippingAddress
 	}
-	for _, item := range in.Items {
-		if strings.TrimSpace(item.SKU) == "" || item.Quantity <= 0 {
+	if len(in.Items) > maxCheckoutItems {
+		return errInvalidItemPayload
+	}
+	for index := range in.Items {
+		in.Items[index].SKU = strings.TrimSpace(in.Items[index].SKU)
+		if in.Items[index].SKU == "" || invalidItemQuantity(in.Items[index].Quantity) {
 			return errInvalidItemPayload
 		}
 	}
@@ -68,6 +78,9 @@ func buildPricedItems(items []SessionItem, products map[string]CatalogProduct) (
 		product, ok := products[key]
 		if !ok || product.UnitPriceAmount <= 0 {
 			return nil, 0, fmt.Errorf("%w:%s", errInvalidItemPayload, key)
+		}
+		if !product.ReadyForCheckout {
+			return nil, 0, fmt.Errorf("%w:%s", errProductUnavailable, key)
 		}
 		title := strings.TrimSpace(product.Name)
 		if title == "" {
@@ -106,21 +119,4 @@ func shippingAmountForSubtotal(subtotal int) int {
 func tooShortOptional(v string) bool {
 	trimmed := strings.TrimSpace(v)
 	return trimmed != "" && len(trimmed) < 2
-}
-
-func missingAddress(addr ShippingAddress) bool {
-	required := []string{
-		addr.FirstName,
-		addr.LastName,
-		addr.Street1,
-		addr.City,
-		addr.Zip,
-		addr.Country,
-	}
-	for _, entry := range required {
-		if strings.TrimSpace(entry) == "" {
-			return true
-		}
-	}
-	return false
 }

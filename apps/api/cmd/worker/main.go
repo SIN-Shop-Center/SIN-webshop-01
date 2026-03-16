@@ -9,6 +9,7 @@ import (
 	"simone-webshop/apps/api/internal/config"
 	"simone-webshop/apps/api/internal/db"
 	"simone-webshop/apps/api/internal/events"
+	"simone-webshop/apps/api/internal/objectstore"
 	"simone-webshop/apps/api/internal/worker"
 )
 
@@ -24,6 +25,17 @@ func main() {
 	}
 	defer pool.Close()
 
+	r2Client, err := objectstore.NewR2(context.Background(), objectstore.R2Config{
+		AccountID:       cfg.R2AccountID,
+		AccessKeyID:     cfg.R2AccessKeyID,
+		SecretAccessKey: cfg.R2SecretAccessKey,
+		Bucket:          cfg.R2Bucket,
+		PresignTTL:      time.Duration(cfg.R2PresignTTLSeconds) * time.Second,
+	})
+	if err != nil {
+		log.Fatalf("r2 configuration failed: %v", err)
+	}
+
 	ctx := context.Background()
 	store := worker.NewStore(pool)
 	processor := worker.NewProcessor(pool, worker.Options{
@@ -37,8 +49,23 @@ func main() {
 		BillingTaxID:                cfg.BillingTaxID,
 		BillingVATID:                cfg.BillingVATID,
 		InvoiceOutputDir:            cfg.InvoiceOutputDir,
+		SiteURL:                     cfg.SiteURL,
 		N8NWebhookURL:               cfg.N8NWebhookURL,
 		N8NSharedSecret:             cfg.N8NSharedSecret,
+		TikTokBrowserRunnerToken:    cfg.TikTokBrowserRunnerToken,
+		NVIDIAAPIKey:                cfg.NVIDIAAPIKey,
+		NVIDIAReasonURL:             cfg.NVIDIAReasonURL,
+		NVIDIAPredictURL:            cfg.NVIDIAPredictURL,
+		NVIDIATransferURL:           cfg.NVIDIATransferURL,
+		NVIDIAMaxLiveVariantsPerRun: cfg.NVIDIAMaxLiveVariantsPerRun,
+		NVIDIAMinRequestInterval:    time.Duration(cfg.NVIDIAMinRequestIntervalMS) * time.Millisecond,
+		ModalAPIToken:               cfg.ModalAPIToken,
+		ModalRenderURL:              cfg.ModalRenderURL,
+		ModalStatusURL:              cfg.ModalStatusURL,
+		ModalPollInterval:           time.Duration(cfg.ModalPollIntervalMS) * time.Millisecond,
+		ModalRequestTimeout:         time.Duration(cfg.ModalRequestTimeoutSeconds) * time.Second,
+		ModalMaxVariantsPerRun:      cfg.ModalMaxVariantsPerRun,
+		R2Client:                    r2Client,
 	})
 	workerName := os.Getenv("WORKER_NAME")
 	if workerName == "" {

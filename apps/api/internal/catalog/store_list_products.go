@@ -24,8 +24,12 @@ func (s *Store) ListProducts(ctx context.Context, filter ProductFilter) ([]Produ
   join public.suppliers s on s.id = sc.supplier_id
   where s.auto_fulfill_enabled = true
     and s.status in ('approved', 'active')
+    and s.onboarding_status = 'connected'
+    and s.compliance_state = 'approved'
     and (
-      (s.fulfillment_mode = 'api' and coalesce(nullif(s.api_endpoint, ''), '') <> '')
+      (s.fulfillment_mode = 'api'
+        and coalesce(nullif(s.api_endpoint, ''), '') <> ''
+        and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
       or
       (s.fulfillment_mode = 'email' and coalesce(nullif(s.contact_email, ''), nullif(s.email, '')) <> '')
     )

@@ -18,6 +18,18 @@ func NewStripeClient(secretKey string) *StripeClient {
 	return &StripeClient{secretKey: strings.TrimSpace(secretKey)}
 }
 
+func buildStripeSuccessURL(siteURL, orderID string) string {
+	return fmt.Sprintf("%s/checkout/success?order_id=%s&session_id={CHECKOUT_SESSION_ID}", siteURL, orderID)
+}
+
+func buildStripeCancelURL(siteURL, orderID string) string {
+	return fmt.Sprintf("%s/checkout?cancelled=true&order_id=%s", siteURL, orderID)
+}
+
+func buildStripePaymentMethodTypes() []string {
+	return []string{"card", "link"}
+}
+
 func (s *StripeClient) CreateHostedCheckout(input StripeSessionInput) (StripeSessionOutput, error) {
 	if s.secretKey == "" {
 		return StripeSessionOutput{}, errors.New("stripe_secret_key_missing")
@@ -26,8 +38,8 @@ func (s *StripeClient) CreateHostedCheckout(input StripeSessionInput) (StripeSes
 	if currency == "" {
 		currency = "eur"
 	}
-	successURL := fmt.Sprintf("%s/checkout/success?order_id=%s&session_id={CHECKOUT_SESSION_ID}", input.SiteURL, input.OrderID)
-	cancelURL := fmt.Sprintf("%s/checkout?cancelled=true&order_id=%s", input.SiteURL, input.OrderID)
+	successURL := buildStripeSuccessURL(input.SiteURL, input.OrderID)
+	cancelURL := buildStripeCancelURL(input.SiteURL, input.OrderID)
 
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
@@ -39,7 +51,7 @@ func (s *StripeClient) CreateHostedCheckout(input StripeSessionInput) (StripeSes
 		},
 	}
 	params.SetIdempotencyKey(input.IdempotencyKey)
-	params.PaymentMethodTypes = stripe.StringSlice([]string{"card"})
+	params.PaymentMethodTypes = stripe.StringSlice(buildStripePaymentMethodTypes())
 
 	for _, item := range input.Items {
 		params.LineItems = append(params.LineItems, &stripe.CheckoutSessionLineItemParams{

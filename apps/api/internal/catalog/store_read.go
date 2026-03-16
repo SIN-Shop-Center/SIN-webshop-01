@@ -36,6 +36,30 @@ select
 from public.products p
 left join public.categories c on c.id = p.category_id
 where p.is_active = true
+  and exists (
+    with supplier_candidates as (
+      select ps.supplier_id
+      from public.product_suppliers ps
+      where ps.product_id = p.id
+        and ps.is_active = true
+      union
+      select p.supplier_id
+    )
+    select 1
+    from supplier_candidates sc
+    join public.suppliers s on s.id = sc.supplier_id
+    where s.auto_fulfill_enabled = true
+      and s.status in ('approved', 'active')
+      and s.onboarding_status = 'connected'
+      and s.compliance_state = 'approved'
+      and (
+        (s.fulfillment_mode = 'api'
+          and coalesce(nullif(s.api_endpoint, ''), '') <> ''
+          and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
+        or
+        (s.fulfillment_mode = 'email' and coalesce(nullif(s.contact_email, ''), nullif(s.email, '')) <> '')
+      )
+  )
   and (p.id::text = $1 or p.slug = $1)
 limit 1
 `

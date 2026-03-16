@@ -5,14 +5,30 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"simone-webshop/apps/api/internal/objectstore"
+	"simone-webshop/apps/api/internal/suppliers"
 )
 
 type Handler struct {
-	store *Store
+	store          *Store
+	suppliersStore *suppliers.Store
+	r2             *objectstore.R2Client
 }
 
-func NewHandler(pool *pgxpool.Pool) *Handler {
-	return &Handler{store: NewStore(pool)}
+type Options struct {
+	R2Client *objectstore.R2Client
+}
+
+func NewHandler(pool *pgxpool.Pool, options ...Options) *Handler {
+	var resolved Options
+	if len(options) > 0 {
+		resolved = options[0]
+	}
+	return &Handler{
+		store:          NewStore(pool),
+		suppliersStore: suppliers.NewStore(pool),
+		r2:             resolved.R2Client,
+	}
 }
 
 func (h *Handler) ListOrders(c *gin.Context) {

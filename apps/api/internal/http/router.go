@@ -1,6 +1,9 @@
 package http
 
 import (
+	"context"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"simone-webshop/apps/api/internal/account"
@@ -13,9 +16,11 @@ import (
 	"simone-webshop/apps/api/internal/config"
 	"simone-webshop/apps/api/internal/http/handlers"
 	"simone-webshop/apps/api/internal/http/middleware"
+	"simone-webshop/apps/api/internal/objectstore"
 	"simone-webshop/apps/api/internal/orders"
 	"simone-webshop/apps/api/internal/promotions"
 	"simone-webshop/apps/api/internal/social"
+	"simone-webshop/apps/api/internal/storefront"
 	"simone-webshop/apps/api/internal/suppliers"
 	"simone-webshop/apps/api/internal/support"
 )
@@ -66,6 +71,21 @@ func NewRouter(cfg config.Config, pool *pgxpool.Pool) *gin.Engine {
 	api.GET("/checkout/session-status", checkoutH.SessionStatus)
 	api.POST("/webhooks/stripe", checkoutH.StripeWebhook)
 
+	storefrontH := storefront.NewHandler(pool, storefront.Options{
+		SiteURL:         cfg.SiteURL,
+		StripeSecretKey: cfg.StripeSecretKey,
+	})
+	storeG := api.Group("/store")
+	storeG.GET("/cart", storefrontH.GetCart)
+	storeG.POST("/cart/items", storefrontH.AddCartItem)
+	storeG.PATCH("/cart/items/:sku", storefrontH.PatchCartItem)
+	storeG.DELETE("/cart/items/:sku", storefrontH.DeleteCartItem)
+	storeG.DELETE("/cart", storefrontH.ClearCart)
+	storeG.GET("/checkout/session", storefrontH.GetCheckoutSession)
+	storeG.POST("/checkout/session", storefrontH.CreateCheckoutSession)
+	storeG.GET("/orders/lookup", storefrontH.GetOrder)
+	storeG.POST("/access-requests", storefrontH.CreateAccessRequest)
+
 	ordersH := orders.NewHandler(pool)
 	ordG := api.Group("/orders", authn.Middleware(), middleware.RequireRoles("customer", "admin", "ops", "support"))
 	ordG.GET("", ordersH.ListOrders)
@@ -76,7 +96,18 @@ func NewRouter(cfg config.Config, pool *pgxpool.Pool) *gin.Engine {
 	accountG.GET("/me", accountH.GetMe)
 	accountG.PATCH("/me", accountH.PatchMe)
 
-	adminH := admin.NewHandler(pool)
+	r2Client, err := objectstore.NewR2(context.Background(), objectstore.R2Config{
+		AccountID:       cfg.R2AccountID,
+		AccessKeyID:     cfg.R2AccessKeyID,
+		SecretAccessKey: cfg.R2SecretAccessKey,
+		Bucket:          cfg.R2Bucket,
+		PresignTTL:      time.Duration(cfg.R2PresignTTLSeconds) * time.Second,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	adminH := admin.NewHandler(pool, admin.Options{R2Client: r2Client})
 	aiH := ai.NewHandler(pool, ai.Options{ProviderURL: cfg.OpenCodeURL, ProviderKey: cfg.OpenCodeAPIKey, Model: cfg.OpenCodeModel})
 	socialH := social.NewHandler(pool)
 	suppliersH := suppliers.NewHandler(pool, suppliers.Options{

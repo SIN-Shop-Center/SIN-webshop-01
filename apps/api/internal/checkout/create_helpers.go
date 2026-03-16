@@ -2,10 +2,14 @@ package checkout
 
 import (
 	"errors"
+	"net/url"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 )
+
+var errSiteURLMissing = errors.New("site_url_missing")
+var errSiteURLInvalid = errors.New("site_url_invalid")
 
 func collectItemIdentifiers(items []SessionItem) []string {
 	seen := make(map[string]struct{}, len(items))
@@ -38,10 +42,14 @@ func toSessionResponse(row *CheckoutSessionRecord) SessionResponse {
 	}
 }
 
-func fallbackSiteURL(siteURL string) string {
+func ResolveSiteURL(siteURL string) (string, error) {
 	trimmed := strings.TrimSpace(siteURL)
 	if trimmed == "" {
-		return "http://localhost:3000"
+		return "", errSiteURLMissing
 	}
-	return trimmed
+	parsed, err := url.Parse(trimmed)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return "", errSiteURLInvalid
+	}
+	return strings.TrimRight(trimmed, "/"), nil
 }

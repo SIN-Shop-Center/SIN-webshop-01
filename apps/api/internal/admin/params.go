@@ -19,12 +19,15 @@ type ProductListParams struct {
 }
 
 type SupplierListParams struct {
-	Page      int
-	Limit     int
-	Search    string
-	Status    string
-	SortBy    string
-	SortOrder string
+	Page             int
+	Limit            int
+	Search           string
+	Status           string
+	Country          string
+	OnboardingStatus string
+	ComplianceState  string
+	SortBy           string
+	SortOrder        string
 }
 
 type BlogListParams struct {
@@ -44,4 +47,12 @@ type PromotionListParams struct {
 	IsActive  *bool
 	SortBy    string
 	SortOrder string
+}
+
+type UGCGenerationListParams struct {
+	Page        int
+	Limit       int
+	Status      string
+	ProductID   string
+	TriggerMode string
 }
