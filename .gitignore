@@ -22,6 +22,12 @@ workers/*/dist/
 .env.development.local
 .env.test.local
 .env.production.local
+!secrets/
+!secrets/*.enc.env
+secrets/*.dec.env
+secrets/*.plain.env
+secrets/*.tmp.env
+secrets/*.runtime.env
 
 # Debug
 npm-debug.log*
@@ -50,9 +56,37 @@ coverage/
 *.pid
 *.seed
 output/
+/.tools/
+/.notebooklm-mcp-cli/
+/.npm-cache/
+apps/web/.npm-cache/
+/tmp/
+/live-*.png
+/mid-scroll-*.png
 pnpm-lock.yaml
 /package-lock.json
 
 # Go test temp dirs
 apps/api/.go-tmp-exec/
 apps/api/.gotmp/
+
+# Wrangler temp artifacts
+.wrangler/
+
+# Playwright CLI artifacts
+.playwright-cli/
+
+# Codex home
+.codex-home/
+
+# Serena
+.serena/
+
+# Screenshots in root (dev artifacts)
+/header-icons-*.png
+/pdp-*.png
+/plp-*.png
+
+# Patch/orig leftovers
+*.orig
+*.patch
