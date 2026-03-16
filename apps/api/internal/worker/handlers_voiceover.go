@@ -36,6 +36,6 @@ func (p *Processor) GenerateVoiceover(ctx context.Context, job Job) error {
 		return fmt.Errorf("failed to generate WasmTtsEngine voiceover: %w", err)
 	}
 
-	p.logger.Info("Voiceover generated", "url", res["audio_url"])
+	fmt.Printf("Voiceover generated url=%v\n", res["audio_url"])
 	return nil
 }

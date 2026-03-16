@@ -13,7 +13,7 @@ import {
 } from './lib/google-api.mjs'
 import { loadLocalEnvFiles, readArgValue } from './lib/cli-env.mjs'
 
-const DEFAULT_DOCUMENT_ID = '1tz_dx8OVLqHEGVP46FhB8IrVYKl_XKuhW9M1rsMk_mU'
+const DEFAULT_DOCUMENT_ID = '1CWNvxXU7aXgO2rCA_RzCkTILuO34_e09vwCWISoOijQ'
 const DOCS_SCOPE = 'https://www.googleapis.com/auth/documents'
 const DEFAULT_TAB_TITLE = 'DESIGN.md'
 const INSERT_MARKER = 'BROWSER_WORKFLOW_GOVERNANCE_DEFINITIONS_V2'

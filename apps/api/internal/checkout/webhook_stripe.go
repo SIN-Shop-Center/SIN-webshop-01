@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/stripe/stripe-go/v78"
-	"github.com/stripe/stripe-go/v78/webhook"
+	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/webhook"
 )
 
 type SupabaseOrderClient interface {

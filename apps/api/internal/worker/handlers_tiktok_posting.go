@@ -30,6 +30,6 @@ func (p *Processor) HandleTikTokVideoPosting(ctx context.Context, job Job) error
 		return fmt.Errorf("failed to post video to TikTok: %w", err)
 	}
 
-	p.logger.Info("TikTok Video Posted Successfully", "response", res)
+	fmt.Printf("TikTok Video Posted Successfully response=%v\n", res)
 	return nil
 }

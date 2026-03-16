@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+type OrderStore interface {
+	GetOrderByID(ctx context.Context, id string) (*OrderSummary, error)
+}
+
 type ChatbotRequest struct {
 	Query     string `json:"query"`
 	OrderID   string `json:"order_id,omitempty"`
@@ -28,7 +32,7 @@ func HandleSupportChat(ctx context.Context, req ChatbotRequest, orderStore Order
 				return ChatbotResponse{Answer: "Leider konnte ich Ihre Bestellung nicht finden.", Handover: true}, nil
 			}
 			return ChatbotResponse{
-				Answer: fmt.Sprintf("Ihre Bestellung %s hat den Status: %s. Sendungsnummer: %s", order.ID, order.Status, order.TrackingNumber),
+				Answer: fmt.Sprintf("Ihre Bestellung %s hat den Status: %s.", order.ID, order.Status),
 			}, nil
 		}
 		return ChatbotResponse{Answer: "Bitte geben Sie Ihre Bestellnummer an.", Action: "request_order_id"}, nil
