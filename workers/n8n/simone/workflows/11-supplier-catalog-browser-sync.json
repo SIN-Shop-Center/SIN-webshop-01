@@ -1,0 +1,315 @@
+{
+  "name": "11 - Supplier Catalog Browser Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supplier-catalog-browser",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook - Browser Harvest Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 340]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event_type }}",
+              "value2": "supplier.catalog.browser.requested"
+            }
+          ]
+        }
+      },
+      "id": "if-catalog-browser-event",
+      "name": "Supplier Catalog Browser Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "const envelope = $input.first().json || {};\nconst payload = envelope.payload || {};\n\nconst trim = (value) => String(value || '').trim();\nconst candidateUrls = Array.isArray(payload.candidate_urls)\n  ? payload.candidate_urls.map((value) => trim(value)).filter(Boolean)\n  : [];\nconst siteBaseUrl = trim(payload.site_url || $env.SITE_URL || $env.SIMONE_WEB_BASE_URL || $env.NEXT_PUBLIC_SITE_URL || '').replace(/\\/$/, '');\nconst callbackPath = trim(payload.callback_path || '/api/admin/suppliers/catalog-sync/callback');\nconst callbackUrl = trim(payload.callback_url || (siteBaseUrl ? `${siteBaseUrl}${callbackPath}` : ''));\nconst rawRunnerUrl = trim(\n  payload.browser_runner_url ||\n  $env.SUPPLIER_BROWSER_RUNNER_URL ||\n  $env.BROWSER_RUNNER_WEBHOOK_URL ||\n  (siteBaseUrl ? `${siteBaseUrl}/api/automation/supplier-catalog-browser/catalog-harvest` : '')\n);\nconst runnerRequestUrl = rawRunnerUrl\n  ? (rawRunnerUrl.endsWith('/catalog-harvest') ? rawRunnerUrl : `${rawRunnerUrl}/catalog-harvest`)\n  : '';\nconst callbackSecret = trim(\n  $env.SUPPLIER_CALLBACK_SECRET ||\n  $env.SUPPLIER_ONBOARDING_CALLBACK_SECRET ||\n  $env.SUPPLIER_WEBHOOK_SECRET ||\n  $env.N8N_SHARED_SECRET ||\n  ''\n);\nconst internalToken = trim($env.SUPPLIER_BROWSER_RUNNER_TOKEN || callbackSecret);\n\nreturn [{\n  json: {\n    eventType: trim(envelope.event_type),\n    supplierId: trim(payload.supplier_id),\n    supplierName: trim(payload.supplier_name),\n    targetUrl: trim(payload.target_url || candidateUrls[0] || ''),\n    candidateUrls,\n    callbackPath,\n    callbackUrl,\n    callbackSecret,\n    internalToken,\n    browserRunnerUrl: rawRunnerUrl,\n    runnerRequestUrl,\n    catalogStatus: trim(payload.catalog_status || 'new') || 'new',\n    browserRecipe: payload.browser_recipe || {},\n    requestPayload: payload.request_payload || {},\n    failureReason: trim(payload.failure_reason),\n    failedSource: trim(payload.failed_source),\n    runnerConfigured: Boolean(runnerRequestUrl && callbackUrl && callbackSecret && internalToken)\n  }\n}];"
+      },
+      "id": "normalize-browser-request",
+      "name": "Browser-Auftrag normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.runnerConfigured }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-runner-configured",
+      "name": "Browser Runner konfiguriert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 240]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.runnerRequestUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Simone-Internal-Token",
+              "value": "={{ $json.internalToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"supplier_id\": $json.supplierId,\n  \"supplier_name\": $json.supplierName,\n  \"target_url\": $json.targetUrl,\n  \"candidate_urls\": $json.candidateUrls,\n  \"catalog_status\": $json.catalogStatus,\n  \"browser_recipe\": $json.browserRecipe,\n  \"request_payload\": $json.requestPayload,\n  \"failure_reason\": $json.failureReason,\n  \"failed_source\": $json.failedSource\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "request-browser-runner",
+      "name": "Browser Runner anstoßen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1120, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $node['Browser-Auftrag normalisieren'].json || {};\nconst response = $input.first().json || {};\nconst crypto = require('crypto');\n\nconst trim = (value) => String(value || '').trim();\nconst rawItems = Array.isArray(response.items)\n  ? response.items\n  : Array.isArray(response.products)\n    ? response.products\n    : [];\nconst harvestedAt = new Date().toISOString();\n\nconst items = rawItems.map((item, index) => {\n  const title = trim(item.title || item.name || item.product_name);\n  if (!title) {\n    return null;\n  }\n\n  return {\n    external_product_id: trim(item.external_product_id || item.external_id || item.id || `${request.supplierId}-${index + 1}`),\n    supplier_sku: trim(item.supplier_sku || item.sku),\n    title,\n    description: trim(item.description || item.body),\n    source_url: trim(item.source_url || item.url || request.targetUrl),\n    image_url: trim(item.image_url || item.image || item.thumbnail),\n    currency: trim(item.currency || 'EUR').toUpperCase() || 'EUR',\n    price: item.price ?? null,\n    compare_at_price: item.compare_at_price ?? null,\n    minimum_order_quantity: item.minimum_order_quantity ?? null,\n    stock_hint: item.stock_hint ?? null,\n    lead_time_days: item.lead_time_days ?? null,\n    status: trim(item.status || request.catalogStatus || 'new') || 'new',\n    review_note: trim(item.review_note),\n    ai_score: item.ai_score ?? null,\n    metadata: {\n      ...(item.metadata || {}),\n      harvest_target_url: request.targetUrl,\n      harvested_at: harvestedAt,\n      browser_source: 'n8n_browser_runner',\n      browser_recipe: request.browserRecipe || {},\n      runner_status: trim(response.status || 'completed') || 'completed'\n    }\n  };\n}).filter(Boolean);\n\nconst callbackBody = {\n  supplier_id: request.supplierId,\n  items,\n  source: 'browser_runner',\n  synced_at: harvestedAt,\n  metadata: {\n    target_url: request.targetUrl,\n    candidate_urls: request.candidateUrls,\n    browser_recipe: request.browserRecipe || {},\n    failed_source: request.failedSource,\n    failure_reason: request.failureReason,\n    runner_status: trim(response.status || 'completed') || 'completed'\n  }\n};\n\nconst serializedBody = JSON.stringify(callbackBody);\nconst signature = request.callbackSecret\n  ? `sha256=${crypto.createHmac('sha256', request.callbackSecret).update(serializedBody).digest('hex')}`\n  : '';\n\nreturn [{\n  json: {\n    callbackUrl: request.callbackUrl,\n    callbackBody,\n    serializedBody,\n    signature,\n    itemsCount: items.length\n  }\n}];"
+      },
+      "id": "prepare-callback-payload",
+      "name": "Callback Payload vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 160]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.itemsCount }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "if-items-found",
+      "name": "Produkte gefunden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1560, 160]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.callbackUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Simone-Signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.callbackBody }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "send-catalog-callback",
+      "name": "Catalog Callback senden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1780, 80]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, status: 'catalog_callback_sent', supplierId: $node['Browser-Auftrag normalisieren'].json.supplierId, itemsCount: $node['Callback Payload vorbereiten'].json.itemsCount }) }}"
+      },
+      "id": "respond-success",
+      "name": "Erfolg zurückgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2000, 80]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, ignored: true, reason: 'event_type_not_supported' }) }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "respond-ignored",
+      "name": "Ignorieren",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 460]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'browser_runner_not_configured', requiredInputs: ['payload.callback_url or SITE_URL', 'payload.browser_runner_url or SUPPLIER_BROWSER_RUNNER_URL', 'SUPPLIER_WEBHOOK_SECRET or N8N_SHARED_SECRET'] }) }}",
+        "options": {
+          "responseCode": 412
+        }
+      },
+      "id": "respond-runner-missing",
+      "name": "Konfiguration fehlt",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'browser_runner_returned_no_products', supplierId: $node['Browser-Auftrag normalisieren'].json.supplierId }) }}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "id": "respond-no-products",
+      "name": "Keine Produkte gefunden",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1780, 240]
+    }
+  ],
+  "connections": {
+    "Webhook - Browser Harvest Event": {
+      "main": [
+        [
+          {
+            "node": "Supplier Catalog Browser Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supplier Catalog Browser Event?": {
+      "main": [
+        [
+          {
+            "node": "Browser-Auftrag normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser-Auftrag normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Browser Runner konfiguriert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser Runner konfiguriert?": {
+      "main": [
+        [
+          {
+            "node": "Browser Runner anstoßen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Konfiguration fehlt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser Runner anstoßen": {
+      "main": [
+        [
+          {
+            "node": "Callback Payload vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Payload vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Produkte gefunden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Produkte gefunden?": {
+      "main": [
+        [
+          {
+            "node": "Catalog Callback senden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Keine Produkte gefunden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catalog Callback senden": {
+      "main": [
+        [
+          {
+            "node": "Erfolg zurückgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["suppliers", "catalog", "browser", "automation"],
+  "triggerCount": 0,
+  "active": true
+}

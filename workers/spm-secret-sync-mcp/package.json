@@ -1,0 +1,20 @@
+{
+  "name": "@simone/spm-secret-sync-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/check.mjs",
+    "lint": "node ./scripts/check.mjs",
+    "typecheck": "node ./scripts/check.mjs",
+    "test": "node --test ./test/*.test.mjs",
+    "start": "node ./src/server.mjs",
+    "start:http": "SPM_MCP_TRANSPORT=http node ./src/server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@simone/spm-core": "workspace:*",
+    "express": "^5.1.0",
+    "zod": "^3.25.76"
+  }
+}

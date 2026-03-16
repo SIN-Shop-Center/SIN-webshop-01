@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "echo \"n8n workflows are json assets\"",
-    "lint": "echo \"no n8n linter configured\"",
-    "typecheck": "echo \"n8n typecheck not wired\"",
-    "test": "echo \"no n8n tests yet\""
+    "build": "node ../../scripts/check-n8n-workflows.mjs",
+    "lint": "node ../../scripts/check-n8n-workflows.mjs",
+    "typecheck": "node ../../scripts/check-n8n-workflows.mjs",
+    "test": "node ../../scripts/check-n8n-workflows.mjs"
   }
 }

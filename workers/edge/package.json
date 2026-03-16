@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "echo \"supabase edge functions are runtime sources\"",
-    "lint": "echo \"no edge linter configured\"",
-    "typecheck": "echo \"typecheck via supabase CLI not wired\"",
-    "test": "echo \"no edge tests yet\""
+    "build": "node ../../scripts/check-workers-edge.mjs",
+    "lint": "node ../../scripts/check-workers-edge.mjs",
+    "typecheck": "node ../../scripts/check-workers-edge.mjs",
+    "test": "node ../../scripts/check-workers-edge.mjs"
   }
 }

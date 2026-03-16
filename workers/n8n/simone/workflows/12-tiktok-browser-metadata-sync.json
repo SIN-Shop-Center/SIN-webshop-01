@@ -1,0 +1,313 @@
+{
+  "name": "12 - TikTok Browser Metadata Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tiktok-browser-metadata",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook - TikTok Metadata Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 340]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event_type }}",
+              "value2": "channel.connect.browser_metadata.requested"
+            }
+          ]
+        }
+      },
+      "id": "if-tiktok-browser-event",
+      "name": "TikTok Browser Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "const envelope = $input.first().json || {};\nconst payload = envelope.payload || {};\n\nconst trim = (value) => String(value || '').trim();\nconst candidateUrls = Array.isArray(payload.candidate_urls)\n  ? payload.candidate_urls.map((value) => trim(value)).filter(Boolean)\n  : [];\nconst siteBaseUrl = trim(payload.site_url || $env.SITE_URL || $env.SIMONE_WEB_BASE_URL || $env.NEXT_PUBLIC_SITE_URL || '').replace(/\\/$/, '');\nconst callbackPath = trim(payload.callback_path || '/api/admin/channels/tiktok/connect/browser-metadata/callback');\nconst callbackUrl = trim(payload.callback_url || (siteBaseUrl ? `${siteBaseUrl}${callbackPath}` : ''));\nconst rawRunnerUrl = trim(\n  payload.browser_runner_url ||\n  $env.TIKTOK_BROWSER_METADATA_RUNNER_URL ||\n  $env.BROWSER_RUNNER_WEBHOOK_URL ||\n  (siteBaseUrl ? `${siteBaseUrl}/api/automation/tiktok-shop/browser-metadata` : '')\n);\nconst runnerRequestUrl = rawRunnerUrl || '';\nconst callbackSecret = trim(\n  $env.TIKTOK_SHOP_CALLBACK_SECRET ||\n  $env.N8N_SHARED_SECRET ||\n  $env.SUPPLIER_WEBHOOK_SECRET ||\n  ''\n);\nconst internalToken = trim($env.TIKTOK_BROWSER_RUNNER_TOKEN || callbackSecret);\n\nreturn [{\n  json: {\n    eventType: trim(envelope.event_type),\n    channel: trim(payload.channel || 'tiktok'),\n    stateToken: trim(payload.state_token),\n    browserSessionRef: trim(payload.browser_session_ref),\n    targetUrl: trim(payload.target_url || candidateUrls[0] || ''),\n    candidateUrls,\n    callbackPath,\n    callbackUrl,\n    callbackSecret,\n    internalToken,\n    browserRunnerUrl: rawRunnerUrl,\n    runnerRequestUrl,\n    browserRecipe: payload.browser_recipe || {},\n    requestPayload: payload.request_payload || {},\n    runnerConfigured: Boolean(runnerRequestUrl && callbackUrl && callbackSecret && internalToken)\n  }\n}];"
+      },
+      "id": "normalize-browser-request",
+      "name": "Browser-Auftrag normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.runnerConfigured }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-runner-configured",
+      "name": "Browser Runner konfiguriert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 240]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.runnerRequestUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Simone-Internal-Token",
+              "value": "={{ $json.internalToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": $json.channel,\n  \"state_token\": $json.stateToken,\n  \"browser_session_ref\": $json.browserSessionRef,\n  \"target_url\": $json.targetUrl,\n  \"candidate_urls\": $json.candidateUrls,\n  \"browser_recipe\": $json.browserRecipe,\n  \"request_payload\": $json.requestPayload\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "request-browser-runner",
+      "name": "Browser Runner anstoßen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1120, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $node['Browser-Auftrag normalisieren'].json || {};\nconst response = $input.first().json || {};\nconst crypto = require('crypto');\n\nconst trim = (value) => String(value || '').trim();\nconst availableShops = Array.isArray(response.available_shops)\n  ? response.available_shops\n  : Array.isArray(response.shops)\n    ? response.shops\n    : [];\nconst callbackBody = {\n  channel: request.channel,\n  state_token: request.stateToken,\n  merchant_id: trim(response.merchant_id || response.seller_id),\n  seller_id: trim(response.seller_id || response.merchant_id),\n  shop_id: trim(response.shop_id),\n  shop_cipher: trim(response.shop_cipher || response.third_shop_id),\n  third_shop_id: trim(response.third_shop_id || response.shop_cipher),\n  shop_name: trim(response.shop_name),\n  shop_region: trim(response.shop_region),\n  browser_session_ref: trim(response.browser_session_ref || request.browserSessionRef),\n  source_url: trim(response.source_url || response.current_url || request.targetUrl),\n  available_shops: availableShops,\n  status: trim(response.status || 'completed') || 'completed'\n};\n\nconst serializedBody = JSON.stringify(callbackBody);\nconst signature = request.callbackSecret\n  ? `sha256=${crypto.createHmac('sha256', request.callbackSecret).update(serializedBody).digest('hex')}`\n  : '';\n\nreturn [{\n  json: {\n    callbackUrl: request.callbackUrl,\n    callbackBody,\n    serializedBody,\n    signature,\n    metadataFound: Boolean(callbackBody.merchant_id || callbackBody.shop_id || callbackBody.shop_cipher || availableShops.length)\n  }\n}];"
+      },
+      "id": "prepare-callback-payload",
+      "name": "Callback Payload vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 160]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.metadataFound }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-metadata-found",
+      "name": "Metadaten gefunden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1560, 160]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.callbackUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Simone-Signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.callbackBody }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "send-metadata-callback",
+      "name": "Metadata Callback senden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1780, 80]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, status: 'metadata_callback_sent', channel: $node['Browser-Auftrag normalisieren'].json.channel, stateToken: $node['Browser-Auftrag normalisieren'].json.stateToken }) }}"
+      },
+      "id": "respond-success",
+      "name": "Erfolg zurückgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2000, 80]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, ignored: true, reason: 'event_type_not_supported' }) }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "respond-ignored",
+      "name": "Ignorieren",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 460]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'browser_runner_not_configured', requiredInputs: ['payload.callback_url or SITE_URL', 'payload.browser_runner_url or TIKTOK_BROWSER_METADATA_RUNNER_URL', 'TIKTOK_SHOP_CALLBACK_SECRET or N8N_SHARED_SECRET', 'TIKTOK_BROWSER_RUNNER_TOKEN'] }) }}",
+        "options": {
+          "responseCode": 412
+        }
+      },
+      "id": "respond-runner-missing",
+      "name": "Konfiguration fehlt",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'browser_runner_returned_no_metadata', channel: $node['Browser-Auftrag normalisieren'].json.channel, stateToken: $node['Browser-Auftrag normalisieren'].json.stateToken }) }}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "id": "respond-no-metadata",
+      "name": "Keine Metadaten gefunden",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1780, 240]
+    }
+  ],
+  "connections": {
+    "Webhook - TikTok Metadata Event": {
+      "main": [
+        [
+          {
+            "node": "TikTok Browser Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok Browser Event?": {
+      "main": [
+        [
+          {
+            "node": "Browser-Auftrag normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser-Auftrag normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Browser Runner konfiguriert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser Runner konfiguriert?": {
+      "main": [
+        [
+          {
+            "node": "Browser Runner anstoßen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Konfiguration fehlt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browser Runner anstoßen": {
+      "main": [
+        [
+          {
+            "node": "Callback Payload vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Payload vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Metadaten gefunden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metadaten gefunden?": {
+      "main": [
+        [
+          {
+            "node": "Metadata Callback senden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Keine Metadaten gefunden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metadata Callback senden": {
+      "main": [
+        [
+          {
+            "node": "Erfolg zurückgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "tiktok-browser-metadata-sync-v1",
+  "tags": ["tiktok", "browser", "metadata", "automation"]
+}

@@ -182,6 +182,38 @@ ingress:
       connectTimeout: 60s
 
   # ==========================================================================
+  # SIN A2A WORKFORCE
+  # ==========================================================================
+
+  # SIN Silicon Workforce Directory
+  - hostname: a2a.delqhi.com
+    service: http://localhost:3000
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # SIN-Passwordmanager Guide
+  - hostname: sin-passwordmanager.delqhi.com
+    service: http://localhost:3000
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # SIN-Passwordmanager A2A Runtime
+  - hostname: spm-a2a.delqhi.com
+    service: http://localhost:4646
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # SIN-Passwordmanager MCP Runtime
+  - hostname: spm-mcp.delqhi.com
+    service: http://localhost:8650
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # ==========================================================================
   # ROOM 13 - Delqhi Social Network Platform
   # ==========================================================================
   

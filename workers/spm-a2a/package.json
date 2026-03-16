@@ -1,0 +1,22 @@
+{
+  "name": "@simone/spm-a2a",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/check.mjs",
+    "lint": "node ./scripts/check.mjs",
+    "typecheck": "node ./scripts/check.mjs",
+    "test": "node --test ./test/*.test.mjs",
+    "start": "node ./src/server.mjs",
+    "ctl": "node ./src/spmctl.mjs",
+    "bootstrap": "node ./src/bootstrap.mjs",
+    "import:sops": "node ./src/import-sops.mjs"
+  },
+  "dependencies": {
+    "@a2a-js/sdk": "^0.3.10",
+    "@simone/spm-core": "workspace:*",
+    "express": "^5.1.0",
+    "zod": "^3.25.76"
+  }
+}
