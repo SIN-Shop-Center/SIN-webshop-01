@@ -724,6 +724,237 @@ paths:
         '202':
           description: Accepted
 
+  /admin/ugc/settings:
+    get:
+      summary: Admin get UGC generator settings
+      responses:
+        '200':
+          description: UGC generator settings
+    put:
+      summary: Admin update UGC generator settings
+      responses:
+        '200':
+          description: Updated
+
+  /admin/ugc/assets/person:
+    get:
+      summary: Admin list UGC person assets
+      responses:
+        '200':
+          description: Person asset list
+    post:
+      summary: Admin create UGC person asset
+      responses:
+        '201':
+          description: Created
+
+  /admin/ugc/jobs:
+    get:
+      summary: Admin list UGC generation jobs
+      responses:
+        '200':
+          description: UGC job list
+    post:
+      summary: Admin create UGC generation job
+      responses:
+        '202':
+          description: Accepted
+
+  /admin/ugc/jobs/{id}:
+    get:
+      summary: Admin get UGC generation job detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: UGC generation job detail
+
+  /admin/ugc/jobs/{id}/retry:
+    post:
+      summary: Admin retry UGC generation job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Accepted
+
+  /admin/suppliers/{id}/credentials:
+    get:
+      summary: Admin get supplier credentials metadata
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Supplier credential metadata (redacted)
+    put:
+      summary: Admin update supplier credentials metadata/secret-ref
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+
+  /admin/suppliers/{id}/product-mappings:
+    get:
+      summary: Admin list supplier product mappings
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product mappings
+    put:
+      summary: Admin replace supplier product mappings
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+
+  /admin/suppliers/{id}/onboarding/runs:
+    get:
+      summary: Admin list supplier onboarding runs
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Onboarding runs
+    post:
+      summary: Admin create supplier onboarding run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+
+  /admin/suppliers/{id}/onboarding/runs/{run_id}:
+    get:
+      summary: Admin get supplier onboarding run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: run_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Onboarding run
+    patch:
+      summary: Admin patch supplier onboarding run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: run_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+
+  /admin/suppliers/onboarding/callback:
+    post:
+      summary: Callback endpoint for external onboarding browser runner
+      responses:
+        '202':
+          description: Callback accepted
+
+  /admin/suppliers/catalog-sync/callback:
+    post:
+      summary: Callback endpoint for external supplier catalog browser runner
+      responses:
+        '202':
+          description: Callback accepted
+
+  /admin/crm/tasks:
+    get:
+      summary: Admin list CRM tasks
+      responses:
+        '200':
+          description: Task list
+    post:
+      summary: Admin create CRM task
+      responses:
+        '201':
+          description: Created
+
+  /admin/crm/tasks/{id}:
+    patch:
+      summary: Admin patch CRM task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+
+  /admin/crm/activities:
+    get:
+      summary: Admin list CRM activities
+      responses:
+        '200':
+          description: Activity list
+    post:
+      summary: Admin create CRM activity
+      responses:
+        '201':
+          description: Created
+
+  /admin/crm/notes:
+    get:
+      summary: Admin list CRM notes
+      responses:
+        '200':
+          description: Notes list
+    post:
+      summary: Admin create CRM note
+      responses:
+        '201':
+          description: Created
+
   /automation/{target}/run:
     post:
       summary: Trigger automation run

@@ -5,10 +5,10 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "build": "echo \"ui package is source-only\"",
+    "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"no ui linter configured\"",
-    "test": "echo \"no ui tests yet\""
+    "lint": "tsc --noEmit",
+    "test": "tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "^5.3.0"

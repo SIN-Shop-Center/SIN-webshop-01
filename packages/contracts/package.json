@@ -6,9 +6,9 @@
   "main": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"no contract linter configured\"",
-    "build": "echo \"contracts are source-only\"",
-    "test": "echo \"no contract tests yet\""
+    "lint": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "test": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^3.22.0"
