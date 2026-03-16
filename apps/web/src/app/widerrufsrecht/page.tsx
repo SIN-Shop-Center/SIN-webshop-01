@@ -1,4 +1,12 @@
+import type { Metadata } from 'next'
 import { InfoPage } from '@/components/content/InfoPage'
+import { buildPageMetadata } from '@/lib/page-metadata'
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Widerrufsrecht',
+  description: 'Hinweise zum gesetzlichen Widerrufsrecht für Verbraucher bei Simone Shop.',
+  path: '/widerrufsrecht',
+})
 
 export default function WiderrufsrechtPage() {
   return (

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import Link from 'next/link'
+import Link from '@/components/ui/Link'
 import { Tag } from 'lucide-react'
 import type { CustomerSegment } from '@simone/contracts'
 import { useActivePromotions } from './useActivePromotions'
@@ -32,18 +32,29 @@ export function PromotionBannerStrip({
   const { items, loading } = useActivePromotions(placement, segment)
   const promo = useMemo(() => items[0], [items])
 
-  if (loading || !promo) {
-    return null
-  }
-
-  const badge = promo.code ? `Code: ${promo.code}` : 'Aktive Aktion'
-  const accent = safeColor(promo.bannerColor)
-  const style = {
-    borderColor: `${accent}44`,
-    backgroundColor: `${accent}14`,
-  }
-
   if (variant === 'header') {
+    // Keep header height stable while promos load to avoid layout shift during early interactions/tests.
+    if (loading || !promo) {
+      return (
+        <div
+          className={className}
+          style={{
+            minHeight: '2.4rem',
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+          }}
+          aria-hidden="true"
+        />
+      )
+    }
+
+    const badge = promo.code ? `Code: ${promo.code}` : 'Aktive Aktion'
+    const accent = safeColor(promo.bannerColor)
+    const style = {
+      borderColor: `${accent}44`,
+      backgroundColor: `${accent}14`,
+    }
+
     return (
       <div className={className} style={style}>
         <div className="shell-container flex min-h-[2.4rem] items-center justify-between gap-3 text-xs font-medium text-brand-text">
@@ -55,6 +66,17 @@ export function PromotionBannerStrip({
         </div>
       </div>
     )
+  }
+
+  if (loading || !promo) {
+    return null
+  }
+
+  const badge = promo.code ? `Code: ${promo.code}` : 'Aktive Aktion'
+  const accent = safeColor(promo.bannerColor)
+  const style = {
+    borderColor: `${accent}44`,
+    backgroundColor: `${accent}14`,
   }
 
   return (

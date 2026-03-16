@@ -1,5 +1,5 @@
-import { AccountPageShell } from '@/features/account'
+import { redirect } from 'next/navigation'
 
 export default function AccountPage() {
-  return <AccountPageShell />
+  redirect('/kundencenter')
 }

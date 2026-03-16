@@ -1,13 +1,16 @@
 'use client'
 
-import { Check, SlidersHorizontal } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import type { Category } from '@/types'
+import { ProductFiltersPanel } from './ProductFiltersPanel'
 
 export interface FilterState {
   categories: string[]
   priceRange: [number, number]
   inStock: boolean | null
+  featuredBadges: string[]
+  useCases: string[]
+  ratingMin: number | null
+  fastDeliveryOnly: boolean
   sortBy: string
   search: string
 }
@@ -19,24 +22,30 @@ interface ProductFiltersProps {
   minPrice?: number
   maxPrice?: number
   productCount?: number
+  availableUseCases?: string[]
 }
 
 export const defaultFilterState: FilterState = {
   categories: [],
   priceRange: [0, 1000],
   inStock: null,
-  sortBy: 'newest',
+  featuredBadges: [],
+  useCases: [],
+  ratingMin: null,
+  fastDeliveryOnly: false,
+  sortBy: 'popular',
   search: '',
 }
 
-const SORT_OPTIONS = [
-  { value: 'newest', label: 'Neueste zuerst' },
-  { value: 'price-asc', label: 'Preis aufsteigend' },
-  { value: 'price-desc', label: 'Preis absteigend' },
-  { value: 'name-asc', label: 'Name A-Z' },
-  { value: 'name-desc', label: 'Name Z-A' },
-  { value: 'popular', label: 'Beliebtheit' },
-]
+function clamp(value: number, min: number, max: number): number {
+  if (value < min) {
+    return min
+  }
+  if (value > max) {
+    return max
+  }
+  return value
+}
 
 export function ProductFilters({
   categories,
@@ -45,9 +54,32 @@ export function ProductFilters({
   minPrice = 0,
   maxPrice = 1000,
   productCount = 0,
+  availableUseCases = [],
 }: ProductFiltersProps) {
   const setValue = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onFiltersChange({ ...filters, [key]: value })
+  }
+
+  const setMinPrice = (rawInput: string) => {
+    if (rawInput.trim() === '') {
+      return
+    }
+    const parsed = Number(rawInput)
+    const fallback = filters.priceRange[0]
+    const safeValue = Number.isFinite(parsed) ? parsed : fallback
+    const clamped = clamp(safeValue, minPrice, filters.priceRange[1])
+    setValue('priceRange', [clamped, filters.priceRange[1]])
+  }
+
+  const setMaxPrice = (rawInput: string) => {
+    if (rawInput.trim() === '') {
+      return
+    }
+    const parsed = Number(rawInput)
+    const fallback = filters.priceRange[1]
+    const safeValue = Number.isFinite(parsed) ? parsed : fallback
+    const clamped = clamp(safeValue, filters.priceRange[0], maxPrice)
+    setValue('priceRange', [filters.priceRange[0], clamped])
   }
 
   const toggleCategory = (categoryId: string) => {
@@ -61,12 +93,38 @@ export function ProductFilters({
     setValue('categories', [...filters.categories, categoryId])
   }
 
+  const toggleBadge = (badgeId: string) => {
+    if (filters.featuredBadges.includes(badgeId)) {
+      setValue(
+        'featuredBadges',
+        filters.featuredBadges.filter((value) => value !== badgeId),
+      )
+      return
+    }
+    setValue('featuredBadges', [...filters.featuredBadges, badgeId])
+  }
+
+  const toggleUseCase = (useCase: string) => {
+    if (filters.useCases.includes(useCase)) {
+      setValue(
+        'useCases',
+        filters.useCases.filter((value) => value !== useCase),
+      )
+      return
+    }
+    setValue('useCases', [...filters.useCases, useCase])
+  }
+
   const clearFilters = () => {
     onFiltersChange({
       categories: [],
       priceRange: [minPrice, maxPrice],
       inStock: null,
-      sortBy: 'newest',
+      featuredBadges: [],
+      useCases: [],
+      ratingMin: null,
+      fastDeliveryOnly: false,
+      sortBy: 'popular',
       search: filters.search,
     })
   }
@@ -74,130 +132,20 @@ export function ProductFilters({
   const hasFilters =
     filters.categories.length > 0 ||
     filters.inStock !== null ||
+    filters.featuredBadges.length > 0 ||
+    filters.useCases.length > 0 ||
+    filters.ratingMin !== null ||
+    filters.fastDeliveryOnly ||
     filters.priceRange[0] !== minPrice ||
     filters.priceRange[1] !== maxPrice
+  const activeFilterCount =
+    filters.categories.length +
+    (filters.inStock !== null ? 1 : 0) +
+    filters.featuredBadges.length +
+    filters.useCases.length +
+    (filters.ratingMin !== null ? 1 : 0) +
+    (filters.fastDeliveryOnly ? 1 : 0) +
+    (filters.priceRange[0] !== minPrice || filters.priceRange[1] !== maxPrice ? 1 : 0)
 
-  return (
-    <section className="glass-card sticky top-24 rounded-[1.8rem] p-5 md:p-6">
-      <div className="mb-5 flex items-center justify-between gap-2">
-        <h2 className="inline-flex items-center gap-2 text-base font-semibold text-brand-text">
-          <SlidersHorizontal className="h-4 w-4 text-brand-text" />
-          Filter
-        </h2>
-        <span className="rounded-full border border-brand-border bg-white px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-brand-text-muted">
-          {productCount} Treffer
-        </span>
-      </div>
-
-      <div className="space-y-6">
-        <div>
-          <label className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-brand-text-muted" htmlFor="sortBy">
-            Sortierung
-          </label>
-          <select
-            id="sortBy"
-            value={filters.sortBy}
-            onChange={(event) => setValue('sortBy', event.target.value)}
-            className="w-full rounded-2xl border border-brand-border bg-white px-3 py-2.5 text-sm text-brand-text focus:border-black focus:outline-none"
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-brand-text-muted">Kategorien</p>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => {
-              const selected = filters.categories.includes(category.id)
-              return (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => toggleCategory(category.id)}
-                  aria-pressed={selected}
-                  className={[
-                    'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
-                    selected
-                      ? 'border-black bg-black text-white'
-                      : 'border-brand-border bg-white text-brand-text hover:border-black/30',
-                  ].join(' ')}
-                >
-                  {selected ? <Check className="h-3 w-3" /> : null}
-                  {category.name}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-brand-text-muted">Preisbereich</p>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="block">
-              <span className="mb-1 block text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-text-muted">Min</span>
-              <input
-                type="number"
-                min={minPrice}
-                max={filters.priceRange[1]}
-                value={filters.priceRange[0]}
-                onChange={(event) => setValue('priceRange', [Number(event.target.value), filters.priceRange[1]])}
-                className="w-full rounded-xl border border-brand-border bg-white px-3 py-2 text-sm text-brand-text focus:border-black focus:outline-none"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-text-muted">Max</span>
-              <input
-                type="number"
-                min={filters.priceRange[0]}
-                max={maxPrice}
-                value={filters.priceRange[1]}
-                onChange={(event) => setValue('priceRange', [filters.priceRange[0], Number(event.target.value)])}
-                className="w-full rounded-xl border border-brand-border bg-white px-3 py-2 text-sm text-brand-text focus:border-black focus:outline-none"
-              />
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-brand-text-muted">Verfuegbarkeit</p>
-          <div className="grid gap-2">
-            {[
-              { label: 'Alle Produkte', value: null as boolean | null },
-              { label: 'Auf Lager', value: true },
-              { label: 'Nicht verfugbar', value: false },
-            ].map((option) => {
-              const selected = filters.inStock === option.value
-              return (
-                <button
-                  key={option.label}
-                  type="button"
-                  onClick={() => setValue('inStock', option.value)}
-                  className={[
-                    'rounded-xl border px-3 py-2 text-left text-sm font-medium transition-colors',
-                    selected
-                      ? 'border-black bg-black text-white'
-                      : 'border-brand-border bg-white text-brand-text hover:border-black/30',
-                  ].join(' ')}
-                >
-                  {option.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {hasFilters ? (
-        <div className="mt-6">
-          <Button variant="outline" fullWidth onClick={clearFilters}>
-            Filter zurucksetzen
-          </Button>
-        </div>
-      ) : null}
-    </section>
-  )
+  return <ProductFiltersPanel categories={categories} filters={filters} setValue={setValue} toggleCategory={toggleCategory} toggleBadge={toggleBadge} toggleUseCase={toggleUseCase} setMinPrice={setMinPrice} setMaxPrice={setMaxPrice} minPrice={minPrice} maxPrice={maxPrice} productCount={productCount} activeFilterCount={activeFilterCount} hasFilters={hasFilters} clearFilters={clearFilters} availableUseCases={availableUseCases} />
 }

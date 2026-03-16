@@ -1,215 +1,215 @@
-import {
-  CatalogCategoryListSchema,
-  CatalogProductListSchema,
-  CatalogProductSchema,
-  type CatalogCategory,
-  type CatalogProduct,
-} from '@simone/contracts'
-import { sampleCategories, sampleProducts } from '@/data/sample-products'
+import { CatalogCategoryListSchema, CatalogProductListSchema, CatalogProductSchema } from '@simone/contracts'
+import { sampleProducts } from '@/data/sample-products'
 import type { Category, Product } from '@/types'
+import {
+  CATEGORIES_TTL_MS,
+  PRODUCT_DETAIL_TTL_MS,
+  PRODUCTS_TTL_MS,
+  STALE_REUSE_TTL_MS,
+} from './client-constants'
+import { readCache, readCacheEntry, readStaleCacheEntry, writeCache, catalogCaches, catalogInFlight } from './client-cache'
+import { allowCatalogSampleFallback } from './client-fallback'
+import { fetchWithTimeout } from './client-fetch'
+import { normalizeLegacySampleProduct, normalizeSampleCategories, normalizeSampleProducts, toUICategory, toUIProduct } from './client-normalizers'
+import { buildCatalogQuery } from './client-query'
+import type { ProductQuery } from './client-types'
 
-const DEFAULT_IMAGE = '/placeholder.jpg'
+const {
+  productListCache,
+  productDetailCache,
+  categoriesCache,
+} = catalogCaches
 
-type ProductQuery = {
-  search?: string
-  category?: string
-  page?: number
-  limit?: number
-}
-
-function allowSampleFallback(): boolean {
-  const toggle = (process.env.NEXT_PUBLIC_WEB_CATALOG_FALLBACK_ENABLED || '').trim().toLowerCase()
-  if (toggle === 'false') {
-    return false
-  }
-  if (toggle === 'true') {
-    return true
-  }
-  return true
-}
-
-function toCategoryReference(product: CatalogProduct): NonNullable<Product['category']> {
-  const fallback = 'allgemein'
-  const id = product.categoryId || fallback
-  const name = product.categoryName || 'Allgemein'
-  const slug = product.categorySlug || id
-  return {
-    id,
-    name,
-    slug,
-  }
-}
-
-function toUIProduct(product: CatalogProduct): Product {
-  const categoryRef = toCategoryReference(product)
-  const rating = typeof product.rating === 'number' ? product.rating : undefined
-  const reviewCount = typeof product.reviewCount === 'number' ? product.reviewCount : undefined
-
-  return {
-    id: product.id,
-    slug: product.slug || product.id,
-    name: product.name,
-    description: product.description || '',
-    price: product.price,
-    originalPrice: product.originalPrice,
-    compareAtPrice: product.originalPrice,
-    images: product.images.length ? product.images : [DEFAULT_IMAGE],
-    category: categoryRef,
-    categoryId: categoryRef.id,
-    rating,
-    reviewCount,
-    inStock: product.stock > 0 && product.isActive,
-    isSale: typeof product.originalPrice === 'number' && product.originalPrice > product.price,
-    stock: product.stock,
-    createdAt: product.createdAt || new Date().toISOString(),
-    updatedAt: product.updatedAt || new Date().toISOString(),
-  }
-}
-
-function normalizeLegacySampleProduct(product: Product): Product {
-  if (typeof product.category === 'object' && product.category !== null) {
-    return {
-      ...product,
-      images: product.images.length ? product.images : [DEFAULT_IMAGE],
-      inStock: product.inStock ?? product.stock > 0,
-    }
-  }
-
-  const knownCategory = sampleCategories.find((entry) => entry.id === product.categoryId)
-
-  return {
-    ...product,
-    category: {
-      id: knownCategory?.id || product.categoryId || 'allgemein',
-      name: knownCategory?.name || (typeof product.category === 'string' ? product.category : 'Allgemein'),
-      slug: knownCategory?.slug || product.categoryId || 'allgemein',
-    },
-    images: product.images.length ? product.images : [DEFAULT_IMAGE],
-    inStock: product.inStock ?? product.stock > 0,
-    compareAtPrice: product.compareAtPrice || product.originalPrice,
-  }
-}
-
-function normalizeSampleProducts(items: Product[]): Product[] {
-  return items.map(normalizeLegacySampleProduct)
-}
-
-function normalizeSampleCategories(): Category[] {
-  return sampleCategories.map((category) => ({
-    ...category,
-    productCount: sampleProducts.filter((product) => product.categoryId === category.id).length,
-  }))
-}
-
-function buildQuery(params: ProductQuery) {
-  const query = new URLSearchParams()
-  if (params.search) {
-    query.set('search', params.search)
-  }
-  if (params.category) {
-    query.set('category', params.category)
-  }
-  if (params.page) {
-    query.set('page', String(params.page))
-  }
-  if (params.limit) {
-    query.set('limit', String(params.limit))
-  }
-  return query.toString()
-}
+const {
+  productListInFlight,
+  productDetailInFlight,
+  categoriesInFlight,
+} = catalogInFlight
 
 export async function loadCatalogProducts(params: ProductQuery = {}): Promise<Product[]> {
-  const query = buildQuery(params)
+  const query = buildCatalogQuery(params)
   const url = query ? `/api/products?${query}` : '/api/products'
+  const cacheKey = query || '__all__'
 
+  const cached = readCache(productListCache, cacheKey, 'catalog-products-list')
+  if (cached) {
+    return cached
+  }
+
+  const existingRequest = productListInFlight.get(cacheKey)
+  if (existingRequest) {
+    return existingRequest
+  }
+
+  const request = (async () => {
+    try {
+      const response = await fetchWithTimeout(url, {
+        method: 'GET',
+        headers: { accept: 'application/json' },
+      })
+
+      if (!response.ok) {
+        throw new Error(`catalog products request failed (${response.status})`)
+      }
+
+      const payload = CatalogProductListSchema.parse(await response.json())
+      if (payload.items.length === 0 && allowCatalogSampleFallback()) {
+        return writeCache(
+          productListCache,
+          cacheKey,
+          normalizeSampleProducts(sampleProducts),
+          PRODUCTS_TTL_MS,
+          'catalog-products-list',
+        )
+      }
+
+      return writeCache(
+        productListCache,
+        cacheKey,
+        payload.items.map(toUIProduct),
+        PRODUCTS_TTL_MS,
+        'catalog-products-list',
+      )
+    } catch (error) {
+      const stale = readStaleCacheEntry(productListCache, cacheKey, 'catalog-products-list')
+      if (stale) {
+        return writeCache(productListCache, cacheKey, stale.value, STALE_REUSE_TTL_MS, 'catalog-products-list')
+      }
+
+      if (!allowCatalogSampleFallback()) {
+        console.error('catalog_products_fetch_failed_no_fallback', error)
+        return writeCache(productListCache, cacheKey, [], 15_000, 'catalog-products-list')
+      }
+
+      return writeCache(
+        productListCache,
+        cacheKey,
+        normalizeSampleProducts(sampleProducts),
+        PRODUCTS_TTL_MS,
+        'catalog-products-list',
+      )
+    }
+  })()
+
+  productListInFlight.set(cacheKey, request)
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`catalog products request failed (${response.status})`)
-    }
-
-    const payload = CatalogProductListSchema.parse(await response.json())
-    if (payload.items.length === 0 && allowSampleFallback()) {
-      return normalizeSampleProducts(sampleProducts)
-    }
-    return payload.items.map(toUIProduct)
-  } catch (error) {
-    if (!allowSampleFallback()) {
-      console.error('catalog_products_fetch_failed_no_fallback', error)
-      return []
-    }
-    return normalizeSampleProducts(sampleProducts)
+    return await request
+  } finally {
+    productListInFlight.delete(cacheKey)
   }
 }
 
 export async function loadCatalogProductById(id: string): Promise<Product | null> {
-  try {
-    const response = await fetch(`/api/products/${id}`, {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null
-      }
-      throw new Error(`catalog product request failed (${response.status})`)
-    }
-
-    const payload = CatalogProductSchema.parse(await response.json())
-    return toUIProduct(payload)
-  } catch (error) {
-    if (!allowSampleFallback()) {
-      console.error('catalog_product_fetch_failed_no_fallback', error)
-      return null
-    }
-    const fallback = sampleProducts.find((product) => product.id === id)
-    return fallback ? normalizeLegacySampleProduct(fallback) : null
+  const detailCached = readCacheEntry(productDetailCache, id, 'catalog-product-detail')
+  if (detailCached) {
+    return detailCached.value
   }
-}
 
-function toUICategory(category: CatalogCategory): Category {
-  return {
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    description: category.description || undefined,
-    image: category.image || undefined,
-    productCount: undefined,
+  const existingRequest = productDetailInFlight.get(id)
+  if (existingRequest) {
+    return existingRequest
+  }
+
+  const request = (async () => {
+    try {
+      const response = await fetchWithTimeout(`/api/products/${id}`, {
+        method: 'GET',
+        headers: { accept: 'application/json' },
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return writeCache(productDetailCache, id, null, PRODUCT_DETAIL_TTL_MS, 'catalog-product-detail')
+        }
+        throw new Error(`catalog product request failed (${response.status})`)
+      }
+
+      const payload = CatalogProductSchema.parse(await response.json())
+      return writeCache(productDetailCache, id, toUIProduct(payload), PRODUCT_DETAIL_TTL_MS, 'catalog-product-detail')
+    } catch (error) {
+      const stale = readStaleCacheEntry(productDetailCache, id, 'catalog-product-detail')
+      if (stale) {
+        return writeCache(productDetailCache, id, stale.value, STALE_REUSE_TTL_MS, 'catalog-product-detail')
+      }
+
+      if (!allowCatalogSampleFallback()) {
+        console.error('catalog_product_fetch_failed_no_fallback', error)
+        return writeCache(productDetailCache, id, null, 15_000, 'catalog-product-detail')
+      }
+
+      const fallback = sampleProducts.find((product) => product.id === id)
+      return writeCache(
+        productDetailCache,
+        id,
+        fallback ? normalizeLegacySampleProduct(fallback) : null,
+        PRODUCT_DETAIL_TTL_MS,
+        'catalog-product-detail',
+      )
+    }
+  })()
+
+  productDetailInFlight.set(id, request)
+  try {
+    return await request
+  } finally {
+    productDetailInFlight.delete(id)
   }
 }
 
 export async function loadCatalogCategories(): Promise<Category[]> {
+  const cacheKey = '__all__'
+  const cached = readCache(categoriesCache, cacheKey, 'catalog-categories')
+  if (cached) {
+    return cached
+  }
+
+  const existingRequest = categoriesInFlight.get(cacheKey)
+  if (existingRequest) {
+    return existingRequest
+  }
+
+  const request = (async () => {
+    try {
+      const response = await fetchWithTimeout('/api/categories', {
+        method: 'GET',
+        headers: { accept: 'application/json' },
+      })
+
+      if (!response.ok) {
+        throw new Error(`catalog categories request failed (${response.status})`)
+      }
+
+      const payload = CatalogCategoryListSchema.parse(await response.json())
+      if (payload.items.length === 0 && allowCatalogSampleFallback()) {
+        return writeCache(categoriesCache, cacheKey, normalizeSampleCategories(), CATEGORIES_TTL_MS, 'catalog-categories')
+      }
+
+      return writeCache(
+        categoriesCache,
+        cacheKey,
+        payload.items.map(toUICategory),
+        CATEGORIES_TTL_MS,
+        'catalog-categories',
+      )
+    } catch (error) {
+      const stale = readStaleCacheEntry(categoriesCache, cacheKey, 'catalog-categories')
+      if (stale) {
+        return writeCache(categoriesCache, cacheKey, stale.value, STALE_REUSE_TTL_MS, 'catalog-categories')
+      }
+
+      if (!allowCatalogSampleFallback()) {
+        console.error('catalog_categories_fetch_failed_no_fallback', error)
+        return writeCache(categoriesCache, cacheKey, [], 15_000, 'catalog-categories')
+      }
+
+      return writeCache(categoriesCache, cacheKey, normalizeSampleCategories(), CATEGORIES_TTL_MS, 'catalog-categories')
+    }
+  })()
+
+  categoriesInFlight.set(cacheKey, request)
   try {
-    const response = await fetch('/api/categories', {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`catalog categories request failed (${response.status})`)
-    }
-
-    const payload = CatalogCategoryListSchema.parse(await response.json())
-    if (payload.items.length === 0 && allowSampleFallback()) {
-      return normalizeSampleCategories()
-    }
-    return payload.items.map(toUICategory)
-  } catch (error) {
-    if (!allowSampleFallback()) {
-      console.error('catalog_categories_fetch_failed_no_fallback', error)
-      return []
-    }
-    return normalizeSampleCategories()
+    return await request
+  } finally {
+    categoriesInFlight.delete(cacheKey)
   }
 }

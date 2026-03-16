@@ -4,7 +4,7 @@ export const PRIMARY_TRUST_SIGNALS: TrustSignal[] = [
   {
     id: 'delivery-fast',
     title: 'Schneller Versand',
-    description: 'Versand in 24-48h bei verfügbaren Artikeln',
+    description: 'Versand in 24-48 Stunden bei verfügbaren Artikeln',
     icon: 'truck',
     priority: 'primary',
     href: '/versand',
@@ -36,7 +36,7 @@ export const CHECKOUT_TRUST_SIGNALS: TrustSignal[] = [
   },
   {
     id: 'support-fast',
-    title: 'Support erreichbar',
+    title: 'Kontakt in 24 Stunden',
     description: 'Antwort in der Regel innerhalb von 24 Stunden',
     icon: 'support',
     priority: 'secondary',

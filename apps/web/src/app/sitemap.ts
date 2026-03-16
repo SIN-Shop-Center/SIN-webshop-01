@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { sampleProducts } from '@/data/sample-products'
+import { getInitialCatalogProducts } from '@/lib/server/catalog-list'
 import { absoluteUrl } from '@/lib/site'
 
 const STATIC_ROUTES = [
@@ -16,8 +16,17 @@ const STATIC_ROUTES = [
   '/agb',
 ]
 
-export default function sitemap(): MetadataRoute.Sitemap {
+function safeLastModified(input: string, fallback: Date): Date {
+  const parsed = new Date(input)
+  if (Number.isNaN(parsed.getTime())) {
+    return fallback
+  }
+  return parsed
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
+  const products = await getInitialCatalogProducts(500)
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
     url: absoluteUrl(route),
@@ -26,13 +35,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === '/' ? 1 : 0.7,
   }))
 
-  const productEntries: MetadataRoute.Sitemap = sampleProducts.map((product) => ({
+  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
     url: absoluteUrl(`/products/${encodeURIComponent(product.id)}`),
-    lastModified: new Date(product.updatedAt),
+    lastModified: safeLastModified(product.updatedAt, now),
     changeFrequency: 'daily',
     priority: 0.8,
   }))
 
   return [...staticEntries, ...productEntries]
 }
-

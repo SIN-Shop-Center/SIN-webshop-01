@@ -1,16 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 
-function requiredEnv(name: string): string {
-  const value = process.env[name]
+function requiredEnv(name: string, fallbackName?: string): string {
+  const value = process.env[name] || (fallbackName ? process.env[fallbackName] : undefined)
   if (!value) {
+    if (fallbackName) {
+      throw new Error(`${name} (or ${fallbackName}) is required.`)
+    }
     throw new Error(`${name} is required.`)
   }
   return value
 }
 
 export function createBrowserClient() {
-  const supabaseUrl = requiredEnv('NEXT_PUBLIC_SUPABASE_URL')
-  const supabaseAnonKey = requiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  const supabaseUrl = requiredEnv('NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_URL')
+  const supabaseAnonKey = requiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY')
   return createClient(supabaseUrl, supabaseAnonKey)
 }
 

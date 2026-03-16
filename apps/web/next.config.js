@@ -1,4 +1,5 @@
 const isProduction = process.env.NODE_ENV === 'production'
+const vercelProduction = process.env.VERCEL_ENV === 'production'
 
 const DEFAULT_IMAGE_HOSTS = ['picsum.photos']
 
@@ -17,6 +18,17 @@ function toHostname(value) {
     return ''
   }
 }
+
+function usesHttpsOrigin(value) {
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+const publicSiteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.SITE_URL || ''
+const enforceHttpsSecurityHeaders = isProduction && (vercelProduction || usesHttpsOrigin(publicSiteUrl))
 
 function resolveImageHosts() {
   const configured = process.env.NEXT_PUBLIC_IMAGE_REMOTE_ALLOWLIST || ''
@@ -69,7 +81,7 @@ function buildCsp() {
     'object-src \'none\'',
   ]
 
-  if (isProduction) {
+  if (enforceHttpsSecurityHeaders) {
     directives.push('upgrade-insecure-requests')
   }
 
@@ -87,7 +99,7 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), microphone=(), payment=(), usb=()' },
 ]
 
-if (isProduction) {
+if (enforceHttpsSecurityHeaders) {
   securityHeaders.push({
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
@@ -97,7 +109,6 @@ if (isProduction) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   images: {
     remotePatterns: resolveImageHosts().map((hostname) => ({
       protocol: 'https',
@@ -105,6 +116,7 @@ const nextConfig = {
     })),
   },
   experimental: {
+    externalDir: true,
     serverActions: {
       bodySizeLimit: '2mb',
     },

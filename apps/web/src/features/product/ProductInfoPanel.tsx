@@ -1,8 +1,7 @@
-import { Check } from 'lucide-react'
+import { Check, Star, Truck } from 'lucide-react'
 import { ProductActionPanel } from '@/features/product/actions/ProductActionPanel'
 import { ProductPricingBlock } from '@/features/product/pricing/ProductPricingBlock'
 import { ProductTrustPanel } from '@/features/product/trust/ProductTrustPanel'
-import { PromotionBannerStrip } from '@/features/promotions'
 import type { CustomerSegment } from '@simone/contracts'
 import type { Product } from '@/types'
 
@@ -11,59 +10,111 @@ type ProductInfoPanelProps = {
   product: Product
   segment: CustomerSegment
   quantity: number
+  maxQuantity: number
   ctaLabel?: string
   trustFirst?: boolean
   onQuantityChange: (value: number) => void
   onAddToCart: () => void
 }
 
-const QUICK_BENEFITS = ['Kostenfreie Versandoptionen', '30 Tage Rueckgabe', 'Schneller Support im Checkout']
-
 export function ProductInfoPanel({
   categoryName,
   product,
   segment,
   quantity,
+  maxQuantity,
   ctaLabel,
   trustFirst = false,
   onQuantityChange,
   onAddToCart,
 }: ProductInfoPanelProps) {
+  const benefitList =
+    segment === 'b2b'
+      ? ['Verfügbarkeit sofort sichtbar', 'Für Wiederbestellungen geeignet', 'Firmenkauf ohne Zusatzschritte']
+      : ['Preis und Lieferung früh sichtbar', 'Schnell im Warenkorb und Checkout', 'Rückgabe klar erklärt']
+  const highlights = (product.highlights || []).slice(0, 3)
+  const useCases = (product.useCases || []).slice(0, 3)
+
   return (
     <article className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-      <section className="rounded-[1.8rem] border border-brand-border bg-white/90 p-6 shadow-[0_14px_36px_rgba(10,10,10,0.08)]">
-        <p className="text-xs font-bold uppercase tracking-[0.1em] text-brand-text-muted">{categoryName}</p>
-        <h1 className="mt-2 text-4xl leading-tight md:text-5xl">{product.name}</h1>
-        <p className="mt-4 text-sm leading-7 text-brand-text-muted">{product.description}</p>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {QUICK_BENEFITS.map((entry) => (
-            <span
-              key={entry}
-              className="inline-flex items-center gap-1.5 rounded-full border border-brand-border bg-brand-bg-muted/70 px-3 py-1.5 text-xs font-semibold text-brand-text"
-            >
-              <Check className="h-3.5 w-3.5 text-emerald-600" />
-              {entry}
+      <section className="rounded-[1.8rem] border border-brand-border bg-white p-6 shadow-[0_14px_36px_rgba(10,10,10,0.06)]">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-brand-text-muted">
+          <span className="ui-pill text-[0.72rem] font-semibold uppercase tracking-[0.1em]">
+            {categoryName}
+          </span>
+          {typeof product.rating === 'number' && typeof product.reviewCount === 'number' && product.reviewCount > 0 ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Star className="h-4 w-4 fill-[#d2a44d] text-[#d2a44d]" />
+              {product.rating.toFixed(1)} ({product.reviewCount})
             </span>
+          ) : null}
+          {product.deliveryEstimate ? (
+            <span className="ui-pill text-xs font-semibold">
+              <Truck className="h-3.5 w-3.5" />
+              {product.deliveryEstimate}
+            </span>
+          ) : null}
+        </div>
+
+        <h1 className="mt-3 text-4xl leading-tight md:text-5xl">{product.name}</h1>
+        <p className="mt-4 text-base leading-7 text-brand-text-muted">{product.description}</p>
+
+        {useCases.length > 0 ? (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {useCases.map((entry) => (
+              <span
+                key={entry}
+                className="ui-pill text-xs font-semibold"
+              >
+                {entry}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="mt-6 grid gap-2">
+          {benefitList.map((entry) => (
+            <div
+              key={entry}
+              className="inline-flex items-center gap-2 rounded-2xl border border-brand-border bg-brand-bg px-3 py-3 text-sm font-medium text-brand-text"
+            >
+              <Check className="h-4 w-4 text-brand-success" />
+              {entry}
+            </div>
           ))}
         </div>
+
+        {highlights.length > 0 ? (
+          <div className="mt-6 rounded-[1.5rem] border border-brand-border bg-brand-surface p-4">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
+              Warum dieses Produkt schnell passt
+            </p>
+            <div className="mt-3 grid gap-2">
+              {highlights.map((entry) => (
+                <div key={entry} className="inline-flex items-center gap-2 text-sm text-brand-text">
+                  <Check className="h-4 w-4 text-brand-success" />
+                  {entry}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
 
-      <ProductPricingBlock product={product} />
+      <ProductPricingBlock product={product} segment={segment} />
 
-      {trustFirst ? <ProductTrustPanel /> : null}
-
-      <PromotionBannerStrip placement="pdp" segment={segment} className="block" />
+      {trustFirst ? <ProductTrustPanel segment={segment} /> : null}
 
       <ProductActionPanel
         product={product}
         quantity={quantity}
+        maxQuantity={maxQuantity}
         ctaLabel={ctaLabel}
         onQuantityChange={onQuantityChange}
         onAddToCart={onAddToCart}
       />
 
-      {!trustFirst ? <ProductTrustPanel /> : null}
+      {!trustFirst ? <ProductTrustPanel segment={segment} /> : null}
     </article>
   )
 }

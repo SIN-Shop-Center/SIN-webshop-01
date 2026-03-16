@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/ui/Link'
 import { ArrowRight, Building2, UserRound } from 'lucide-react'
 import { useCustomerSegmentStore } from '@/features/segment'
 import type { CustomerSegment } from '@simone/contracts'
@@ -16,8 +16,8 @@ const ENTRIES: Array<{
 }> = [
   {
     segment: 'b2c',
-    title: 'Fuer Privatkunden',
-    tag: 'Direktkauf',
+    title: 'Für Privatkunden',
+    tag: 'Schneller Kauf',
     description: 'Klare Preisangaben, schnelle Lieferung und unkomplizierte Retoure.',
     impact: 'Schnelle Entscheidung ohne Checkout-Reibung.',
     href: '/products?segment=b2c',
@@ -25,10 +25,10 @@ const ENTRIES: Array<{
   },
   {
     segment: 'b2b',
-    title: 'Fuer Unternehmen',
-    tag: 'Team-Mode',
-    description: 'Verfuegbarkeit, VAT-Felder und strukturierter Bestellprozess fuer Teams.',
-    impact: 'Planbare Reorder-Prozesse inklusive Angebotslogik.',
+    title: 'Für Unternehmen',
+    tag: 'Planbare Beschaffung',
+    description: 'Verfügbarkeit, Firmenangaben und strukturierter Bestellprozess für Teams.',
+    impact: 'Planbare Nachbestellungen und klare Ablaufe für Teams.',
     href: '/products?segment=b2b',
     icon: Building2,
   },
@@ -48,8 +48,8 @@ export function SegmentEntryCards() {
               className={[
                 'group relative overflow-hidden rounded-[1.9rem] border p-7 transition-all duration-300 md:p-8',
                 selected
-                  ? 'border-black bg-white shadow-[0_22px_45px_rgba(10,10,10,0.14)]'
-                  : 'border-brand-border bg-white/80 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_18px_36px_rgba(10,10,10,0.1)]',
+                  ? 'border-black bg-white shadow-[0_22px_45px_rgba(10,10,10,0.12)]'
+                  : 'border-brand-border bg-white hover:-translate-y-1 hover:border-black/15 hover:shadow-[0_18px_36px_rgba(10,10,10,0.08)]',
               ].join(' ')}
             >
               <div className="mb-5 flex items-start justify-between gap-3">
@@ -61,26 +61,38 @@ export function SegmentEntryCards() {
                 >
                   <entry.icon className="h-5 w-5" />
                 </div>
-                <span className="trust-chip px-3 py-1 text-[0.67rem]">{entry.tag}</span>
+                <span className="trust-chip px-3 py-1 text-[0.67rem]">{selected ? 'Aktiv' : entry.tag}</span>
               </div>
 
               <h2 className="text-3xl leading-tight">{entry.title}</h2>
               <p className="mt-3 text-sm leading-7 text-brand-text-muted">{entry.description}</p>
-              <p className="mt-5 rounded-2xl border border-brand-border bg-brand-bg-muted/70 px-4 py-3 text-sm font-semibold text-brand-text">
+              <p className="mt-5 rounded-2xl border border-brand-border bg-brand-bg px-4 py-3 text-sm font-semibold text-brand-text">
                 {entry.impact}
               </p>
+
+              <div className="mt-5 grid gap-2 text-sm text-brand-text-muted">
+                {entry.segment === 'b2b' ? (
+                  <>
+                    <p>Preis- und Mengenklarheit für Teams.</p>
+                    <p>Checkout mit USt-IdNr. und Bestellreferenz.</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Schnelle Orientierung ohne Angebotschaos.</p>
+                    <p>Rückgabe und Kontakt direkt im Kaufkontext sichtbar.</p>
+                  </>
+                )}
+              </div>
 
               <Link
                 href={entry.href}
                 onClick={() => setSegment(entry.segment)}
                 className={[
-                  'mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-                  selected
-                    ? 'bg-black text-white hover:bg-zinc-800'
-                    : 'border border-brand-border bg-white text-brand-text hover:border-black/30 hover:text-black',
+                  'ui-pill mt-6 gap-2 text-sm',
+                  selected ? 'ui-pill-active' : 'ui-pill-muted',
                 ].join(' ')}
               >
-                Einstieg oeffnen
+                {entry.segment === 'b2b' ? 'Firmenkauf starten' : 'Privat einkaufen'}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </article>

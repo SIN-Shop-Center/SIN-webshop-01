@@ -1,25 +1,25 @@
-import { BadgeCheck, Clock3, ShieldCheck, Sparkles } from 'lucide-react'
+import { Clock3, PackageCheck, ShieldCheck, Sparkles } from 'lucide-react'
 
 const VALUE_PROPS = [
   {
-    title: 'Sofort verstandlicher Nutzen',
-    description: 'Jede Produktkarte zeigt klaren Anwendungswert statt Marketingfloskeln.',
+    title: 'Nutzen in Sekunden erfassbar',
+    description: 'Produkt, Preis, Lieferung und Kaufimpuls werden ohne Umwege lesbar.',
     icon: Sparkles,
   },
   {
     title: 'Lieferung planbar',
-    description: 'Verfuegbarkeiten und Versandzeiten sind im Funnel sichtbar, nicht versteckt.',
+    description: 'Verfügbarkeiten und Versandlogik bleiben über den ganzen Funnel sichtbar.',
     icon: Clock3,
   },
   {
-    title: 'Vertrauen messbar',
-    description: 'Rueckgabe, Zahlungssicherheit und Support werden in Kaufmomenten eingeblendet.',
+    title: 'Vertrauen im Kaufmoment',
+    description: 'Rückgabe, Zahlungssicherheit und Kontakt erscheinen genau dort, wo sie gebraucht werden.',
     icon: ShieldCheck,
   },
   {
-    title: 'Echte Social-Proof-Signale',
-    description: 'Bewertungen und Qualitatsindikatoren werden konsistent und datenbasiert dargestellt.',
-    icon: BadgeCheck,
+    title: 'Operative Klarheit',
+    description: 'Weniger Dekoration, mehr Orientierung. Jede Fläche hat eine klare Aufgabe.',
+    icon: PackageCheck,
   },
 ]
 
@@ -30,13 +30,13 @@ export function ValuePropsGrid() {
         {VALUE_PROPS.map((item, index) => (
           <article
             key={item.title}
-            className="rounded-[1.65rem] border border-brand-border bg-white/85 p-5 shadow-[0_10px_26px_rgba(10,10,10,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_18px_36px_rgba(10,10,10,0.1)]"
+            className="rounded-[1.65rem] border border-brand-border bg-white p-5 shadow-[0_10px_26px_rgba(10,10,10,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-black/15 hover:shadow-[0_18px_36px_rgba(10,10,10,0.08)]"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-brand-border bg-brand-bg-muted/80">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-brand-border bg-brand-bg">
                 <item.icon className="h-5 w-5 text-brand-text" />
               </span>
-              <span className="inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-full border border-brand-border bg-white px-2 text-[0.68rem] font-bold tracking-[0.08em] text-brand-text-muted">
+              <span className="inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-full border border-brand-border bg-brand-bg px-2 text-[0.68rem] font-bold tracking-[0.08em] text-brand-text-muted">
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>

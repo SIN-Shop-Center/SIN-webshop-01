@@ -3,8 +3,8 @@
 export function ProductSkeleton() {
   return (
     <div className="overflow-hidden rounded-3xl border border-brand-border bg-white/85 shadow-[0_10px_28px_rgba(10,10,10,0.07)] animate-pulse">
-      <div className="aspect-square bg-brand-bg-muted" />
-      <div className="space-y-3 p-5">
+      <div className="aspect-[4/3] bg-brand-bg-muted" />
+      <div className="space-y-3 p-4">
         <div className="h-3 w-20 rounded bg-brand-bg-muted" />
         <div className="space-y-2">
           <div className="h-4 w-full rounded bg-brand-bg-muted" />

@@ -1,33 +1,20 @@
 import type { Metadata, Viewport } from 'next'
-import { Suspense } from 'react'
-import dynamic from 'next/dynamic'
-import { Inter, Space_Grotesk } from 'next/font/google'
+import { Manrope, Space_Grotesk } from 'next/font/google'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DEFAULT_LOCALE, SITE_DESCRIPTION, SITE_NAME, getSiteUrl } from '@/lib/site'
 import { Providers } from './providers'
+import { SiteChrome } from '@/components/layout/SiteChrome'
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-sans',
 })
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-display',
 })
-
-const CartDrawer = dynamic(
-  () => import('@/components/layout/CartDrawer').then((module) => module.CartDrawer),
-  { ssr: false },
-)
-
-const AIChatWidget = dynamic(
-  () => import('@/components/ai/AIChatWidget').then((module) => module.AIChatWidget),
-  { ssr: false },
-)
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -52,7 +39,7 @@ const websiteJsonLd = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${SITE_NAME} - Premium Commerce für B2B und B2C`,
+    default: `${SITE_NAME} - Produkte schneller verstehen. Sicherer entscheiden.`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -62,7 +49,7 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   category: 'shopping',
-  keywords: ['Online-Shop', 'B2B', 'B2C', 'Premium Commerce', 'Deutschland', 'Simone'],
+  keywords: ['Online-Shop', 'B2B', 'B2C', 'klare Preise', 'Deutschland', 'Simone Shop'],
   authors: [{ name: 'Simone Schulze' }],
   robots: {
     index: true,
@@ -76,26 +63,19 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: `${SITE_NAME} - Premium Commerce für B2B und B2C`,
-    description: 'Trust-first Einkaufserlebnis mit klaren Kosten und schneller Abwicklung.',
+    title: `${SITE_NAME} - Produkte schneller verstehen. Sicherer entscheiden.`,
+    description: SITE_DESCRIPTION,
     url: '/',
     type: 'website',
     siteName: SITE_NAME,
     locale: DEFAULT_LOCALE,
-    images: [
-      {
-        url: 'https://picsum.photos/seed/simone-shop-og/1200/630',
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} Open Graph`,
-      },
-    ],
+    images: ['/opengraph-image'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} - Premium Commerce für B2B und B2C`,
+    title: `${SITE_NAME} - Produkte schneller verstehen. Sicherer entscheiden.`,
     description: SITE_DESCRIPTION,
-    images: ['https://picsum.photos/seed/simone-shop-og/1200/630'],
+    images: ['/twitter-image'],
   },
 }
 
@@ -112,27 +92,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" suppressHydrationWarning>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} min-h-screen bg-brand-bg font-sans text-brand-text`}>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable} min-h-screen bg-brand-bg font-sans text-brand-text`}>
         <JsonLd id="org-jsonld" data={organizationJsonLd} />
         <JsonLd id="website-jsonld" data={websiteJsonLd} />
         <Providers>
           <a
             href="#main-content"
-            className="sr-only absolute left-2 top-2 z-[120] rounded-lg bg-brand-accent px-4 py-2 text-sm font-semibold text-white focus:not-sr-only"
+            className="sr-only absolute left-2 top-2 z-[120] inline-flex min-h-[2.75rem] items-center rounded-lg bg-brand-accent px-4 py-2 text-sm font-semibold text-white focus:not-sr-only"
           >
             Zum Hauptinhalt springen
           </a>
-          <div className="flex flex-col min-h-screen">
-            <Suspense fallback={<div className="h-[6.5rem] border-b border-brand-border bg-brand-surface" />}>
-              <Navbar />
-            </Suspense>
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Footer />
+          <div className="flex min-h-screen flex-col">
+            <div className="flex-1">
+              <SiteChrome>{children}</SiteChrome>
+            </div>
           </div>
-          <CartDrawer />
-          <AIChatWidget />
         </Providers>
       </body>
     </html>

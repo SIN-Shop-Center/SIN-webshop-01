@@ -14,17 +14,13 @@ export function CheckoutStepper({ currentStep }: CheckoutStepperProps) {
           <span
             className={[
               'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold',
-              currentStep === entry.id
-                ? 'border-black bg-black text-white'
-                : 'border-brand-border bg-white text-brand-text-muted',
+              currentStep === entry.id ? 'border-black bg-black text-white' : 'border-brand-border bg-white text-brand-text-muted',
             ].join(' ')}
           >
             <entry.icon className="h-4 w-4" />
             {entry.label}
           </span>
-          {index < CHECKOUT_STEPS.length - 1 ? (
-            <ChevronRight className="h-4 w-4 text-brand-text-muted" />
-          ) : null}
+          {index < CHECKOUT_STEPS.length - 1 ? <ChevronRight className="h-4 w-4 text-brand-text-muted" /> : null}
         </div>
       ))}
     </div>

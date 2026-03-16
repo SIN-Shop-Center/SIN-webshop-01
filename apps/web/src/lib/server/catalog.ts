@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { getProductById } from '@/data/sample-products'
+import { getApiBaseUrlIfConfigured } from '@/lib/api/base-url'
+import { allowCatalogApiFallback } from './catalog-api-fallback'
 
 export type SeoProduct = {
   id: string
@@ -13,8 +15,7 @@ export type SeoProduct = {
 }
 
 function apiBaseUrl(): string {
-  const configured = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL
-  return configured ? configured.replace(/\/$/, '') : ''
+  return getApiBaseUrlIfConfigured()
 }
 
 function asString(input: unknown): string {
@@ -69,7 +70,7 @@ function mapApiProduct(payload: Record<string, unknown>): SeoProduct | null {
 }
 
 export async function getSeoProduct(productId: string): Promise<SeoProduct | null> {
-  const fallback = fallbackProduct(productId)
+  const fallback = allowCatalogApiFallback() ? fallbackProduct(productId) : null
   const baseUrl = apiBaseUrl()
   if (!baseUrl) {
     return fallback
@@ -95,4 +96,3 @@ export async function getSeoProduct(productId: string): Promise<SeoProduct | nul
     return fallback
   }
 }
-

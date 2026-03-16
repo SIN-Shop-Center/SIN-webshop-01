@@ -20,7 +20,7 @@ export function AccountSidebar({ user, activeTab, onTabChange, onLogout }: Accou
         <p className="text-sm text-brand-text-muted">{user.email}</p>
       </div>
 
-      <nav className="space-y-1">
+      <nav className="space-y-1" aria-label="Kundencenter Bereiche">
         {ACCOUNT_TABS.map((tab) => (
           <button
             key={tab.id}

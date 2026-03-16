@@ -7,6 +7,48 @@ type TrackOptions = {
   route?: string
 }
 
+const ANALYTICS_BACKOFF_MS = 60_000
+const ANALYTICS_DISABLED_UNTIL_KEY = 'simone.analytics.disabled-until'
+let analyticsDisabledUntil = 0
+
+function analyticsDisabledByConfig(): boolean {
+  const configured = (process.env.NEXT_PUBLIC_WEB_ANALYTICS_ENABLED || '').trim().toLowerCase()
+  if (configured === 'false') {
+    return true
+  }
+  if (configured === 'true') {
+    return false
+  }
+
+  return (process.env.NEXT_PUBLIC_WEB_CATALOG_FALLBACK_ENABLED || '').trim().toLowerCase() === 'true'
+}
+
+function readDisabledUntilFromStorage(): number {
+  if (typeof window === 'undefined') {
+    return 0
+  }
+
+  try {
+    const raw = window.localStorage.getItem(ANALYTICS_DISABLED_UNTIL_KEY)
+    const parsed = Number.parseInt(raw || '', 10)
+    return Number.isFinite(parsed) ? parsed : 0
+  } catch {
+    return 0
+  }
+}
+
+function persistDisabledUntil(value: number) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(ANALYTICS_DISABLED_UNTIL_KEY, String(value))
+  } catch {
+    // Ignore localStorage write failures (private mode, quota, etc.)
+  }
+}
+
 function currentRoute(): string | undefined {
   if (typeof window === 'undefined') {
     return undefined
@@ -36,6 +78,13 @@ function currentExperimentAssignments(): Record<string, string> {
 }
 
 export async function trackEvent(type: AnalyticsEventType, options: TrackOptions = {}) {
+  const disabledUntil = Math.max(analyticsDisabledUntil, readDisabledUntilFromStorage())
+  analyticsDisabledUntil = disabledUntil
+
+  if (analyticsDisabledByConfig() || Date.now() < disabledUntil) {
+    return
+  }
+
   const segment = options.segment || useCustomerSegmentStore.getState().segment
   const payload = {
     ...(options.payload || {}),
@@ -50,7 +99,19 @@ export async function trackEvent(type: AnalyticsEventType, options: TrackOptions
   })
 
   try {
-    await fetch('/api/analytics', {
+    // Prefer sendBeacon to avoid aborted requests during fast navigations/unloads.
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      try {
+        const blob = new Blob([JSON.stringify(event)], { type: 'application/json' })
+        if (navigator.sendBeacon('/api/analytics', blob)) {
+          return
+        }
+      } catch {
+        // Fall back to fetch.
+      }
+    }
+
+    const response = await fetch('/api/analytics', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -58,7 +119,13 @@ export async function trackEvent(type: AnalyticsEventType, options: TrackOptions
       body: JSON.stringify(event),
       keepalive: true,
     })
+    if (!response.ok && response.status >= 500) {
+      analyticsDisabledUntil = Date.now() + ANALYTICS_BACKOFF_MS
+      persistDisabledUntil(analyticsDisabledUntil)
+    }
   } catch {
+    analyticsDisabledUntil = Date.now() + ANALYTICS_BACKOFF_MS
+    persistDisabledUntil(analyticsDisabledUntil)
     // Tracking is best-effort and must never block checkout or navigation.
   }
 }

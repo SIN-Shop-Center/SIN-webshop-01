@@ -10,25 +10,33 @@ interface ProductGridProps {
   loading?: boolean
   columns?: 2 | 3 | 4
   emptyMessage?: string
+  emptyHint?: string
+  emptyActionLabel?: string
+  onEmptyAction?: () => void
 }
+
+const GRID_COLUMNS = {
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
+} as const
+
+const SKELETON_KEYS = [0, 1, 2, 3, 4, 5, 6, 7] as const
 
 export function ProductGrid({
   products,
   loading = false,
   columns = 4,
   emptyMessage = 'Keine Produkte gefunden.',
+  emptyHint,
+  emptyActionLabel,
+  onEmptyAction,
 }: ProductGridProps) {
-  const gridCols = {
-    2: 'grid-cols-1 sm:grid-cols-2',
-    3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-  }
-
   if (loading) {
     return (
-      <div className={`grid ${gridCols[columns]} gap-6`}>
-        {[...Array(8)].map((_, i) => (
-          <ProductSkeleton key={i} />
+      <div className={`grid ${GRID_COLUMNS[columns]} gap-5`}>
+        {SKELETON_KEYS.map((key) => (
+          <ProductSkeleton key={key} />
         ))}
       </div>
     )
@@ -39,18 +47,27 @@ export function ProductGrid({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[1.8rem] border border-brand-border bg-white/85 px-6 py-14 text-center"
+        className="rounded-[1.8rem] border border-brand-border bg-white px-6 py-14 text-center"
       >
         <p className="text-2xl font-semibold text-brand-text">{emptyMessage}</p>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-brand-text-muted">
-          Prufe Filter, Segment oder Suchbegriff. Alle Preise und Verfuegbarkeiten werden transparent aktualisiert.
+          {emptyHint || 'Passe Suche, Segment oder Filter an. Preise und Verfügbarkeiten werden direkt in der Liste aktualisiert.'}
         </p>
+        {emptyActionLabel && onEmptyAction ? (
+          <button
+            type="button"
+            onClick={onEmptyAction}
+            className="ui-pill ui-pill-muted mt-5 text-sm font-semibold"
+          >
+            {emptyActionLabel}
+          </button>
+        ) : null}
       </motion.div>
     )
   }
 
   return (
-    <div className={`grid ${gridCols[columns]} gap-6`}>
+    <div className={`grid ${GRID_COLUMNS[columns]} gap-5`}>
       {products.map((product, index) => (
         <ProductCard key={product.id} product={product} index={index} />
       ))}
@@ -80,8 +97,8 @@ export function FeaturedGrid({ products, title, subtitle }: FeaturedGridProps) {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <div className="xl:col-span-2">
           <ProductCard product={featured} index={0} />
         </div>
         {rest.slice(0, 4).map((product, index) => (

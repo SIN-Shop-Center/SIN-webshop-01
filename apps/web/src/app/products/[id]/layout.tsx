@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: ProductLayoutProps): Promise<
   if (!product) {
     return {
       title: 'Produkt nicht gefunden',
-      description: `Dieses Produkt ist aktuell nicht verfügbar.`,
+      description: 'Dieses Produkt ist aktuell nicht im Sortiment. Im Katalog bleiben Preis, Lieferung und Rückgabe sichtbar.',
       alternates: {
         canonical: canonicalPath,
       },
@@ -28,11 +28,11 @@ export async function generateMetadata({ params }: ProductLayoutProps): Promise<
   }
 
   const description =
-    product.description || `${product.name} im Sortiment von ${SITE_NAME}.`
-  const title = `${product.name}`
+    product.description || `${product.name} mit sichtbarem Preis, klarer Lieferung und transparenter Rückgabe bei ${SITE_NAME}.`
+  const title = `${product.name} | ${SITE_NAME}`
 
   return {
-    title,
+    title: product.name,
     description,
     alternates: {
       canonical: canonicalPath,
@@ -61,4 +61,3 @@ export async function generateMetadata({ params }: ProductLayoutProps): Promise<
 export default function ProductLayout({ children }: ProductLayoutProps) {
   return children
 }
-

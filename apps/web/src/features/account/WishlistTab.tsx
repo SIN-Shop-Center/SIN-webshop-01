@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/ui/Link'
 import { HeartIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui'
 import { formatPrice } from '@/lib/utils'
@@ -35,7 +35,7 @@ export function WishlistTab({ products }: WishlistTabProps) {
           <article key={product.id} className="panel flex gap-4 p-4">
             <div className="h-24 w-24 overflow-hidden rounded-lg bg-brand-bg-muted">
               <Image
-                src={product.images[0] || '/placeholder-product.jpg'}
+                src={product.images[0] || '/catalog/product-fallback.svg'}
                 alt={product.name}
                 width={96}
                 height={96}

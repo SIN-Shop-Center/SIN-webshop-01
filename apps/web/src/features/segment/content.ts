@@ -28,10 +28,10 @@ export const SEGMENT_COPY: Record<CustomerSegment, SegmentCopy> = {
   b2b: {
     heroKicker: 'Zuverlässig beschaffen statt improvisieren',
     heroTitle: 'B2B-Bestellung mit klaren Prozessen und Planbarkeit.',
-    heroSubtitle: 'Rechnungs- und VAT-fähig, wiederbestellbar und auf Lieferfähigkeit optimiert.',
+    heroSubtitle: 'Mit Firmenangaben, USt-IdNr. und klarer Lieferfähigkeit für wiederkehrende Bestellungen.',
     primaryCta: 'B2B-Angebot starten',
     secondaryCta: 'Lieferfähigkeit prüfen',
-    productHint: 'Nettopreis-Orientierung und optionale Bestellreferenz',
-    trustFocus: ['Rechnung & VAT', 'Verfügbarkeit transparent', 'Wiederbestellung mit Referenz'],
+    productHint: 'Firmenangaben, Bestellreferenz und klare Beschaffungsschritte',
+    trustFocus: ['Rechnung & USt-IdNr.', 'Verfügbarkeit transparent', 'Wiederbestellung mit Referenz'],
   },
 }

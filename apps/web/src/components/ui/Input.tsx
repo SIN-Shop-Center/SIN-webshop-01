@@ -1,7 +1,6 @@
 'use client'
 
 import { forwardRef, useState, type InputHTMLAttributes } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -45,6 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={actualType}
             disabled={disabled}
+            suppressHydrationWarning
             className={cn(
               'w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-brand-text transition-colors',
               'placeholder:text-brand-text-muted focus:border-brand-accent focus:outline-none',
@@ -67,25 +67,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ) : null}
           {!isPassword && rightIcon ? <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brand-text-muted">{rightIcon}</span> : null}
         </div>
-        <AnimatePresence>
-          {error || success || hint ? (
-            <motion.p
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              className={cn(
-                'mt-1.5 flex items-center gap-1 text-xs',
-                error && 'text-red-600',
-                success && 'text-green-600',
-                hint && !error && !success && 'text-brand-text-muted',
-              )}
-            >
-              {error ? <AlertCircle className="h-3.5 w-3.5" /> : null}
-              {success ? <CheckCircle className="h-3.5 w-3.5" /> : null}
-              {error || success || hint}
-            </motion.p>
-          ) : null}
-        </AnimatePresence>
+        {error || success || hint ? (
+          <p
+            className={cn(
+              'mt-1.5 flex items-center gap-1 text-xs',
+              error && 'text-red-600',
+              success && 'text-green-600',
+              hint && !error && !success && 'text-brand-text-muted',
+            )}
+            aria-live={error ? 'assertive' : 'polite'}
+          >
+            {error ? <AlertCircle className="h-3.5 w-3.5" /> : null}
+            {success ? <CheckCircle className="h-3.5 w-3.5" /> : null}
+            {error || success || hint}
+          </p>
+        ) : null}
       </div>
     )
   },

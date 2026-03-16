@@ -4,40 +4,40 @@ import type { PaymentState } from './useCheckoutSuccessState'
 export const CHECKOUT_SUCCESS_CONTENT: Record<PaymentState, { heading: string; description: string }> = {
   loading: {
     heading: 'Zahlung wird geprüft',
-    description: 'Wir validieren den Zahlungsstatus mit Stripe und unserem Backend.',
+    description: 'Wir gleichen den Zahlungsstatus gerade ab und aktualisieren danach sofort deine Bestellung.',
   },
   paid: {
-    heading: 'Danke, Bestellung erfolgreich',
-    description: 'Dein Auftrag wurde eingereicht. Wir halten dich bei jedem Schritt transparent auf dem Laufenden.',
+    heading: 'Bestellung erfolgreich eingegangen',
+    description: 'Dein Auftrag ist erfasst. Wir informieren dich per E-Mail über Prüfung, Versand und Zustellung.',
   },
   pending: {
-    heading: 'Zahlung noch in Prüfung',
-    description: 'Wir haben deine Bestellung erhalten, die Zahlungsbestätigung steht noch aus.',
+    heading: 'Zahlung wird noch bestätigt',
+    description: 'Die Bestellung ist angelegt, die Rückmeldung des Zahlungsanbieters steht noch aus.',
   },
   failed: {
     heading: 'Zahlung fehlgeschlagen',
-    description: 'Die Zahlung konnte nicht bestätigt werden. Bitte starte den Checkout erneut.',
+    description: 'Die Zahlung konnte nicht bestätigt werden. Du kannst die Zahlung direkt erneut starten.',
   },
   error: {
     heading: 'Status aktuell nicht verfügbar',
-    description: 'Bitte aktualisiere diese Seite oder kontaktiere den Support mit deiner Bestellnummer.',
+    description: 'Bitte aktualisiere diese Seite oder kontaktiere uns mit deiner Bestellnummer.',
   },
 }
 
 export const CHECKOUT_SUCCESS_STEPS = [
   {
     icon: PackageCheck,
-    title: 'Bestellung bestätigt',
-    description: 'Deine Bestellung wurde verarbeitet und in die Fulfillment-Pipeline übergeben.',
+    title: 'Bestellung eingegangen',
+    description: 'Wir haben deinen Auftrag erfasst und bereiten die nächsten Schritte vor.',
   },
   {
     icon: Truck,
-    title: 'Versandstatus folgt',
-    description: 'Sobald der Versand startet, erhältst du ein Tracking-Update per E-Mail.',
+    title: 'Versandupdate folgt',
+    description: 'Sobald der Versand startet, erhältst du dein Tracking-Update per E-Mail.',
   },
   {
     icon: Repeat2,
-    title: 'Schnell nachbestellen',
-    description: 'Im Konto findest du alle Positionen für eine schnelle Wiederbestellung.',
+    title: 'Einfach wieder bestellen',
+    description: 'Im Konto bleiben deine Positionen für eine spätere Wiederbestellung griffbereit.',
   },
 ] as const

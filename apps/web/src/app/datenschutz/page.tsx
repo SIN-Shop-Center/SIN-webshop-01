@@ -1,4 +1,12 @@
+import type { Metadata } from 'next'
 import { InfoPage } from '@/components/content/InfoPage'
+import { buildPageMetadata } from '@/lib/page-metadata'
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Datenschutz',
+  description: 'Informationen zur Verarbeitung personenbezogener Daten gemäß DSGVO bei Simone Shop.',
+  path: '/datenschutz',
+})
 
 export default function DatenschutzPage() {
   return (

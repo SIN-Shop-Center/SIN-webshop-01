@@ -15,5 +15,5 @@ export const PAYMENT_METHODS: Array<{
   label: string
   info: string
 }> = [
-  { id: 'card', label: 'Kreditkarte (Stripe)', info: 'Visa, Mastercard, AMEX' },
+  { id: 'card', label: 'Karte oder Link', info: 'Visa, Mastercard, AMEX oder gespeicherte Link-Zahlung' },
 ]

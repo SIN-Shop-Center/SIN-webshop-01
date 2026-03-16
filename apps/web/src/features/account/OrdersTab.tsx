@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/ui/Link'
 import { ShoppingBagIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui'
 import type { AccountOrderSource } from '@/features/account/client'
@@ -110,7 +110,7 @@ export function OrdersTab({ orders, loading, error, source }: OrdersTabProps) {
                 <div key={item.id} className="flex items-center gap-3">
                   <div className="h-16 w-16 overflow-hidden rounded-lg bg-brand-bg-muted">
                     <Image
-                      src={item.productImage || '/placeholder-product.jpg'}
+                      src={item.productImage || '/catalog/product-fallback.svg'}
                       alt={item.productName}
                       width={64}
                       height={64}

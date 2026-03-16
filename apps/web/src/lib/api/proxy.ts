@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getApiBaseUrl } from './base-url'
+import { applyRateLimit, resolveRateLimitRule, toRetryAfterSeconds } from './proxy-rate-limit'
 
 const HOP_BY_HOP_HEADERS = new Set([
   'connection',
@@ -28,167 +30,9 @@ const FORWARDED_RESPONSE_HEADERS = new Set([
 
 const REQUEST_TIMEOUT_MS = 15_000
 
-type RateLimitRule = {
-  id: string
-  pathPrefix: string
-  methods: string[]
-  max: number
-  windowMs: number
-}
-
-type RateLimitState = {
-  count: number
-  resetAt: number
-}
-
-type RateLimitResult = {
-  limit: number
-  remaining: number
-  resetAt: number
-  retryAfterSeconds: number
-  exceeded: boolean
-}
-
-const RATE_LIMIT_RULES: RateLimitRule[] = [
-  {
-    id: 'catalog-read',
-    pathPrefix: '/api/v1/catalog/',
-    methods: ['GET'],
-    max: 240,
-    windowMs: 60_000,
-  },
-  {
-    id: 'promotions-read',
-    pathPrefix: '/api/v1/promotions/active',
-    methods: ['GET'],
-    max: 180,
-    windowMs: 60_000,
-  },
-  {
-    id: 'analytics-events',
-    pathPrefix: '/api/v1/analytics/events',
-    methods: ['POST'],
-    max: 90,
-    windowMs: 60_000,
-  },
-  {
-    id: 'checkout-create',
-    pathPrefix: '/api/v1/checkout/session',
-    methods: ['POST'],
-    max: 20,
-    windowMs: 60_000,
-  },
-  {
-    id: 'checkout-status',
-    pathPrefix: '/api/v1/checkout/session-status',
-    methods: ['GET'],
-    max: 120,
-    windowMs: 60_000,
-  },
-  {
-    id: 'support-tickets',
-    pathPrefix: '/api/v1/support/tickets',
-    methods: ['POST'],
-    max: 20,
-    windowMs: 60_000,
-  },
-  {
-    id: 'ai-chat',
-    pathPrefix: '/api/v1/ai/chat',
-    methods: ['POST'],
-    max: 30,
-    windowMs: 60_000,
-  },
-]
-
-declare global {
-  // eslint-disable-next-line no-var
-  var __simoneRateLimitStore: Map<string, RateLimitState> | undefined
-}
-
-const rateLimitStore = globalThis.__simoneRateLimitStore ?? new Map<string, RateLimitState>()
-globalThis.__simoneRateLimitStore = rateLimitStore
-
-function apiBaseUrl(): string {
-  const configured = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL
-  if (configured) {
-    return configured
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('INTERNAL_API_URL or NEXT_PUBLIC_API_URL is required in production')
-  }
-
-  return 'http://localhost:8080'
-}
-
-function clientAddress(req: NextRequest): string {
-  const raw =
-    req.headers.get('cf-connecting-ip') ||
-    req.headers.get('x-forwarded-for') ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  const ip = raw.split(',')[0]?.trim() || 'unknown'
-  return ip
-}
-
-function resolveRateLimitRule(targetPath: string, method: string): RateLimitRule | null {
-  if (process.env.NEXT_PUBLIC_DISABLE_WEB_RATE_LIMITS === 'true') {
-    return null
-  }
-
-  const normalizedMethod = method.toUpperCase()
-  for (const rule of RATE_LIMIT_RULES) {
-    if (targetPath.startsWith(rule.pathPrefix) && rule.methods.includes(normalizedMethod)) {
-      return rule
-    }
-  }
-  return null
-}
-
-function applyRateLimit(req: NextRequest, rule: RateLimitRule): RateLimitResult {
-  const now = Date.now()
-  const key = `${rule.id}:${clientAddress(req)}`
-
-  const current = rateLimitStore.get(key)
-  if (!current || current.resetAt <= now) {
-    const resetAt = now + rule.windowMs
-    rateLimitStore.set(key, {
-      count: 1,
-      resetAt,
-    })
-    return {
-      limit: rule.max,
-      remaining: Math.max(rule.max - 1, 0),
-      resetAt,
-      retryAfterSeconds: Math.ceil(rule.windowMs / 1000),
-      exceeded: false,
-    }
-  }
-
-  if (current.count >= rule.max) {
-    return {
-      limit: rule.max,
-      remaining: 0,
-      resetAt: current.resetAt,
-      retryAfterSeconds: Math.max(Math.ceil((current.resetAt - now) / 1000), 1),
-      exceeded: true,
-    }
-  }
-
-  current.count += 1
-  rateLimitStore.set(key, current)
-  return {
-    limit: rule.max,
-    remaining: Math.max(rule.max - current.count, 0),
-    resetAt: current.resetAt,
-    retryAfterSeconds: Math.max(Math.ceil((current.resetAt - now) / 1000), 1),
-    exceeded: false,
-  }
-}
-
-function toRetryAfterSeconds(resetAt: number): string {
-  return String(Math.max(Math.ceil((resetAt - Date.now()) / 1000), 1))
+function requestIDFrom(req: NextRequest): string {
+  const existing = req.headers.get('x-request-id')?.trim()
+  return existing || crypto.randomUUID()
 }
 
 function cacheControlFor(targetPath: string, method: string, status: number): string {
@@ -234,12 +78,40 @@ type ProxyOptions = {
   body?: BodyInit
 }
 
+function configErrorResponse(requestID: string, reason: string): NextResponse {
+  const headers = new Headers({
+    'content-type': 'application/json',
+    'cache-control': 'private, no-store',
+    'x-request-id': requestID,
+  })
+  applyResponseSecurityHeaders(headers)
+
+  return NextResponse.json(
+    {
+      error: 'api_proxy_config_invalid',
+      reason,
+      request_id: requestID,
+    },
+    {
+      status: 503,
+      headers,
+    },
+  )
+}
+
 export async function proxyRequest(
   req: NextRequest,
   targetPath: string,
   options?: ProxyOptions,
 ): Promise<NextResponse> {
-  const base = apiBaseUrl().replace(/\/$/, '')
+  const requestID = requestIDFrom(req)
+  let base = ''
+  try {
+    base = getApiBaseUrl()
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'api_base_url_invalid'
+    return configErrorResponse(requestID, reason)
+  }
   const target = new URL(`${base}${targetPath}`)
   const incoming = new URL(req.url)
   target.search = incoming.search
@@ -271,6 +143,7 @@ export async function proxyRequest(
 
   const headers = forwardHeaders(req)
   headers.set('x-forwarded-host', req.headers.get('host') || '')
+  headers.set('x-request-id', requestID)
 
   const init: RequestInit = {
     method,
@@ -293,6 +166,28 @@ export async function proxyRequest(
   let upstream: Response
   try {
     upstream = await fetch(target, init)
+  } catch (error) {
+    const timeout = error instanceof Error && error.name === 'AbortError'
+    const status = timeout ? 504 : 502
+
+    responseHeaders.set('content-type', 'application/json')
+    responseHeaders.set('cache-control', 'private, no-store')
+    responseHeaders.set('x-request-id', requestID)
+    if (timeout) {
+      responseHeaders.set('retry-after', '1')
+    }
+    applyResponseSecurityHeaders(responseHeaders)
+
+    return NextResponse.json(
+      {
+        error: timeout ? 'upstream_timeout' : 'upstream_unreachable',
+        request_id: requestID,
+      },
+      {
+        status,
+        headers: responseHeaders,
+      },
+    )
   } finally {
     if (timeoutHandle) {
       clearTimeout(timeoutHandle)
@@ -315,6 +210,7 @@ export async function proxyRequest(
     responseHeaders.set('x-ratelimit-reset', String(rateLimitResult.resetAt))
   }
 
+  responseHeaders.set('x-request-id', requestID)
   applyResponseSecurityHeaders(responseHeaders)
 
   const body = await upstream.text()

@@ -48,10 +48,8 @@ export function SegmentSwitch({ className }: SegmentSwitchProps) {
             aria-selected={selected}
             onClick={() => onSelect(value)}
             className={cn(
-              'rounded-full px-3 py-1.5 text-sm font-semibold transition-colors',
-              selected
-                ? 'bg-brand-accent text-white shadow-sm'
-                : 'text-brand-text-muted hover:text-brand-text',
+              'ui-pill text-sm font-semibold',
+              selected ? 'ui-pill-active' : 'ui-pill-muted',
             )}
           >
             {SEGMENT_LABELS[value]}

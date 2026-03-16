@@ -1,4 +1,12 @@
+import type { Metadata } from 'next'
 import { InfoPage } from '@/components/content/InfoPage'
+import { buildPageMetadata } from '@/lib/page-metadata'
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'AGB',
+  description: 'Allgemeine Geschäftsbedingungen für Bestellungen bei Simone Shop.',
+  path: '/agb',
+})
 
 export default function AgbPage() {
   return (

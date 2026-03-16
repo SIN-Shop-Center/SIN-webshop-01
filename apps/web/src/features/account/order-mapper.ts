@@ -80,7 +80,7 @@ export function mapApiOrderToUIOrder(order: ApiOrder, userID: string, addresses:
       id: item.id || `${order.id}-${index}`,
       productId: item.product_id || item.sku || 'unknown',
       productName: item.title || item.sku || 'Produkt',
-      productImage: '/placeholder-product.jpg',
+      productImage: '/catalog/product-fallback.svg',
       quantity: item.quantity,
       price: resolveUnitPrice(item),
       variant: item.variant || undefined,

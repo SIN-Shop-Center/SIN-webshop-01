@@ -29,7 +29,7 @@ export function AccountPageShell() {
 
   const handleLogout = () => {
     logout()
-    window.location.href = '/'
+    window.location.href = '/logout'
   }
 
   return (

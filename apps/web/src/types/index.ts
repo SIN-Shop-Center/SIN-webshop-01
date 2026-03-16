@@ -1,3 +1,9 @@
+export interface ProductBadge {
+  id: string
+  label: string
+  tone?: 'dark' | 'accent' | 'neutral'
+}
+
 // Product Types
 export interface Product {
   id: string
@@ -18,6 +24,13 @@ export interface Product {
   isFeatured?: boolean
   inStock?: boolean
   tags?: string[]
+  badges?: ProductBadge[]
+  deliveryEstimate?: string
+  useCases?: string[]
+  highlights?: string[]
+  compareGroup?: string
+  bundleCandidateIds?: string[]
+  popularityScore?: number
   variants?: ProductVariant[]
   supplier?: Supplier
   stock: number

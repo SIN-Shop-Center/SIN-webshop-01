@@ -1,0 +1,10 @@
+export const DEFAULT_IMAGE = '/catalog/product-fallback.svg'
+export const PRODUCTS_TTL_MS = 90_000
+export const PRODUCT_DETAIL_TTL_MS = 90_000
+export const CATEGORIES_TTL_MS = 5 * 60_000
+export const REQUEST_TIMEOUT_MS = 8_000
+export const STALE_REUSE_TTL_MS = 20_000
+export const PRODUCTS_CACHE_MAX_ENTRIES = 120
+export const PRODUCT_DETAIL_CACHE_MAX_ENTRIES = 300
+export const CATEGORIES_CACHE_MAX_ENTRIES = 24
+export const CACHE_STORAGE_VERSION = 'v2'
