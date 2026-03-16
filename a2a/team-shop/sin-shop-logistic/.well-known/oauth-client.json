@@ -1,0 +1,14 @@
+{
+  "client_id": "https://sin-shop-logistic-a2a.delqhi.com/.well-known/oauth-client.json",
+  "client_name": "SIN-Shop-Logistic",
+  "redirect_uris": [
+    "https://sin-shop-logistic-a2a.delqhi.com/oauth/callback"
+  ],
+  "grant_types": [
+    "authorization_code"
+  ],
+  "response_types": [
+    "code"
+  ],
+  "token_endpoint_auth_method": "none"
+}

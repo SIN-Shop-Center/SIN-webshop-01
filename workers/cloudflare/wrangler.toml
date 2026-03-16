@@ -1,0 +1,7 @@
+name = "simone-worldbest-shop"
+main = "worker.mjs"
+compatibility_date = "2026-02-26"
+compatibility_flags = ["nodejs_compat"]
+routes = [
+  { pattern = "delqhi.com/*", zone_name = "delqhi.com" }
+]

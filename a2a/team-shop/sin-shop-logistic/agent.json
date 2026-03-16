@@ -1,0 +1,19 @@
+{
+  "name": "SIN-Shop-Logistic",
+  "description": "Spezialisierter Shop-Agent fuer Droppshipping-Lieferanten-Registrierung, Produktintegration und Synchrone TikTok-Shop-Anbindung.",
+  "version": "0.1.0",
+  "protocolVersion": "0.3.0",
+  "url": "https://sin-shop-logistic-a2a.delqhi.com/a2a/jsonrpc",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "incrementalArtifacts": true
+  },
+  "skills": [
+    {
+      "id": "core",
+      "name": "Core Skill",
+      "description": "Primary skill bundle for SIN-Shop-Logistic."
+    }
+  ]
+}

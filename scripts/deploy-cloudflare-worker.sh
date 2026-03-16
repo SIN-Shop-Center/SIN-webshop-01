@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-WORKER_FILE="$ROOT_DIR/workers/cloudflare/worker.mjs"
+WORKER_FILE="$ROOT_DIR/workers/cloudflare/dist.mjs"
 WORKER_NAME="${CLOUDFLARE_WORKER_NAME:-simone-worldbest-shop}"
 COMPATIBILITY_DATE="${CLOUDFLARE_COMPATIBILITY_DATE:-2026-02-26}"
 WRANGLER_CONFIG_DEFAULT="$HOME/Library/Preferences/.wrangler/config/default.toml"
@@ -76,8 +76,8 @@ echo "Deploying worker '$WORKER_NAME' to account '$ACCOUNT_ID'..."
 DEPLOY_RESPONSE="$(
   curl -fsS -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/workers/scripts/$WORKER_NAME" \
     "${CF_AUTH_HEADERS[@]/#/-H }" \
-    -F "metadata={\"main_module\":\"worker.mjs\",\"compatibility_date\":\"$COMPATIBILITY_DATE\",\"compatibility_flags\":[\"nodejs_compat\"]};type=application/json" \
-    -F "worker.mjs=@$WORKER_FILE;type=application/javascript+module"
+    -F "metadata={\"main_module\":\"dist.mjs\",\"compatibility_date\":\"$COMPATIBILITY_DATE\",\"compatibility_flags\":[\"nodejs_compat\"]};type=application/json" \
+    -F "dist.mjs=@$WORKER_FILE;type=application/javascript+module"
 )"
 
 DEPLOY_OK="$(

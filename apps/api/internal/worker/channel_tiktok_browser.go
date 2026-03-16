@@ -75,3 +75,70 @@ func (p *Processor) dispatchTikTokBrowserAction(ctx context.Context, route strin
 	}
 	return response, nil
 }
+
+type TikTokProductListing struct {
+	ProductTitle  string         `json:"product_title"`
+	Description   string         `json:"description"`
+	CategoryId    string         `json:"category_id"`
+	BrandId       string         `json:"brand_id,omitempty"`
+	Skus          []TikTokSKU    `json:"skus"`
+	MainImages    []string       `json:"main_images"`
+	PackageWeight string         `json:"package_weight"`
+	PackageDims   TikTokDims     `json:"package_dims"`
+	Delivery      TikTokDelivery `json:"delivery_option"`
+}
+
+type TikTokSKU struct {
+	OuterSkuId    string `json:"outer_sku_id"`
+	OriginalPrice string `json:"original_price"`
+	StockQuantity int    `json:"stock_quantity"`
+}
+
+type TikTokDims struct {
+	Length string `json:"length"`
+	Width  string `json:"width"`
+	Height string `json:"height"`
+	Unit   string `json:"unit"`
+}
+
+type TikTokDelivery struct {
+	DeliveryOptionId string `json:"delivery_option_id"`
+}
+
+type CatalogProduct struct {
+	Name            string
+	HtmlDescription string
+	SKU             string
+	Price           float64
+	InventoryCount  int
+	Images          []string
+}
+
+// ConvertToTikTokListing creates a mapped payload for TikTok Shop API
+func ConvertToTikTokListing(internalProduct CatalogProduct) ([]byte, error) {
+	listing := TikTokProductListing{
+		ProductTitle: internalProduct.Name,
+		Description:  internalProduct.HtmlDescription,
+		CategoryId:   "1000", // Default or map
+		Skus: []TikTokSKU{
+			{
+				OuterSkuId:    internalProduct.SKU,
+				OriginalPrice: fmt.Sprintf("%.2f", internalProduct.Price),
+				StockQuantity: internalProduct.InventoryCount,
+			},
+		},
+		MainImages:    internalProduct.Images,
+		PackageWeight: "0.5",
+		PackageDims: TikTokDims{
+			Length: "10",
+			Width:  "10",
+			Height: "5",
+			Unit:   "cm",
+		},
+		Delivery: TikTokDelivery{
+			DeliveryOptionId: "default",
+		},
+	}
+
+	return json.Marshal(listing)
+}
