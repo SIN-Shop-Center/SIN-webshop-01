@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, RefreshCw, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { AdminAccessGate, ExperimentPanel } from '@/features/admin'
+import { ExperimentPanel } from '@/features/admin'
 import { getAuthHeaders } from '@/lib/api/auth'
 
 type FunnelResponse = {
@@ -96,8 +96,7 @@ export default function AdminAnalyticsPage() {
   )
 
   return (
-    <AdminAccessGate>
-    <main className="shell-container py-10">
+    <main className="pb-10">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-text-muted">War-Room</p>
@@ -171,6 +170,5 @@ export default function AdminAnalyticsPage() {
         <ExperimentPanel items={experiments?.items || []} loading={loading} />
       </section>
     </main>
-    </AdminAccessGate>
   )
 }

@@ -24,6 +24,8 @@ export const DOMAIN_CONFIG: Record<string, DomainConfig> = {
   'affiliate-offers': { title: 'Affiliate Offers', endpoint: '/api/admin/affiliate/offers?limit=50' },
   automation: { title: 'Automation Health', endpoint: '/api/admin/automation/health' },
   'kill-switch': { title: 'Kill Switch Configuration', endpoint: '/api/admin/settings' },
+  crm: { title: 'CRM Tasks', endpoint: '/api/admin/crm/tasks?limit=50' },
+  'csm-sla': { title: 'CSM SLA Tasks', endpoint: '/api/admin/crm/tasks?status=open&limit=50' },
 }
 
 export const DOMAIN_COLUMNS: Record<string, string[]> = {
@@ -51,6 +53,8 @@ export const DOMAIN_COLUMNS: Record<string, string[]> = {
     'payment_without_supplier_minute',
   ],
   'kill-switch': ['growth_kill_switch', 'automation_policy', 'trend_policy', 'autopilot_ready'],
+  crm: ['id', 'entity_type', 'entity_id', 'title', 'status', 'priority', 'updated_at'],
+  'csm-sla': ['id', 'entity_type', 'entity_id', 'title', 'status', 'priority', 'due_at'],
 }
 
 export function extractItems(payload: unknown): unknown[] {
