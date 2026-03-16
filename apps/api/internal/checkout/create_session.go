@@ -75,7 +75,7 @@ func (h *Handler) CreateSession(c *gin.Context) {
 		TotalAmount:      totalAmount,
 	})
 	if err != nil {
-		c.JSON(500, gin.H{"error": "order_create_failed"})
+		c.JSON(500, gin.H{"error": "order_create_failed", "detail": err.Error()})
 		return
 	}
 

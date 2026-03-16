@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -20,6 +22,13 @@ func Connect(dsn string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	// If connecting to Supabase pooler (port 6543) or PgBouncer, 
+	// we must disable prepared statement caching to avoid 42P05 errors.
+	if strings.Contains(dsn, "pooler.supabase.com:6543") || strings.Contains(dsn, "pgbouncer") {
+		cfg.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeExec
+	}
+
 	cfg.MaxConns = 20
 	cfg.MinConns = 2
 	cfg.MaxConnIdleTime = 10 * time.Minute
