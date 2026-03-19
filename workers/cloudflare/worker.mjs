@@ -12914,6 +12914,38 @@ img { display: block; max-width: 100%; }
     min-height: var(--control-height-compact);
     padding: 0.38rem 0.72rem;
   }
+  .catalog-controls {
+    margin-top: 0.75rem;
+  }
+  .catalog-toolbar-meta {
+    justify-content: flex-start;
+  }
+  .catalog-context-note small {
+    display: none;
+  }
+  .category-chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .chip {
+    min-width: 0;
+  }
+  .catalog-hero-proof,
+  .catalog-start-header,
+  .catalog-start-strip,
+  .catalog-compare-strip {
+    display: none;
+  }
+  .result-count {
+    margin-top: 0.35rem;
+  }
+  .product-support-line {
+    font-size: 0.78rem;
+  }
+  .product-grid {
+    gap: 0.75rem;
+  }
   .checkout-hero-card {
     padding: 0.9rem;
     gap: 0.65rem;
