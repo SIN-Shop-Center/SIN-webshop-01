@@ -1,6 +1,7 @@
 import Link from '@/components/ui/Link'
 import { BadgeCheck, Building2, Clock3, Mail, ShieldCheck } from 'lucide-react'
 import { PUBLIC_SUPPORT_EMAIL } from '@/lib/public-contact'
+import { STOREFRONT_FOOTER_LEGAL_NOTE, STOREFRONT_LEGAL_LINKS } from '@/lib/storefront-legal'
 import { FooterLegalLinks } from './FooterLegalLinks'
 
 const FOOTER_GROUPS = [
@@ -26,12 +27,7 @@ const FOOTER_GROUPS = [
   },
   {
     title: 'Rechtliches',
-    links: [
-      { label: 'Impressum', href: '/impressum' },
-      { label: 'Datenschutz', href: '/datenschutz' },
-      { label: 'AGB', href: '/agb' },
-      { label: 'Widerruf', href: '/widerrufsrecht' },
-    ],
+    links: STOREFRONT_LEGAL_LINKS,
   },
 ]
 
@@ -117,7 +113,7 @@ export function Footer() {
         <div className="mt-10 flex flex-col gap-4 border-t border-brand-border pt-6 text-sm text-brand-text-muted md:flex-row md:items-end md:justify-between">
           <p>© 2026 Simone Shop. Alle Rechte vorbehalten.</p>
           <div className="flex flex-col gap-2 md:items-end">
-            <p>Preise in EUR. Versand im DACH-Raum. Lieferung, Rückgabe und Kontakt klar dokumentiert.</p>
+            <p>{STOREFRONT_FOOTER_LEGAL_NOTE}</p>
             <FooterLegalLinks />
           </div>
         </div>

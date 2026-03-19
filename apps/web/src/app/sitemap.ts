@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getInitialCatalogProducts } from '@/lib/server/catalog-list'
 import { absoluteUrl } from '@/lib/site'
+import { STOREFRONT_LEGAL_LINKS, STOREFRONT_LEGAL_PAGES } from '@/lib/storefront-legal'
 
 const STATIC_ROUTES = [
   '/',
@@ -10,10 +11,7 @@ const STATIC_ROUTES = [
   '/kontakt',
   '/versand',
   '/rueckgabe',
-  '/datenschutz',
-  '/impressum',
-  '/widerrufsrecht',
-  '/agb',
+  ...STOREFRONT_LEGAL_LINKS.map((link) => link.href),
 ]
 
 function safeLastModified(input: string, fallback: Date): Date {

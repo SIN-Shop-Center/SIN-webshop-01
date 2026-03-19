@@ -1,11 +1,5 @@
 import Link from '@/components/ui/Link'
-
-const LEGAL_LINKS = [
-  { label: 'Impressum', href: '/impressum' },
-  { label: 'Datenschutz', href: '/datenschutz' },
-  { label: 'AGB', href: '/agb' },
-  { label: 'Widerruf', href: '/widerrufsrecht' },
-] as const
+import { STOREFRONT_LEGAL_LINKS } from '@/lib/storefront-legal'
 
 type FooterLegalLinksProps = {
   className?: string
@@ -22,7 +16,7 @@ export function FooterLegalLinks({ className, linkClassName }: FooterLegalLinksP
       aria-label="Rechtliche Links"
       className={joinClasses('flex flex-wrap items-center gap-x-4 gap-y-2', className)}
     >
-      {LEGAL_LINKS.map((link) => (
+      {STOREFRONT_LEGAL_LINKS.map((link) => (
         <Link
           key={link.href}
           href={link.href}
