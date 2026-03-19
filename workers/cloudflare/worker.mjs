@@ -4334,185 +4334,82 @@ function renderNotFoundCategoryStrip() {
 }
 
 function renderContactSupportHub(pathname, requestContext = null) {
-  const trendingTopics = [
-    { href: "/kundencenter", label: "Bestellung verfolgen" },
-    { href: "/faq", label: "Rechnung finden" },
-    { href: "/versand", label: "Lieferung klaeren" },
-    { href: "/rueckgabe", label: "Retoure starten" },
-    { href: "/products?segment=b2b", label: "Firmenkauf" },
-  ];
-  const heroHighlights = [
-    { label: "Antwortzeit", value: "meist < 24h" },
-    { label: "Bestellhilfe", value: "mit Kontext" },
-    { label: "Shop bleibt offen", value: "weiter einkaufen" },
-  ];
   const quickActions = [
     {
-      eyebrow: "Soforthilfe",
+      eyebrow: "Bestellung",
       title: "Bestellungen verwalten",
-      copy: "Bestellstatus, Verlauf und direkte Rueckwege im Kundencenter oeffnen.",
+      copy: "Bestellstatus, Verlauf und naechste Schritte direkt im Kundencenter sehen.",
       href: "/kundencenter",
-      label: "Jetzt oeffnen",
+      label: "Kundencenter oeffnen",
     },
     {
-      eyebrow: "Soforthilfe",
+      eyebrow: "Rueckgabe",
       title: "Rueckgabe starten",
-      copy: "Rueckgabe und Reklamation ohne Umweg erklaert, bevor es im Support stecken bleibt.",
+      copy: "Rueckgabe und Reklamation ohne Umweg oeffnen.",
       href: "/rueckgabe",
-      label: "Rueckgabe ansehen",
+      label: "Rueckgabe oeffnen",
     },
     {
-      eyebrow: "Soforthilfe",
+      eyebrow: "Versand",
       title: "Versand pruefen",
-      copy: "Lieferfenster, Versandkosten und Ablauf direkt klaeren.",
+      copy: "Lieferfenster, Versandkosten und Ablauf schnell klaeren.",
       href: "/versand",
-      label: "Versand ansehen",
+      label: "Versand oeffnen",
     },
   ];
   const topicCards = [
     {
       eyebrow: "Bestellung & Lieferung",
       title: "Status, Tracking und Adressfragen",
-      copy: "Wenn du schon bestellt hast, fuehren Kundencenter und Versandseite schneller zur Antwort als eine freie Support-Anfrage.",
+      copy: "Fuer bestehende Bestellungen ist das der schnellste Weg.",
       href: "/kundencenter",
       label: "Zum Kundencenter",
     },
     {
       eyebrow: "Rueckgabe & Reklamation",
       title: "Retoure, Defekt oder falscher Artikel",
-      copy: "Die Rueckgabe bleibt ein klarer Serviceweg mit sichtbaren naechsten Schritten statt langer Textwand.",
+      copy: "Rueckgabe und Reklamation mit klaren naechsten Schritten.",
       href: "/rueckgabe",
       label: "Rueckgabe lesen",
     },
     {
       eyebrow: "Zahlung & Rechnung",
       title: "Rechnung, Zahlungsstatus und Beleg",
-      copy: "Fragen zu Rechnung oder Zahlung lassen sich ueber FAQ und Bestellkontext sauber einordnen.",
+      copy: "Fragen zu Rechnung, Zahlung oder Beleg schnell klaeren.",
       href: "/faq",
       label: "FAQ oeffnen",
     },
     {
-      eyebrow: "Produktberatung",
-      title: "Vor dem Kauf die richtige Wahl treffen",
-      copy: "Wenn du vor dem Checkout eine Frage hast, bleibt Hilfe sichtbar, ohne den Shop aus dem Blick zu verlieren.",
+      eyebrow: "Vor dem Kauf",
+      title: "Produktfrage oder Kaufhilfe",
+      copy: "Wenn du vor der Bestellung Hilfe brauchst, findest du hier den passenden Einstieg.",
       href: "/products",
       label: "Zum Sortiment",
     },
-    {
-      eyebrow: "Firmenkauf",
-      title: "B2B, Mengen und Referenzen",
-      copy: "Firmenkauf bleibt moeglich, ohne den normalen Kaufpfad fuer alle anderen zu ueberladen.",
-      href: "/products?segment=b2b",
-      label: "Firmenkauf ansehen",
-    },
-    {
-      eyebrow: "Kontakt",
-      title: "Wenn Selbsthilfe nicht reicht",
-      copy: "Dann geht es direkt in den Kontaktweg mit Bestellkontext, Servicehinweis oder Produktfrage.",
-      href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}`,
-      label: "E-Mail an Support",
-    },
   ];
-  const supportResources = [
-    { eyebrow: "Ressource", title: "FAQ", copy: "Die haeufigsten Fragen schnell statt versteckt im Footer.", href: "/faq", label: "FAQ lesen" },
-    { eyebrow: "Ressource", title: "Versand", copy: "Lieferfenster und Versandlogik frueh sichtbar.", href: "/versand", label: "Versand lesen" },
-    { eyebrow: "Ressource", title: "Rueckgabe", copy: "Rueckweg und Reklamation klar erklaert.", href: "/rueckgabe", label: "Rueckgabe lesen" },
-    { eyebrow: "Ressource", title: "Kundencenter", copy: "Bestellungen und Verlauf getrennt vom Shop, aber direkt erreichbar.", href: "/kundencenter", label: "Kundencenter oeffnen" },
-  ];
-  const channels = [
-    {
-      eyebrow: "Kontaktkanal",
-      title: "E-Mail Support",
-      copy: SUPPORT_EMAIL,
-      meta: "In der Regel innerhalb von 24 Stunden.",
-      href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}`,
-      label: "E-Mail schreiben",
-    },
-    {
-      eyebrow: "Kontaktkanal",
-      title: "Bestellung mit Kontext",
-      copy: "Im Kundencenter starten, wenn die Anfrage an eine bestehende Bestellung gebunden ist.",
-      meta: "Hilft bei Status, Verlauf und spaeteren Rueckfragen.",
-      href: "/kundencenter",
-      label: "Kundencenter oeffnen",
-    },
-    {
-      eyebrow: "Kontaktkanal",
-      title: "Rueckgabe oder Reklamation",
-      copy: "Rueckgabe zuerst klar einordnen und dann gezielt eskalieren.",
-      meta: "Reduziert Reibung bei Defekt, Austausch oder falschem Artikel.",
-      href: "/rueckgabe",
-      label: "Rueckgabe starten",
-    },
+  const supportLinks = [
+    { href: "/faq", label: "FAQ" },
+    { href: "/kundencenter", label: "Kundencenter" },
+    { href: "/versand", label: "Versand" },
+    { href: "/products?segment=b2b", label: "Firmenkauf" },
   ];
 
   const content = `
 <section class="shell page-hero support-hub-hero">
-  <div class="support-hero-layout">
-    <div class="support-hero-copy">
-      <p class="kicker-badge">Kontakt & Hilfe</p>
-      <h1>Support wie im Store, nicht wie eine Sackgasse.</h1>
-      <p>Der Kontaktbereich fuehrt zuerst in die haeufigsten Loesungen und erst dann in die Eskalation. So bleibt Hilfe klar, schnell und kaufnah.</p>
-      <div class="info-pills">
-        <span>Bestellungen verwalten</span>
-        <span>Rueckgabe ohne Umweg</span>
-        <span>Antwort in der Regel innerhalb von 24 Stunden</span>
-      </div>
-      <div class="support-topic-pills">
-        ${trendingTopics
-          .map((item) => `<a href="${item.href}">${escapeHtml(item.label)}</a>`)
-          .join("")}
-      </div>
-      <div class="section-cta-row">
-        <a href="/kundencenter" class="btn-primary">Bestellung verwalten</a>
-        <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}" class="btn-secondary">Support kontaktieren</a>
-      </div>
+  <div class="support-hero-copy support-hero-copy-simple">
+    <p class="kicker-badge">Kontakt & Hilfe</p>
+    <h1>Wie koennen wir helfen?</h1>
+    <p>Waehle zuerst den passenden Weg fuer Bestellung, Lieferung, Rueckgabe oder persoenlichen Support.</p>
+    <div class="section-cta-row">
+      <a href="/kundencenter" class="btn-primary">Bestellung verwalten</a>
+      <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}" class="btn-secondary">Support schreiben</a>
     </div>
-    <aside class="support-hero-panel">
-      <p>Beliebte Anliegen</p>
-      <strong>Starte direkt mit dem naechsten sinnvollen Schritt.</strong>
-      <div class="support-hero-link-list">
-        ${trendingTopics
-          .slice(0, 4)
-          .map((item) => `<a href="${item.href}">${escapeHtml(item.label)}</a>`)
-          .join("")}
-      </div>
-      <div class="support-hero-meta-grid">
-        ${heroHighlights
-          .map(
-            (item) => `<article class="support-hero-meta-card">
-          <p>${escapeHtml(item.label)}</p>
-          <strong>${escapeHtml(item.value)}</strong>
-        </article>`,
-          )
-          .join("")}
-      </div>
-    </aside>
-  </div>
-</section>
-
-<section class="shell section-gap-tight">
-  <div class="section-header">
-    <p class="eyebrow">Soforthilfe</p>
-    <h2>Die haeufigsten Wege zuerst.</h2>
-    <p>Google Store zieht wichtige Aufgaben nach vorn. Genau das macht diese Kontaktseite jetzt auch.</p>
-  </div>
-  <div class="support-quick-grid">
-    ${quickActions
-      .map(
-        (item) => `<a class="support-quick-card" href="${item.href}">
-      <p>${escapeHtml(item.eyebrow)}</p>
-      <strong>${escapeHtml(item.title)}</strong>
-      <span>${escapeHtml(item.copy)}</span>
-      <em>${escapeHtml(item.label)}</em>
-    </a>`,
-      )
-      .join("")}
+    <p class="support-direct-line">Direktkontakt: <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}">${SUPPORT_EMAIL}</a> · Antwort meist innerhalb von 24 Stunden</p>
   </div>
 </section>
 
 ${requestContext ? `<section class="shell section-gap-tight">
-  <div class="auth-state-card">
+  <div class="auth-state-card support-context-card">
     <div class="auth-state-strip">
       ${requestContext.badges
         .map((badge) => `<article class="auth-state-mini"><p>${escapeHtml(badge.label)}</p><strong>${escapeHtml(badge.value)}</strong></article>`)
@@ -4530,9 +4427,29 @@ ${requestContext ? `<section class="shell section-gap-tight">
 
 <section class="shell section-gap-tight">
   <div class="section-header">
-    <p class="eyebrow">Wobei brauchst du Hilfe?</p>
-    <h2>Vom Selbstservice zur Eskalation in einem klaren Raster.</h2>
-    <p>Statt derselben generischen Infoseite fuer alles gibt es hier echte Einstiegspunkte fuer Bestellung, Rueckgabe, Zahlung und Firmenkauf.</p>
+    <p class="eyebrow">Soforthilfe</p>
+    <h2>Starte mit dem schnellsten Weg.</h2>
+    <p>Die haeufigsten Anliegen stehen direkt hier.</p>
+  </div>
+  <div class="support-quick-grid">
+    ${quickActions
+      .map(
+        (item) => `<a class="support-quick-card" href="${item.href}">
+      <p>${escapeHtml(item.eyebrow)}</p>
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.copy)}</span>
+      <em>${escapeHtml(item.label)}</em>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>
+
+<section class="shell section-gap-tight">
+  <div class="section-header">
+    <p class="eyebrow">Beliebte Themen</p>
+    <h2>Wobei brauchst du Hilfe?</h2>
+    <p>Weniger Auswahl, klarere Entscheidungen.</p>
   </div>
   <div class="support-topic-grid">
     ${topicCards
@@ -4548,47 +4465,27 @@ ${requestContext ? `<section class="shell section-gap-tight">
   </div>
 </section>
 
-${renderServiceVisualStrip()}
-
 <section class="shell section-gap-tight">
-  <div class="section-header">
-    <p class="eyebrow">Supportressourcen</p>
-    <h2>Die wichtigsten Hilfeflaechen bleiben sichtbar.</h2>
-    <p>Wie beim Google Store wird Hilfe nicht nur als Kontakt, sondern auch als Hub fuer die naechsten sinnvollen Schritte gebaut.</p>
-  </div>
-  <div class="support-resource-grid">
-    ${supportResources
-      .map(
-        (item) => `<a class="support-resource-card" href="${item.href}">
-      <p>${escapeHtml(item.eyebrow)}</p>
-      <strong>${escapeHtml(item.title)}</strong>
-      <span>${escapeHtml(item.copy)}</span>
-      <em>${escapeHtml(item.label)}</em>
-    </a>`,
-      )
-      .join("")}
+  <div class="support-simple-panel">
+    <p class="eyebrow">Weitere Hilfe</p>
+    <div class="support-simple-links">
+      ${supportLinks.map((item) => `<a href="${item.href}">${escapeHtml(item.label)}</a>`).join("")}
+    </div>
   </div>
 </section>
 
 <section class="shell section-gap-tight">
-  <div class="support-escalation-card">
-    <div class="section-header">
-      <p class="eyebrow">Noch Hilfe noetig?</p>
-      <h2>Dann direkt in den passenden Kontaktkanal.</h2>
-      <p>Der Eskalationsblock kommt bewusst nach den Schnellwegen. So fuehlt sich die Seite eher wie ein Support-Hub und weniger wie eine kaputte Sackgasse an.</p>
+  <div class="support-contact-panel">
+    <p class="eyebrow">Direkter Kontakt</p>
+    <h2>Schreib uns, wenn du persoenliche Hilfe brauchst.</h2>
+    <p>Antwort meist innerhalb von 24 Stunden. Wenn es um eine bestehende Bestellung geht, hilft das Kundencenter meistens schneller.</p>
+    <div class="support-contact-meta">
+      <strong>${SUPPORT_EMAIL}</strong>
+      <span>Support fuer Bestellung, Lieferung, Rueckgabe und Produktfragen</span>
     </div>
-    <div class="contact-channel-grid">
-      ${channels
-        .map(
-          (item) => `<a class="contact-channel-card" href="${item.href}">
-        <p>${escapeHtml(item.eyebrow)}</p>
-        <strong>${escapeHtml(item.title)}</strong>
-        <span>${escapeHtml(item.copy)}</span>
-        <small>${escapeHtml(item.meta)}</small>
-        <em>${escapeHtml(item.label)}</em>
-      </a>`,
-        )
-        .join("")}
+    <div class="section-cta-row">
+      <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}" class="btn-primary">Support schreiben</a>
+      <a href="/kundencenter" class="btn-secondary">Kundencenter oeffnen</a>
     </div>
   </div>
 </section>`;
@@ -8262,126 +8159,54 @@ img { display: block; max-width: 100%; }
 }
 
 .support-hub-hero {
-  background: linear-gradient(135deg, #f6f2eb 0%, #ffffff 45%, #efe6da 100%);
-}
-
-.support-hero-layout {
-  display: grid;
-  gap: 1rem;
+  background: linear-gradient(180deg, #faf8f5 0%, #ffffff 100%);
 }
 
 .support-hero-copy {
   min-width: 0;
 }
 
-.support-topic-pills {
-  margin-top: 0.85rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+.support-hero-copy-simple {
+  max-width: 42rem;
 }
 
-.support-topic-pills a,
-.support-hero-link-list a {
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+.support-direct-line {
+  margin: 0.85rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.support-direct-line a {
   color: var(--ink);
-  min-height: 2.25rem;
-  padding: 0.45rem 0.72rem;
-  font-size: 0.8rem;
   font-weight: 700;
-  display: inline-flex;
-  align-items: center;
 }
 
-.support-hero-panel {
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: var(--shadow-soft);
-  padding: 1rem;
-  display: grid;
-  gap: 0.75rem;
-}
-
-.support-hero-panel p,
-.support-hero-meta-card p {
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #0f766e;
-}
-
-.support-hero-panel strong {
-  font-size: 1rem;
-  line-height: 1.45;
-}
-
-.support-hero-link-list,
-.support-hero-meta-grid {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.support-hero-link-list a {
-  justify-content: flex-start;
-}
-
-.support-hero-meta-card {
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.8rem;
-  display: grid;
-  gap: 0.15rem;
-}
-
-.support-hero-meta-card strong {
-  font-size: 0.95rem;
-  line-height: 1.35;
+.support-context-card {
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .support-quick-grid,
-.support-topic-grid,
-.support-resource-grid,
-.contact-channel-grid {
+.support-topic-grid {
   display: grid;
   gap: 0.75rem;
 }
 
 .support-quick-card,
-.support-topic-card,
-.support-resource-card,
-.contact-channel-card {
+.support-topic-card {
   border: 1px solid var(--line);
-  border-radius: 1.2rem;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: var(--shadow-soft);
+  border-radius: 1rem;
+  background: #fff;
   color: var(--ink);
   padding: 1rem;
   display: grid;
   gap: 0.28rem;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-}
-
-.support-quick-card:hover,
-.support-topic-card:hover,
-.support-resource-card:hover,
-.contact-channel-card:hover,
-.support-topic-pills a:hover,
-.support-hero-link-list a:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 38px rgba(17, 24, 39, 0.08);
-  border-color: rgba(17, 17, 17, 0.16);
 }
 
 .support-quick-card p,
 .support-topic-card p,
-.support-resource-card p,
-.contact-channel-card p {
+.support-contact-panel .eyebrow,
+.support-simple-panel .eyebrow {
   margin: 0;
   font-size: 0.72rem;
   font-weight: 800;
@@ -8392,25 +8217,21 @@ img { display: block; max-width: 100%; }
 
 .support-quick-card strong,
 .support-topic-card strong,
-.support-resource-card strong,
-.contact-channel-card strong {
+.support-contact-panel h2 {
   font-size: 1rem;
   line-height: 1.4;
 }
 
 .support-quick-card span,
 .support-topic-card span,
-.support-resource-card span,
-.contact-channel-card span {
+.support-contact-panel p {
   color: var(--ink-muted);
   font-size: 0.84rem;
   line-height: 1.5;
 }
 
 .support-quick-card em,
-.support-topic-card em,
-.support-resource-card em,
-.contact-channel-card em {
+.support-topic-card em {
   margin-top: 0.45rem;
   font-style: normal;
   font-size: 0.78rem;
@@ -8418,18 +8239,53 @@ img { display: block; max-width: 100%; }
   color: var(--ink);
 }
 
-.contact-channel-card small {
-  color: var(--ink-muted);
-  font-size: 0.78rem;
-  line-height: 1.45;
+.support-simple-panel,
+.support-contact-panel {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1rem;
 }
 
-.support-escalation-card {
+.support-simple-links {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.support-simple-links a {
   border: 1px solid var(--line);
-  border-radius: 1.35rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 241, 233, 0.96));
-  box-shadow: var(--shadow-soft);
-  padding: 1rem;
+  border-radius: 999px;
+  background: #faf8f5;
+  color: var(--ink);
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.support-contact-panel h2,
+.support-contact-panel p {
+  margin: 0;
+}
+
+.support-contact-meta {
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.support-contact-meta strong {
+  font-size: 1rem;
+}
+
+.support-contact-meta span {
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .catalog-hero-grid {
