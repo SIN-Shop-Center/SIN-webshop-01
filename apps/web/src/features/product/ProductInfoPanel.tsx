@@ -30,8 +30,8 @@ export function ProductInfoPanel({
 }: ProductInfoPanelProps) {
   const benefitList =
     segment === 'b2b'
-      ? ['Verfügbarkeit sofort sichtbar', 'Für Wiederbestellungen geeignet', 'Firmenkauf ohne Zusatzschritte']
-      : ['Preis und Lieferung früh sichtbar', 'Schnell im Warenkorb und Checkout', 'Rückgabe klar erklärt']
+      ? ['Premium Verarbeitungsqualität', 'Geprüfte Langlebigkeit', 'Volle Garantie']
+      : ['Premium Verarbeitungsqualität', 'Kostenloser Versand ab 50€', '30 Tage Geld-zurück-Garantie']
   const highlights = (product.highlights || []).slice(0, 3)
   const useCases = (product.useCases || []).slice(0, 3)
 
@@ -87,7 +87,7 @@ export function ProductInfoPanel({
         {highlights.length > 0 ? (
           <div className="mt-6 rounded-[1.5rem] border border-brand-border bg-brand-surface p-4">
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-brand-text-muted">
-              Warum dieses Produkt schnell passt
+              Highlights & Vorteile
             </p>
             <div className="mt-3 grid gap-2">
               {highlights.map((entry) => (

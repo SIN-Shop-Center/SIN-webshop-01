@@ -40,7 +40,7 @@ export function ReviewStep({
       <div>
         <h2 className="text-2xl">Bestellung prüfen</h2>
         <p className="mt-2 text-sm leading-7 text-brand-text-muted">
-          Letzter Blick auf Adresse, Artikel und Pflichtbestätigungen. Danach geht es sicher zum Zahlungsanbieter.
+          Bitte prüfe deine Bestellung. Im nächsten Schritt schließt du den Kauf sicher ab.
         </p>
       </div>
 
@@ -98,13 +98,13 @@ export function ReviewStep({
           </div>
 
           <div className="rounded-[1.4rem] border border-brand-border bg-white p-4 text-sm text-brand-text-muted">
-            <p className="font-semibold text-brand-text">Vor dem Absenden noch klar</p>
+            <p className="font-semibold text-brand-text">Deine Vorteile bei uns</p>
             <div className="mt-3 grid gap-2">
               <p className="rounded-xl border border-brand-border bg-brand-bg px-3 py-2">
-                Versand, Rückgabe und Pflichtangaben bleiben auch im letzten Schritt sichtbar.
+                Kostenloser Versand ab 50€ Bestellwert. Schnelle Lieferung direkt zu dir nach Hause.
               </p>
               <p className="rounded-xl border border-brand-border bg-brand-bg px-3 py-2">
-                Es kommen keine versteckten Kosten nach dem Klick auf den Zahlungsanbieter dazu.
+                30 Tage Rückgaberecht. Du kannst Artikel problemlos und stressfrei zurücksenden.
               </p>
             </div>
           </div>

@@ -32,7 +32,7 @@ export function ProductPricingBlock({ product, segment }: ProductPricingBlockPro
         ) : null}
       </div>
 
-      <p className="mt-2 text-sm text-brand-text-muted">MwSt., Versand und Lieferhinweise bleiben vor dem letzten Schritt sichtbar.</p>
+      <p className="mt-2 text-sm text-brand-text-muted">Inkl. MwSt., versandfertig in 24h.</p>
 
       {product.badges && product.badges.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -63,7 +63,7 @@ export function ProductPricingBlock({ product, segment }: ProductPricingBlockPro
         ) : null}
         <span className="ui-pill text-xs font-semibold">
           <Truck className="h-3.5 w-3.5 text-brand-text" />
-          {segment === 'b2b' ? 'USt-IdNr. und Referenz möglich' : `Kostenloser Versand ab ${formatPrice(FREE_SHIPPING_THRESHOLD)}`}
+          {segment === 'b2b' ? 'Kauf auf Rechnung möglich' : `Kostenloser Versand ab ${formatPrice(FREE_SHIPPING_THRESHOLD)}`}
         </span>
       </div>
 
@@ -78,7 +78,7 @@ export function ProductPricingBlock({ product, segment }: ProductPricingBlockPro
         </div>
         <div className="inline-flex items-center gap-2 rounded-2xl border border-brand-border bg-brand-bg px-3 py-3 text-sm font-semibold text-brand-text">
           <RotateCcw className="h-4 w-4 text-brand-text" />
-          {segment === 'b2b' ? 'Rückfragen und Firmenkauf im Checkout' : '30 Tage Rückgabe klar erklärt'}
+          {segment === 'b2b' ? 'Persönlicher B2B Support' : '30 Tage sorgenfreie Rückgabe'}
         </div>
       </div>
     </section>

@@ -191,7 +191,7 @@ export default function ProductDetailPage() {
       <ProductShelfSection
         eyebrow="Oft sinnvoll zusammen"
         title="Ergänze dein Setup ohne Umweg"
-        description="Sekundäre Produkte bleiben sichtbar, ohne den Hauptkauf zu überlagern."
+        description="Perfekte Ergänzungen, die das Beste aus deinem Produkt herausholen."
         products={bundleCandidates}
         columns={3}
       />
@@ -199,7 +199,7 @@ export default function ProductDetailPage() {
       <ProductShelfSection
         eyebrow="Passend zu diesem Produkt"
         title="Ähnliche Optionen für denselben Bedarf"
-        description="Falls du noch zwischen mehreren Lösungen schwankst, bleiben hier Preis, Lieferung und Nutzen vergleichbar."
+        description="Weitere erstklassige Alternativen aus derselben Kategorie."
         products={related}
         columns={4}
       />
@@ -207,7 +207,7 @@ export default function ProductDetailPage() {
       <ProductShelfSection
         eyebrow="Wieder aufnehmen"
         title="Zuletzt angesehene Produkte"
-        description="Du kannst den Entscheidungsfaden wieder aufnehmen, ohne neu suchen zu müssen."
+        description="Diese Highlights hast du dir vor kurzem angesehen."
         products={recentlyViewedProducts}
         columns={4}
       />

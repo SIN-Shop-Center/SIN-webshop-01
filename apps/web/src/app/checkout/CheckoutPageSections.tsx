@@ -14,12 +14,12 @@ export function CheckoutPageHeader({ segmentLabel }: CheckoutPageHeaderProps) {
       </Link>
       <h1 className="mt-3 text-4xl md:text-5xl">Checkout</h1>
       <p className="mt-2 max-w-2xl text-brand-text-muted">
-        {segmentLabel} mit sichtbaren Gesamtkosten, klaren Pflichtfeldern und nur drei nächsten Schritten.
+        Sicherer Checkout. Deine Daten werden verschlüsselt übertragen und vertraulich behandelt.
       </p>
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-brand-text-muted">
-        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">Nur Pflichtfelder</span>
-        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">Zahlung erst nach Prüfung</span>
-        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">Gesamtkosten sichtbar</span>
+        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">SSL-Verschlüsselt</span>
+        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">Käuferschutz</span>
+        <span className="rounded-full border border-brand-border bg-brand-bg px-3 py-1.5">Schneller Versand</span>
       </div>
     </header>
   )

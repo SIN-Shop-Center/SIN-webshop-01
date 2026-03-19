@@ -34,10 +34,10 @@ export function ProductsResultsSummary({
   const subtitle = loading
     ? 'Preise, Lieferung und Verfügbarkeit werden für dich vorbereitet.'
     : count === 0
-      ? 'Entferne Suche oder Filter, damit du wieder das volle Sortiment mit sichtbaren Kosten siehst.'
+      ? 'Passe deine Filter an, um weitere großartige Produkte zu entdecken.'
       : trimmedSearch
-        ? `Treffer für "${trimmedSearch}" mit früh sichtbaren Preisen, Lieferung und Rückgabe.`
-        : 'Preis, Lieferung und Rückgabe bleiben direkt im Sortiment sichtbar.'
+        ? `Treffer für "${trimmedSearch}" in bester Qualität.`
+        : 'Finde genau das, was du suchst – sofort lieferbar.'
 
   return (
     <div className="mb-5 rounded-[1.4rem] border border-brand-border bg-white/88 px-4 py-4 shadow-[0_10px_26px_rgba(18,18,18,0.05)] md:px-5">

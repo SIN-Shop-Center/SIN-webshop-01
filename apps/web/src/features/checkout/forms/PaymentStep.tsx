@@ -18,7 +18,7 @@ export function PaymentStep({ method, onMethodChange, onBack, onContinue }: Paym
       <div>
         <h2 className="text-2xl">Zahlungsmethode</h2>
         <p className="mt-2 text-sm leading-7 text-brand-text-muted">
-          Hier wählst du nur den bevorzugten Zahlungsweg. Vor der finalen Freigabe siehst du beim Anbieter alle Zahlungsdaten noch einmal.
+          Wähle deine bevorzugte Zahlungsmethode. Alle Transaktionen sind sicher und nach modernsten Standards verschlüsselt.
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export function PaymentStep({ method, onMethodChange, onBack, onContinue }: Paym
             </span>
           </div>
           <p className="mt-3 text-xs leading-6 text-white/75">
-            Zahlungsdaten gibst du erst beim Zahlungsanbieter ein. Vorher bleiben Gesamtbetrag und Pflichtangaben sichtbar.
+            Schnell und sicher bezahlen. Deine Daten sind bei uns in besten Händen.
           </p>
         </div>
       ) : (
@@ -71,23 +71,23 @@ export function PaymentStep({ method, onMethodChange, onBack, onContinue }: Paym
       )}
 
       <p className="rounded-[1.2rem] border border-brand-border bg-brand-bg px-4 py-3 text-xs text-brand-text-muted">
-        Die finale Zahlungsbestätigung erfolgt erst beim Zahlungsanbieter. Dort siehst du Karte oder Link mit allen Zahlungsdaten vor Abschluss noch einmal.
+        Deine Bestellung wird erst im nächsten Schritt nach deiner finalen Prüfung verbindlich abgeschlossen.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-[1.2rem] border border-brand-border bg-white px-4 py-3 text-sm text-brand-text-muted">
           <p className="inline-flex items-center gap-2 font-semibold text-brand-text">
             <ShieldCheck className="h-4 w-4 text-brand-success" />
-            Keine versteckten Kosten
+            Volle Kostentransparenz
           </p>
-          <p className="mt-2 text-xs leading-6">Gesamtbetrag und Bestellangaben bleiben vor der Weiterleitung sichtbar.</p>
+          <p className="mt-2 text-xs leading-6">Du siehst alle Kosten auf einen Blick, bevor du zahlst.</p>
         </div>
         <div className="rounded-[1.2rem] border border-brand-border bg-white px-4 py-3 text-sm text-brand-text-muted">
           <p className="inline-flex items-center gap-2 font-semibold text-brand-text">
             <ReceiptText className="h-4 w-4 text-brand-text" />
-            Erst prüfen, dann zahlen
+            Sicher einkaufen
           </p>
-          <p className="mt-2 text-xs leading-6">Im nächsten Schritt kontrollierst du Adresse, Artikel und Pflichtangaben gesammelt.</p>
+          <p className="mt-2 text-xs leading-6">Im nächsten Schritt kannst du deine Bestellung noch einmal in Ruhe prüfen.</p>
         </div>
       </div>
 
