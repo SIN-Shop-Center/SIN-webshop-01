@@ -2538,7 +2538,7 @@ function renderHero(products = PRODUCTS) {
     <div class="hero-copy animate-reveal">
       <p class="kicker-badge">Simone Shop</p>
       <h1>Finde praktische Produkte fuer Alltag, Zuhause und Arbeit.</h1>
-      <p>Suche direkt nach einem Produkt oder starte mit einer Kategorie und unseren beliebtesten Artikeln.</p>
+      <p>Suche direkt nach einem Produkt oder starte jetzt im Sortiment mit den beliebtesten Kategorien.</p>
 
       <form class="hero-search" action="/products" method="get" role="search">
         <label for="heroSearch" class="sr-only">Produkte suchen</label>
@@ -2550,7 +2550,7 @@ function renderHero(products = PRODUCTS) {
           autocomplete="off"
           placeholder="z. B. Kopfhoerer, Lampe oder Hautpflege"
         />
-        <button type="submit" class="btn-primary hero-search-btn">Produkte finden</button>
+        <button type="submit" class="btn-primary hero-search-btn">Jetzt Produkte finden</button>
       </form>
 
       <div class="hero-search-lanes">
@@ -12940,15 +12940,68 @@ img { display: block; max-width: 100%; }
   .result-count {
     margin-top: 0.35rem;
   }
-  .product-support-line {
-    font-size: 0.78rem;
+  .product-body {
+    padding: 0.82rem;
+  }
+  .product-card.compare-mode .product-badge,
+  .product-support-line,
+  .product-context-row-compact {
+    display: none;
+  }
+  .product-title {
+    font-size: 1.02rem;
+    line-height: 1.28;
+  }
+  .product-meta-line.compare-mode {
+    margin-top: 0.42rem;
+    gap: 0.32rem;
+  }
+  .product-price-row {
+    gap: 0.45rem;
+  }
+  .product-price-row strong {
+    font-size: 1.18rem;
   }
   .product-grid {
     gap: 0.75rem;
   }
   .checkout-hero-card {
-    padding: 0.9rem;
-    gap: 0.65rem;
+    padding: 0.82rem;
+    gap: 0.5rem;
+  }
+  .checkout-hero-card h1 {
+    font-size: 2.25rem;
+  }
+  .checkout-hero-pills {
+    margin-top: 0.55rem;
+    gap: 0.32rem;
+  }
+  .checkout-hero-pills span:last-child,
+  .checkout-hero-note {
+    display: none;
+  }
+  .hero-grid {
+    padding: 1.1rem;
+    gap: 0.9rem;
+  }
+  .hero-copy h1 {
+    margin-top: 0.65rem;
+    font-size: 2.35rem;
+    line-height: 1.08;
+  }
+  .hero-copy p {
+    font-size: 0.95rem;
+  }
+  .hero-search {
+    margin-top: 0.8rem;
+  }
+  .hero-search-lanes,
+  .hero-proof-row,
+  .hero-visual {
+    display: none;
+  }
+  .hero-inline-link.hero-primary-link {
+    margin-top: 0.85rem;
   }
   .checkout-confidence-card img {
     display: none;
