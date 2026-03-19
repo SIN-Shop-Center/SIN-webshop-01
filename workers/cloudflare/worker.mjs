@@ -3,6 +3,7 @@ import { PRODUCT_VISUALS } from "./product-visuals.mjs";
 const BUILD_DATE = "2026-03-08";
 const SITE_ORIGIN = "https://delqhi.com";
 let API_ORIGIN = "https://api.delqhi.com";
+const SUPPORT_EMAIL = "support@delqhi.com";
 const LIVE_STORE_READY = true;
 const HOME_VISUALS = {
   hero: "data:image/webp;base64,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",
@@ -4332,6 +4333,276 @@ function renderNotFoundCategoryStrip() {
 </section>`;
 }
 
+function renderContactSupportHub(pathname, requestContext = null) {
+  const trendingTopics = [
+    { href: "/kundencenter", label: "Bestellung verfolgen" },
+    { href: "/faq", label: "Rechnung finden" },
+    { href: "/versand", label: "Lieferung klaeren" },
+    { href: "/rueckgabe", label: "Retoure starten" },
+    { href: "/products?segment=b2b", label: "Firmenkauf" },
+  ];
+  const heroHighlights = [
+    { label: "Antwortzeit", value: "meist < 24h" },
+    { label: "Bestellhilfe", value: "mit Kontext" },
+    { label: "Shop bleibt offen", value: "weiter einkaufen" },
+  ];
+  const quickActions = [
+    {
+      eyebrow: "Soforthilfe",
+      title: "Bestellungen verwalten",
+      copy: "Bestellstatus, Verlauf und direkte Rueckwege im Kundencenter oeffnen.",
+      href: "/kundencenter",
+      label: "Jetzt oeffnen",
+    },
+    {
+      eyebrow: "Soforthilfe",
+      title: "Rueckgabe starten",
+      copy: "Rueckgabe und Reklamation ohne Umweg erklaert, bevor es im Support stecken bleibt.",
+      href: "/rueckgabe",
+      label: "Rueckgabe ansehen",
+    },
+    {
+      eyebrow: "Soforthilfe",
+      title: "Versand pruefen",
+      copy: "Lieferfenster, Versandkosten und Ablauf direkt klaeren.",
+      href: "/versand",
+      label: "Versand ansehen",
+    },
+  ];
+  const topicCards = [
+    {
+      eyebrow: "Bestellung & Lieferung",
+      title: "Status, Tracking und Adressfragen",
+      copy: "Wenn du schon bestellt hast, fuehren Kundencenter und Versandseite schneller zur Antwort als eine freie Support-Anfrage.",
+      href: "/kundencenter",
+      label: "Zum Kundencenter",
+    },
+    {
+      eyebrow: "Rueckgabe & Reklamation",
+      title: "Retoure, Defekt oder falscher Artikel",
+      copy: "Die Rueckgabe bleibt ein klarer Serviceweg mit sichtbaren naechsten Schritten statt langer Textwand.",
+      href: "/rueckgabe",
+      label: "Rueckgabe lesen",
+    },
+    {
+      eyebrow: "Zahlung & Rechnung",
+      title: "Rechnung, Zahlungsstatus und Beleg",
+      copy: "Fragen zu Rechnung oder Zahlung lassen sich ueber FAQ und Bestellkontext sauber einordnen.",
+      href: "/faq",
+      label: "FAQ oeffnen",
+    },
+    {
+      eyebrow: "Produktberatung",
+      title: "Vor dem Kauf die richtige Wahl treffen",
+      copy: "Wenn du vor dem Checkout eine Frage hast, bleibt Hilfe sichtbar, ohne den Shop aus dem Blick zu verlieren.",
+      href: "/products",
+      label: "Zum Sortiment",
+    },
+    {
+      eyebrow: "Firmenkauf",
+      title: "B2B, Mengen und Referenzen",
+      copy: "Firmenkauf bleibt moeglich, ohne den normalen Kaufpfad fuer alle anderen zu ueberladen.",
+      href: "/products?segment=b2b",
+      label: "Firmenkauf ansehen",
+    },
+    {
+      eyebrow: "Kontakt",
+      title: "Wenn Selbsthilfe nicht reicht",
+      copy: "Dann geht es direkt in den Kontaktweg mit Bestellkontext, Servicehinweis oder Produktfrage.",
+      href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}`,
+      label: "E-Mail an Support",
+    },
+  ];
+  const supportResources = [
+    { eyebrow: "Ressource", title: "FAQ", copy: "Die haeufigsten Fragen schnell statt versteckt im Footer.", href: "/faq", label: "FAQ lesen" },
+    { eyebrow: "Ressource", title: "Versand", copy: "Lieferfenster und Versandlogik frueh sichtbar.", href: "/versand", label: "Versand lesen" },
+    { eyebrow: "Ressource", title: "Rueckgabe", copy: "Rueckweg und Reklamation klar erklaert.", href: "/rueckgabe", label: "Rueckgabe lesen" },
+    { eyebrow: "Ressource", title: "Kundencenter", copy: "Bestellungen und Verlauf getrennt vom Shop, aber direkt erreichbar.", href: "/kundencenter", label: "Kundencenter oeffnen" },
+  ];
+  const channels = [
+    {
+      eyebrow: "Kontaktkanal",
+      title: "E-Mail Support",
+      copy: SUPPORT_EMAIL,
+      meta: "In der Regel innerhalb von 24 Stunden.",
+      href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}`,
+      label: "E-Mail schreiben",
+    },
+    {
+      eyebrow: "Kontaktkanal",
+      title: "Bestellung mit Kontext",
+      copy: "Im Kundencenter starten, wenn die Anfrage an eine bestehende Bestellung gebunden ist.",
+      meta: "Hilft bei Status, Verlauf und spaeteren Rueckfragen.",
+      href: "/kundencenter",
+      label: "Kundencenter oeffnen",
+    },
+    {
+      eyebrow: "Kontaktkanal",
+      title: "Rueckgabe oder Reklamation",
+      copy: "Rueckgabe zuerst klar einordnen und dann gezielt eskalieren.",
+      meta: "Reduziert Reibung bei Defekt, Austausch oder falschem Artikel.",
+      href: "/rueckgabe",
+      label: "Rueckgabe starten",
+    },
+  ];
+
+  const content = `
+<section class="shell page-hero support-hub-hero">
+  <div class="support-hero-layout">
+    <div class="support-hero-copy">
+      <p class="kicker-badge">Kontakt & Hilfe</p>
+      <h1>Support wie im Store, nicht wie eine Sackgasse.</h1>
+      <p>Der Kontaktbereich fuehrt zuerst in die haeufigsten Loesungen und erst dann in die Eskalation. So bleibt Hilfe klar, schnell und kaufnah.</p>
+      <div class="info-pills">
+        <span>Bestellungen verwalten</span>
+        <span>Rueckgabe ohne Umweg</span>
+        <span>Antwort in der Regel innerhalb von 24 Stunden</span>
+      </div>
+      <div class="support-topic-pills">
+        ${trendingTopics
+          .map((item) => `<a href="${item.href}">${escapeHtml(item.label)}</a>`)
+          .join("")}
+      </div>
+      <div class="section-cta-row">
+        <a href="/kundencenter" class="btn-primary">Bestellung verwalten</a>
+        <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Support-Anfrage Simone Shop")}" class="btn-secondary">Support kontaktieren</a>
+      </div>
+    </div>
+    <aside class="support-hero-panel">
+      <p>Beliebte Anliegen</p>
+      <strong>Starte direkt mit dem naechsten sinnvollen Schritt.</strong>
+      <div class="support-hero-link-list">
+        ${trendingTopics
+          .slice(0, 4)
+          .map((item) => `<a href="${item.href}">${escapeHtml(item.label)}</a>`)
+          .join("")}
+      </div>
+      <div class="support-hero-meta-grid">
+        ${heroHighlights
+          .map(
+            (item) => `<article class="support-hero-meta-card">
+          <p>${escapeHtml(item.label)}</p>
+          <strong>${escapeHtml(item.value)}</strong>
+        </article>`,
+          )
+          .join("")}
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="shell section-gap-tight">
+  <div class="section-header">
+    <p class="eyebrow">Soforthilfe</p>
+    <h2>Die haeufigsten Wege zuerst.</h2>
+    <p>Google Store zieht wichtige Aufgaben nach vorn. Genau das macht diese Kontaktseite jetzt auch.</p>
+  </div>
+  <div class="support-quick-grid">
+    ${quickActions
+      .map(
+        (item) => `<a class="support-quick-card" href="${item.href}">
+      <p>${escapeHtml(item.eyebrow)}</p>
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.copy)}</span>
+      <em>${escapeHtml(item.label)}</em>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>
+
+${requestContext ? `<section class="shell section-gap-tight">
+  <div class="auth-state-card">
+    <div class="auth-state-strip">
+      ${requestContext.badges
+        .map((badge) => `<article class="auth-state-mini"><p>${escapeHtml(badge.label)}</p><strong>${escapeHtml(badge.value)}</strong></article>`)
+        .join("")}
+    </div>
+    <h2>${escapeHtml(requestContext.title)}</h2>
+    <p>${escapeHtml(requestContext.copy)}</p>
+    ${requestContext.note ? `<p class="summary-note">${escapeHtml(requestContext.note)}</p>` : ""}
+    <div class="section-cta-row">
+      <a href="${requestContext.primaryHref}" class="btn-primary">${escapeHtml(requestContext.primaryLabel)}</a>
+      <a href="${requestContext.secondaryHref}" class="btn-secondary">${escapeHtml(requestContext.secondaryLabel)}</a>
+    </div>
+  </div>
+</section>` : ""}
+
+<section class="shell section-gap-tight">
+  <div class="section-header">
+    <p class="eyebrow">Wobei brauchst du Hilfe?</p>
+    <h2>Vom Selbstservice zur Eskalation in einem klaren Raster.</h2>
+    <p>Statt derselben generischen Infoseite fuer alles gibt es hier echte Einstiegspunkte fuer Bestellung, Rueckgabe, Zahlung und Firmenkauf.</p>
+  </div>
+  <div class="support-topic-grid">
+    ${topicCards
+      .map(
+        (item) => `<a class="support-topic-card" href="${item.href}">
+      <p>${escapeHtml(item.eyebrow)}</p>
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.copy)}</span>
+      <em>${escapeHtml(item.label)}</em>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>
+
+${renderServiceVisualStrip()}
+
+<section class="shell section-gap-tight">
+  <div class="section-header">
+    <p class="eyebrow">Supportressourcen</p>
+    <h2>Die wichtigsten Hilfeflaechen bleiben sichtbar.</h2>
+    <p>Wie beim Google Store wird Hilfe nicht nur als Kontakt, sondern auch als Hub fuer die naechsten sinnvollen Schritte gebaut.</p>
+  </div>
+  <div class="support-resource-grid">
+    ${supportResources
+      .map(
+        (item) => `<a class="support-resource-card" href="${item.href}">
+      <p>${escapeHtml(item.eyebrow)}</p>
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.copy)}</span>
+      <em>${escapeHtml(item.label)}</em>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>
+
+<section class="shell section-gap-tight">
+  <div class="support-escalation-card">
+    <div class="section-header">
+      <p class="eyebrow">Noch Hilfe noetig?</p>
+      <h2>Dann direkt in den passenden Kontaktkanal.</h2>
+      <p>Der Eskalationsblock kommt bewusst nach den Schnellwegen. So fuehlt sich die Seite eher wie ein Support-Hub und weniger wie eine kaputte Sackgasse an.</p>
+    </div>
+    <div class="contact-channel-grid">
+      ${channels
+        .map(
+          (item) => `<a class="contact-channel-card" href="${item.href}">
+        <p>${escapeHtml(item.eyebrow)}</p>
+        <strong>${escapeHtml(item.title)}</strong>
+        <span>${escapeHtml(item.copy)}</span>
+        <small>${escapeHtml(item.meta)}</small>
+        <em>${escapeHtml(item.label)}</em>
+      </a>`,
+        )
+        .join("")}
+    </div>
+  </div>
+</section>`;
+
+  return renderDocument({
+    pathname,
+    title: "Kontakt & Hilfe | Simone Shop",
+    description: "Support-Hub fuer Bestellungen, Lieferung, Rueckgabe, Zahlung und Firmenkauf.",
+    content,
+    breadcrumbLabel: "Kontakt & Hilfe",
+    shareImage: homeVisualUrl("brand"),
+  });
+}
+
 function merchModeForProduct(product) {
   if (!product) return "Direkt greifen";
   if (product.category === "Elektronik") return "Fokus Setup";
@@ -7988,6 +8259,177 @@ img { display: block; max-width: 100%; }
   color: var(--ink-muted);
   font-size: 0.8rem;
   line-height: 1.45;
+}
+
+.support-hub-hero {
+  background: linear-gradient(135deg, #f6f2eb 0%, #ffffff 45%, #efe6da 100%);
+}
+
+.support-hero-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.support-hero-copy {
+  min-width: 0;
+}
+
+.support-topic-pills {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.support-topic-pills a,
+.support-hero-link-list a {
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  min-height: 2.25rem;
+  padding: 0.45rem 0.72rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.support-hero-panel {
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.support-hero-panel p,
+.support-hero-meta-card p {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f766e;
+}
+
+.support-hero-panel strong {
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.support-hero-link-list,
+.support-hero-meta-grid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.support-hero-link-list a {
+  justify-content: flex-start;
+}
+
+.support-hero-meta-card {
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.support-hero-meta-card strong {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.support-quick-grid,
+.support-topic-grid,
+.support-resource-grid,
+.contact-channel-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.support-quick-card,
+.support-topic-card,
+.support-resource-card,
+.contact-channel-card {
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-soft);
+  color: var(--ink);
+  padding: 1rem;
+  display: grid;
+  gap: 0.28rem;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.support-quick-card:hover,
+.support-topic-card:hover,
+.support-resource-card:hover,
+.contact-channel-card:hover,
+.support-topic-pills a:hover,
+.support-hero-link-list a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 38px rgba(17, 24, 39, 0.08);
+  border-color: rgba(17, 17, 17, 0.16);
+}
+
+.support-quick-card p,
+.support-topic-card p,
+.support-resource-card p,
+.contact-channel-card p {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f766e;
+}
+
+.support-quick-card strong,
+.support-topic-card strong,
+.support-resource-card strong,
+.contact-channel-card strong {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.support-quick-card span,
+.support-topic-card span,
+.support-resource-card span,
+.contact-channel-card span {
+  color: var(--ink-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.support-quick-card em,
+.support-topic-card em,
+.support-resource-card em,
+.contact-channel-card em {
+  margin-top: 0.45rem;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.contact-channel-card small {
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.support-escalation-card {
+  border: 1px solid var(--line);
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 241, 233, 0.96));
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
 }
 
 .catalog-hero-grid {
@@ -12090,6 +12532,10 @@ img { display: block; max-width: 100%; }
   .service-visual-grid,
   .info-scenario-grid,
   .info-shortcut-grid,
+  .support-quick-grid,
+  .support-topic-grid,
+  .support-resource-grid,
+  .contact-channel-grid,
   .center-role-grid,
   .login-path-grid,
   .login-benefit-grid,
@@ -12141,6 +12587,13 @@ img { display: block; max-width: 100%; }
   .section-header-with-action {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
+  }
+  .support-hero-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    align-items: start;
+  }
+  .support-hero-meta-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .merch-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
@@ -14688,50 +15141,7 @@ export default {
 
     if (pathname === "/kontakt") {
       const requestContext = buildContactRequestContext(url);
-      return renderInfoPage(pathname, {
-        kicker: "Kontakt",
-        title: "Schnelle Hilfe statt Support-Wand",
-        copy:
-          "Fragen zu Bestellung, Lieferung oder Rueckgabe laufen ueber einen klaren Kontaktpfad. Besucher muessen nicht suchen, um Hilfe zu bekommen.",
-        pills: ["Kontakt klar erreichbar", "Rueckgabe ohne Umweg", "Shop bleibt offen"],
-        facts: [
-          {
-            title: "Kontaktweg",
-            headline: "Ein klarer Pfad fuer Bestellung, Versand und Rueckgabe.",
-            copy: "Hilfe soll nicht versteckt sein. Der Kontakt bleibt im gesamten Kaufpfad erreichbar.",
-          },
-          {
-            title: "Vor dem Kauf",
-            headline: "Besucher muessen Fragen nicht bis zum Checkout schieben.",
-            copy: "Versand, Rueckgabe und Hilfe sind schon auf Startseite, PDP und Checkout klar auffindbar.",
-          },
-          {
-            title: "Nach dem Kauf",
-            headline: "Auch danach bleibt der Rueckweg sauber.",
-            copy: "Kundencenter, Rueckgabe und Kontakt sind nach der Bestellung direkt verlinkt.",
-          },
-        ],
-        supportLinks: [
-          { href: "/faq", label: "FAQ" },
-          { href: "/versand", label: "Versand" },
-          { href: "/rueckgabe", label: "Rueckgabe" },
-        ],
-        faqItems: [
-          {
-            question: "Wann sollte ich den Kontaktweg statt der FAQ nutzen?",
-            answer: "Sobald es um eine konkrete Bestellung, Rueckfrage zur Lieferung oder einen individuellen Servicefall geht.",
-          },
-          {
-            question: "Bleibt der Shop waehrenddessen weiter erreichbar?",
-            answer: "Ja. Kontakt ist ein direkter Serviceweg, ohne dass der sichtbare Kaufpfad verloren geht.",
-          },
-        ],
-        primaryHref: "/products",
-        primaryLabel: "Zum Sortiment",
-        secondaryHref: "/rueckgabe",
-        secondaryLabel: "Rueckgabe ansehen",
-        requestContext,
-      });
+      return renderContactSupportHub(pathname, requestContext);
     }
 
     if (pathname === "/faq") {
