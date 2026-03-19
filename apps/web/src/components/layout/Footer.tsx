@@ -1,6 +1,7 @@
 import Link from '@/components/ui/Link'
 import { BadgeCheck, Building2, Clock3, Mail, ShieldCheck } from 'lucide-react'
 import { PUBLIC_SUPPORT_EMAIL } from '@/lib/public-contact'
+import { FooterLegalLinks } from './FooterLegalLinks'
 
 const FOOTER_GROUPS = [
   {
@@ -113,9 +114,12 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col gap-2 border-t border-brand-border pt-6 text-sm text-brand-text-muted md:flex-row md:items-center md:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-brand-border pt-6 text-sm text-brand-text-muted md:flex-row md:items-end md:justify-between">
           <p>© 2026 Simone Shop. Alle Rechte vorbehalten.</p>
-          <p>Preise in EUR. Versand im DACH-Raum. Lieferung, Rückgabe und Kontakt klar dokumentiert.</p>
+          <div className="flex flex-col gap-2 md:items-end">
+            <p>Preise in EUR. Versand im DACH-Raum. Lieferung, Rückgabe und Kontakt klar dokumentiert.</p>
+            <FooterLegalLinks />
+          </div>
         </div>
       </div>
     </footer>

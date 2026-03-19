@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 import { PUBLIC_SUPPORT_EMAIL } from '@/lib/public-contact'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
+import { FooterLegalLinks } from './FooterLegalLinks'
 
 const CartDrawer = dynamic(
   () => import('@/components/layout/CartDrawer').then((module) => module.CartDrawer),
@@ -58,6 +59,20 @@ function linkClasses(active: boolean, dark = false): string {
   ].join(' ')
 }
 
+function CompactFooter({ copy }: { copy: string }) {
+  return (
+    <footer className="border-t border-brand-border bg-brand-surface">
+      <div className="shell-container flex flex-col gap-3 py-5 text-sm text-brand-text-muted">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <p>{copy}</p>
+          <p>Kontakt: {PUBLIC_SUPPORT_EMAIL}</p>
+        </div>
+        <FooterLegalLinks />
+      </div>
+    </footer>
+  )
+}
+
 function CheckoutChrome({ children }: { children: ReactNode }) {
   return (
     <>
@@ -98,12 +113,7 @@ function CheckoutChrome({ children }: { children: ReactNode }) {
         {children}
       </div>
 
-      <footer className="border-t border-brand-border bg-brand-surface">
-        <div className="shell-container flex flex-col gap-2 py-5 text-sm text-brand-text-muted md:flex-row md:items-center md:justify-between">
-          <p>Adresse, Zahlung und Bestellprüfung ohne unnötige Schleifen.</p>
-          <p>Kontakt: {PUBLIC_SUPPORT_EMAIL}</p>
-        </div>
-      </footer>
+      <CompactFooter copy="Adresse, Zahlung und Bestellprüfung ohne unnötige Schleifen." />
     </>
   )
 }
@@ -146,12 +156,7 @@ function CustomerChrome({ children, pathname }: { children: ReactNode; pathname:
         {children}
       </div>
 
-      <footer className="border-t border-brand-border bg-brand-surface">
-        <div className="shell-container flex flex-col gap-2 py-5 text-sm text-brand-text-muted md:flex-row md:items-center md:justify-between">
-          <p>Bestellungen, Profil und Adressen getrennt vom öffentlichen Shopfluss.</p>
-          <p>Kontakt: {PUBLIC_SUPPORT_EMAIL}</p>
-        </div>
-      </footer>
+      <CompactFooter copy="Bestellungen, Profil und Adressen getrennt vom öffentlichen Shopfluss." />
     </>
   )
 }
@@ -193,12 +198,7 @@ function AuthChrome({ children, pathname }: { children: ReactNode; pathname: str
         {children}
       </div>
 
-      <footer className="border-t border-brand-border bg-brand-surface">
-        <div className="shell-container flex flex-col gap-2 py-5 text-sm text-brand-text-muted md:flex-row md:items-center md:justify-between">
-          <p>Anmeldung für Kundencenter und Admincenter ohne Vermischung mit dem Shop-Funnel.</p>
-          <p>Kontakt: {PUBLIC_SUPPORT_EMAIL}</p>
-        </div>
-      </footer>
+      <CompactFooter copy="Anmeldung für Kundencenter und Admincenter ohne Vermischung mit dem Shop-Funnel." />
     </>
   )
 }

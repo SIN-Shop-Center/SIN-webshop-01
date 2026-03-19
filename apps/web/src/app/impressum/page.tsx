@@ -15,7 +15,7 @@ export default function ImpressumPage() {
   return (
     <InfoPage
       title="Impressum"
-      intro="Pflichtangaben gemäß § 5 TMG. Diese Seite wird vor der Freischaltung mit den finalen Anbieter- und Kontaktdaten vervollständigt."
+      intro="Pflichtangaben für Simone Shop mit Anbieterangaben und direktem Kontakt für rechtliche Anfragen."
       sections={[
         {
           title: 'Anbieter',
@@ -56,7 +56,7 @@ export default function ImpressumPage() {
               {profile.vatId ? <>USt-IdNr.: {profile.vatId}</> : null}
             </>
           ) : (
-            'Steuer- und USt-Angaben werden vor der Freischaltung final ergänzt.'
+            'Derzeit sind keine Steuer- oder USt-Angaben hinterlegt.'
           ),
         },
       ]}

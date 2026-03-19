@@ -2,6 +2,8 @@ import 'server-only'
 import { PUBLIC_B2B_EMAIL, PUBLIC_CONTACT_PHONE, PUBLIC_SUPPORT_EMAIL } from './public-contact'
 
 const PLACEHOLDER_SNIPPETS = ['change_me', 'your_', 'example', 'musterstrasse', 'musterstraße']
+const DEFAULT_IMPRESSUM_NAME = 'Simone Schulze'
+const DEFAULT_IMPRESSUM_ADDRESS = 'Hochwaldpromenade 38, 15834 Rangsdorf, Deutschland'
 
 function cleanValue(value?: string): string {
   const trimmed = String(value || '').trim()
@@ -11,8 +13,8 @@ function cleanValue(value?: string): string {
 }
 
 export function getLegalProfile() {
-  const companyName = cleanValue(process.env.BILLING_COMPANY_NAME)
-  const address = cleanValue(process.env.BILLING_ADDRESS)
+  const companyName = cleanValue(process.env.BILLING_COMPANY_NAME) || DEFAULT_IMPRESSUM_NAME
+  const address = cleanValue(process.env.BILLING_ADDRESS) || DEFAULT_IMPRESSUM_ADDRESS
   const taxId = cleanValue(process.env.BILLING_TAX_ID)
   const vatId = cleanValue(process.env.BILLING_VAT_ID)
   const legalEmail = cleanValue(process.env.LEGAL_EMAIL) || PUBLIC_SUPPORT_EMAIL
