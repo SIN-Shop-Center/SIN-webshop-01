@@ -1,9 +1,15 @@
 import { PRODUCT_VISUALS } from "./product-visuals.mjs";
+import {
+  STOREFRONT_LEGAL_CONTACT,
+  STOREFRONT_FOOTER_LEGAL_NOTE,
+  STOREFRONT_LEGAL_LINKS,
+  STOREFRONT_LEGAL_PAGES,
+} from "../../config/storefront-legal.mjs";
 
 const BUILD_DATE = "2026-03-19";
 const SITE_ORIGIN = "https://delqhi.com";
 let API_ORIGIN = "https://api.delqhi.com";
-const SUPPORT_EMAIL = "support@delqhi.com";
+const SUPPORT_EMAIL = STOREFRONT_LEGAL_CONTACT.legalEmail;
 const LIVE_STORE_READY = true;
 const HOME_VISUALS = {
   hero: "data:image/webp;base64,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",
@@ -306,21 +312,48 @@ for (const product of PRODUCTS) {
   }
 }
 
-const PRODUCT_BY_SLUG = new Map(PRODUCTS.map((product) => [product.slug, product]));
-const PRODUCT_BY_ID = new Map(PRODUCTS.map((product) => [product.id, product]));
-const CATEGORIES = [...new Set(PRODUCTS.map((product) => product.category))];
+const PRODUCT_SEED_BY_SLUG = new Map(PRODUCTS.map((product) => [product.slug, product]));
+const PRODUCT_SEED_BY_ID = new Map(PRODUCTS.map((product) => [product.id, product]));
 
-function getProductBySlugOrFallback(slug, fallbackIndex = 0) {
-  return PRODUCT_BY_SLUG.get(slug) || PRODUCTS[fallbackIndex] || PRODUCTS[0];
+function copySpecRows(specs = []) {
+  return specs.map((row) => [row[0], row[1]]);
 }
 
-function getProductsByCategory(category) {
-  return PRODUCTS.filter((product) => product.category === category);
+function cloneSeedProduct(product) {
+  if (!product) {
+    return null;
+  }
+  return {
+    ...product,
+    gallery: Array.isArray(product.gallery) ? [...product.gallery] : [],
+    features: Array.isArray(product.features) ? [...product.features] : [],
+    specs: Array.isArray(product.specs) ? copySpecRows(product.specs) : [],
+  };
 }
 
-function getCategoryPreviewProducts(category, limit = 3) {
-  return getProductsByCategory(category).slice(0, limit);
+function getCatalogCategories(products = PRODUCTS) {
+  return [...new Set(products.map((product) => product.category).filter(Boolean))];
 }
+
+function getProductBySlugOrFallback(slug, fallbackIndex = 0, products = PRODUCTS) {
+  return (
+    products.find((product) => product.slug === slug) ||
+    cloneSeedProduct(PRODUCT_SEED_BY_SLUG.get(slug)) ||
+    products[fallbackIndex] ||
+    PRODUCTS[fallbackIndex] ||
+    PRODUCTS[0]
+  );
+}
+
+function getProductsByCategory(category, products = PRODUCTS) {
+  return products.filter((product) => product.category === category);
+}
+
+function getCategoryPreviewProducts(category, limit = 3, products = PRODUCTS) {
+  return getProductsByCategory(category, products).slice(0, limit);
+}
+
+const CATEGORIES = getCatalogCategories();
 
 const CATEGORY_VISUALS = {
   Elektronik: "electronics",
@@ -332,7 +365,7 @@ const CATEGORY_VISUALS = {
 const CATEGORY_TAGLINES = {
   Elektronik: "Kopfhoerer, Tracker und Ladegeraete fuer Arbeit und Alltag.",
   "Haus & Garten": "Licht, Duft und Helfer fuer Zuhause und Home Office.",
-  "Beauty & Gesundheit": "Pflege und Essentials fuer die taegliche Routine.",
+  "Beauty & Gesundheit": "Pflege und Essentials fuer deine taegliche Routine.",
   "Sport & Freizeit": "Praktische Produkte fuer unterwegs und Training.",
 };
 
@@ -678,6 +711,115 @@ function getCategoryTagline(category) {
   return CATEGORY_TAGLINES[category] || "Schnell erfassbar, sauber kuratiert und direkt kaufbar.";
 }
 
+function normalizeNumber(value, fallback = 0) {
+  const next = Number(value);
+  return Number.isFinite(next) ? next : fallback;
+}
+
+function normalizeInteger(value, fallback = 0) {
+  const next = Number(value);
+  return Number.isFinite(next) ? Math.max(0, Math.round(next)) : fallback;
+}
+
+function buildDefaultProductFeatures(product) {
+  return [
+    product.category || "Ausgewaehltes Produkt",
+    product.stock > 0 ? `${product.stock} auf Lager` : "Aktuell nicht auf Lager",
+    "24-48h Lieferung",
+    "30 Tage Rueckgabe",
+  ].filter(Boolean);
+}
+
+function buildDefaultProductSpecs(product) {
+  return [
+    ["Kategorie", product.category || "Sortiment"],
+    ["SKU", product.sku || "wird gepflegt"],
+    ["Verfuegbarkeit", product.stock > 0 ? `${product.stock} auf Lager` : "derzeit nicht verfuegbar"],
+    ["Lieferung", "24-48h"],
+  ];
+}
+
+function normalizeCatalogProduct(entry) {
+  const seed = PRODUCT_SEED_BY_SLUG.get(entry?.slug || "") || PRODUCT_SEED_BY_ID.get(entry?.id || "");
+  const category = entry?.categoryName || entry?.category || seed?.category || "Sortiment";
+  const priceEur = normalizeNumber(entry?.price ?? entry?.priceEur ?? seed?.priceEur, 0);
+  let compareAtEur = normalizeNumber(entry?.originalPrice ?? entry?.compareAtEur ?? seed?.compareAtEur, priceEur);
+  if (compareAtEur < priceEur) {
+    compareAtEur = priceEur;
+  }
+  const apiImages = Array.isArray(entry?.images) ? entry.images.filter(Boolean) : [];
+  const seedGallery = Array.isArray(seed?.gallery) ? seed.gallery.filter(Boolean) : [];
+  const imageUrl = seed?.imageUrl || apiImages[0] || entry?.imageUrl || getCategoryVisual(category);
+  const gallery = Array.from(new Set([...seedGallery, ...apiImages, imageUrl].filter(Boolean))).slice(0, 4);
+  const stock = normalizeInteger(entry?.stock ?? seed?.stock, 0);
+  const product = {
+    ...seed,
+    ...entry,
+    id: String(entry?.id || seed?.id || ""),
+    sku: String(entry?.sku || seed?.sku || ""),
+    slug: String(entry?.slug || seed?.slug || ""),
+    name: String(entry?.name || seed?.name || "Produkt"),
+    category,
+    priceEur,
+    compareAtEur,
+    rating: normalizeNumber(entry?.rating ?? seed?.rating, normalizeNumber(seed?.rating, 0)),
+    reviewCount: normalizeInteger(entry?.reviewCount ?? seed?.reviewCount, normalizeInteger(seed?.reviewCount, 0)),
+    stock,
+    badge: String(seed?.badge || entry?.badge || ""),
+    description: String(entry?.description || seed?.description || ""),
+    longDescription: String(seed?.longDescription || entry?.description || seed?.description || ""),
+    imageUrl,
+    gallery,
+    features: Array.isArray(seed?.features) && seed.features.length > 0 ? [...seed.features] : buildDefaultProductFeatures({ category, stock }),
+    specs: Array.isArray(seed?.specs) && seed.specs.length > 0 ? copySpecRows(seed.specs) : buildDefaultProductSpecs({ category, stock, sku: entry?.sku || seed?.sku || "" }),
+    images: gallery,
+  };
+  if (!product.badge) {
+    product.badge = compareAtEur > priceEur ? "Angebot" : stock <= 8 ? "Beliebt" : "Empfohlen";
+  }
+  return product;
+}
+
+function isStorefrontReadyProduct(product) {
+  return Boolean(product?.isActive !== false && String(product?.sku || "").trim() && Number(product?.stock || 0) > 0);
+}
+
+function fallbackCatalogProducts() {
+  return PRODUCTS.map((product) => cloneSeedProduct(product));
+}
+
+async function resolveCatalogProducts(request) {
+  if (!LIVE_STORE_READY) {
+    return fallbackCatalogProducts();
+  }
+  try {
+    const result = await fetchStorefrontJson(request, "/api/v1/catalog/products?limit=64");
+    const items = Array.isArray(result?.data?.items) ? result.data.items : [];
+    const normalized = items
+      .map((item) => normalizeCatalogProduct(item))
+      .filter((item) => item.id && item.slug && item.name)
+      .filter((item) => isStorefrontReadyProduct(item));
+    if (normalized.length > 0) {
+      return normalized;
+    }
+  } catch {
+  }
+  return fallbackCatalogProducts();
+}
+
+function buildProductLookup(products = PRODUCTS) {
+  const lookup = new Map();
+  for (const product of products) {
+    if (product?.id) {
+      lookup.set(String(product.id), product);
+    }
+    if (product?.sku) {
+      lookup.set(String(product.sku), product);
+    }
+  }
+  return lookup;
+}
+
 function buildProductExperienceContent(product) {
   return (
     PRODUCT_DETAIL_CONTENT[product.slug] || {
@@ -692,7 +834,7 @@ function buildProductExperienceContent(product) {
       reasonCopy: "Die Produktseite erklaert Nutzen, Einsatzfall und Kaufkontext statt nur Merkmale aufzureihen.",
       reasons: [
         "Nutzen vor Datenblatt",
-        "Kaufklarheit ohne Ueberforderung",
+        "Einfach sicher zu entscheiden",
         "Preis und Trust im selben Entscheidungsfluss",
       ],
       faq: [
@@ -788,14 +930,14 @@ function buildProductStoryFrames(product, experience) {
       kicker: "Produkt im Fokus",
       title: useCases[0]?.title || fallbackTitle,
       copy: useCases[0]?.copy || experience.positioning,
-      pills: [formatPrice(product.priceEur), "Preis sichtbar"],
+      pills: [formatPrice(product.priceEur), "Direkt lieferbar"],
     },
     {
       imageUrl: contextualVisual,
       kicker: "Im Alltag",
       title: useCases[1]?.title || "Direkt im Einsatz",
       copy: useCases[1]?.copy || experience.useCaseIntro,
-      pills: ["24-48h Lieferung", "Rueckgabe klar"],
+      pills: ["24-48h Lieferung", "30 Tage Rueckgabe"],
     },
     {
       imageUrl: ambientVisual,
@@ -903,11 +1045,11 @@ function getFaqOpenIndex(product) {
   }
 }
 
-function getRelatedProducts(product) {
-  const sameCategory = PRODUCTS.filter(
+function getRelatedProducts(product, products = PRODUCTS) {
+  const sameCategory = products.filter(
     (entry) => entry.id !== product.id && entry.category === product.category,
   );
-  const crossSell = PRODUCTS.filter(
+  const crossSell = products.filter(
     (entry) => entry.id !== product.id && entry.category !== product.category,
   );
 
@@ -1221,7 +1363,8 @@ function clampLocalCartQuantity(product, quantity) {
   return Math.max(1, Math.min(20, stock, normalized));
 }
 
-function buildLocalCartSnapshot(minimalItems) {
+function buildLocalCartSnapshot(minimalItems, products = PRODUCTS) {
+  const productLookup = buildProductLookup(products);
   const bySku = new Map();
   for (const item of minimalItems) {
     const sku = typeof item?.sku === "string" ? item.sku : "";
@@ -1236,7 +1379,7 @@ function buildLocalCartSnapshot(minimalItems) {
   let itemCount = 0;
 
   for (const [sku, requested] of bySku.entries()) {
-    const product = PRODUCT_BY_ID.get(sku);
+    const product = productLookup.get(sku);
     if (!product) continue;
     const quantity = clampLocalCartQuantity(product, requested);
     if (quantity <= 0) continue;
@@ -1300,17 +1443,18 @@ function readLocalOrderSnapshot(orderID, sessionID) {
   return LOCAL_STORE_ORDER_CACHE.get(`${orderID}:${sessionID}`) || null;
 }
 
-async function handleLocalStoreApi(request, url, pathname) {
+async function handleLocalStoreApi(request, url, pathname, products = PRODUCTS) {
   const method = String(request.method || "GET").toUpperCase();
   const subPath = pathname.slice("/api/v1/store".length) || "/";
   const cookieHeader = request.headers.get("cookie") || "";
   const currentItems = parseLocalCartCookie(cookieHeader);
+  const productLookup = buildProductLookup(products);
 
   if (subPath === "/cart") {
     if (method !== "GET") {
       return jsonResponseWithCookies({ error: "method_not_allowed" }, { status: 405 });
     }
-    return jsonResponseWithCookies(buildLocalCartSnapshot(currentItems));
+    return jsonResponseWithCookies(buildLocalCartSnapshot(currentItems, products));
   }
 
   if (subPath === "/cart/items") {
@@ -1320,7 +1464,7 @@ async function handleLocalStoreApi(request, url, pathname) {
     const body = await readJsonBody(request);
     const sku = typeof body?.sku === "string" ? body.sku : "";
     const quantity = Number(body?.quantity || 1);
-    const product = PRODUCT_BY_ID.get(sku);
+    const product = productLookup.get(sku);
     if (!product) {
       return jsonResponseWithCookies({ error: "unknown_sku" }, { status: 400 });
     }
@@ -1337,23 +1481,23 @@ async function handleLocalStoreApi(request, url, pathname) {
       nextItems.push({ sku, quantity: addQty });
     }
     const filtered = nextItems.filter((item) => {
-      const p = PRODUCT_BY_ID.get(item.sku);
+      const p = productLookup.get(item.sku);
       return p && clampLocalCartQuantity(p, item.quantity) > 0;
     });
-    const snapshot = buildLocalCartSnapshot(filtered);
+    const snapshot = buildLocalCartSnapshot(filtered, products);
     return jsonResponseWithCookies(snapshot, { cookies: [serializeLocalCartCookie(filtered)] });
   }
 
   if (subPath.startsWith("/cart/items/")) {
     const sku = decodeURIComponent(subPath.slice("/cart/items/".length));
-    const product = PRODUCT_BY_ID.get(sku);
+    const product = productLookup.get(sku);
     if (!product) {
       return jsonResponseWithCookies({ error: "unknown_sku" }, { status: 400 });
     }
     const nextItems = currentItems.filter((item) => item.sku !== sku);
 
     if (method === "DELETE") {
-      const snapshot = buildLocalCartSnapshot(nextItems);
+      const snapshot = buildLocalCartSnapshot(nextItems, products);
       return jsonResponseWithCookies(snapshot, { cookies: [serializeLocalCartCookie(nextItems)] });
     }
 
@@ -1364,7 +1508,7 @@ async function handleLocalStoreApi(request, url, pathname) {
       if (nextQty > 0) {
         nextItems.push({ sku, quantity: nextQty });
       }
-      const snapshot = buildLocalCartSnapshot(nextItems);
+      const snapshot = buildLocalCartSnapshot(nextItems, products);
       return jsonResponseWithCookies(snapshot, { cookies: [serializeLocalCartCookie(nextItems)] });
     }
 
@@ -1382,7 +1526,7 @@ async function handleLocalStoreApi(request, url, pathname) {
     if (method !== "POST") {
       return jsonResponseWithCookies({ error: "method_not_allowed" }, { status: 405 });
     }
-    const cartSnapshot = buildLocalCartSnapshot(currentItems);
+    const cartSnapshot = buildLocalCartSnapshot(currentItems, products);
     if (!cartSnapshot.items || cartSnapshot.items.length === 0) {
       return jsonResponseWithCookies({ error: "empty_cart" }, { status: 400 });
     }
@@ -1561,11 +1705,6 @@ function buildProductStructuredData(pathname, product) {
       "@type": "Brand",
       name: "Delqhi",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: String(product.rating.toFixed(1)),
-      reviewCount: String(product.reviewCount),
-    },
     additionalProperty: product.specs.map(([name, value]) => ({
       "@type": "PropertyValue",
       name,
@@ -1632,6 +1771,10 @@ function breadcrumbLabelForPath(pathname) {
   const labels = {
     "/": "Start",
     "/products": "Sortiment",
+    "/impressum": "Impressum",
+    "/datenschutz": "Datenschutz",
+    "/agb": "AGB",
+    "/widerrufsrecht": "Widerrufsrecht",
     "/kontakt": "Kontakt",
     "/faq": "FAQ",
     "/versand": "Versand",
@@ -1801,6 +1944,11 @@ function renderSitemapXml() {
   const staticEntries = [
     { path: "/", changefreq: "daily", priority: "1.0" },
     { path: "/products", changefreq: "daily", priority: "0.9" },
+    ...STOREFRONT_LEGAL_LINKS.map((link, index) => ({
+      path: link.href,
+      changefreq: index === 0 ? "monthly" : "weekly",
+      priority: index === 0 ? "0.4" : "0.5",
+    })),
     { path: "/kontakt", changefreq: "weekly", priority: "0.6" },
     { path: "/faq", changefreq: "weekly", priority: "0.6" },
     { path: "/versand", changefreq: "weekly", priority: "0.6" },
@@ -1934,8 +2082,11 @@ function isActive(pathname, href) {
   if (href === "/products") {
     return pathname === "/products" || pathname === "/cart" || pathname === "/checkout" || pathname === "/order-success" || pathname.startsWith("/products/");
   }
+  if (href === "/kundencenter") {
+    return pathname === "/kundencenter" || pathname === "/login";
+  }
   if (href === "/kontakt") {
-    return ["/kontakt", "/faq", "/versand", "/rueckgabe"].includes(pathname);
+    return ["/kontakt", "/faq", "/versand", "/rueckgabe", ...STOREFRONT_LEGAL_LINKS.map((link) => link.href)].includes(pathname);
   }
   return pathname === href;
 }
@@ -2039,6 +2190,10 @@ function renderHeader(pathname) {
 	</header>`;
 }
 
+function renderFooterLegalLinks() {
+  return STOREFRONT_LEGAL_LINKS.map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`).join("");
+}
+
 function renderFooter(pathname) {
   const minimalFooter = pathname === "/checkout" || pathname === "/order-success";
   if (minimalFooter) {
@@ -2055,7 +2210,10 @@ function renderFooter(pathname) {
       <a href="/rueckgabe"><p>Rueckgabe</p><strong>Ruhig erklaert</strong></a>
     </div>
   </div>
-  <div class="shell footer-meta">© 2026 Simone Shop · Build ${BUILD_DATE}</div>
+  <div class="shell footer-legal-links">
+    <div class="info-links">${renderFooterLegalLinks()}</div>
+  </div>
+  <div class="shell footer-meta">${escapeHtml(STOREFRONT_FOOTER_LEGAL_NOTE)} · © 2026 Simone Shop · Build ${BUILD_DATE}</div>
 </footer>`;
   }
 
@@ -2103,8 +2261,18 @@ function renderFooter(pathname) {
         <li><a href="/faq">FAQ</a></li>
       </ul>
     </section>
+
+    <section>
+      <p class="footer-section-title">Rechtliches</p>
+      <ul>
+        ${STOREFRONT_LEGAL_LINKS.map((link) => `<li><a href="${link.href}">${escapeHtml(link.label)}</a></li>`).join("")}
+      </ul>
+    </section>
   </div>
-  <div class="shell footer-meta">© 2026 Simone Shop · Build ${BUILD_DATE}</div>
+  <div class="shell footer-legal-links">
+    <div class="info-links">${renderFooterLegalLinks()}</div>
+  </div>
+  <div class="shell footer-meta">${escapeHtml(STOREFRONT_FOOTER_LEGAL_NOTE)} · © 2026 Simone Shop · Build ${BUILD_DATE}</div>
 </footer>`;
 }
 
@@ -2244,7 +2412,7 @@ function renderProductCard(product, options = {}) {
     </div>
     <div class="product-context-row">
       <span>${escapeHtml(productContext)}</span>
-      <span>${compareMode ? "Zum Produkt" : "Mehr erfahren"}</span>
+      <span>${compareMode ? "Zum Produkt" : "Mehr sehen"}</span>
     </div>
 
     ${
@@ -2254,9 +2422,9 @@ function renderProductCard(product, options = {}) {
       <span>30 Tage Rueckgabe</span>
     </div>`
         : `<div class="product-meta-line">
-      <span class="stars">${renderStars(product.rating)}</span>
-      <span>${product.rating.toFixed(1)} (${product.reviewCount})</span>
       <span class="${stockClass}">${stockText}</span>
+      <span>24-48h Lieferung</span>
+      <span>30 Tage Rueckgabe</span>
     </div>
     <div class="product-trust">
       <span>Preis, Lieferung und Rueckgabe klar auf einen Blick.</span>
@@ -2278,7 +2446,7 @@ function renderProductCard(product, options = {}) {
 </article>`;
 }
 
-function renderHero() {
+function renderHero(products = PRODUCTS) {
   if (!LIVE_STORE_READY) {
     return `
 <section class="hero-wrap">
@@ -2316,31 +2484,31 @@ function renderHero() {
 </section>`;
   }
 
-  const heroCategories = CATEGORIES.slice(0, 4);
-  const lowestPrice = getLowestPrice(PRODUCTS);
+  const heroCategories = getCatalogCategories(products).slice(0, 4);
+  const lowestPrice = getLowestPrice(products);
   const heroQuickProducts = [
-    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro"),
-    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1),
-    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2),
-    getProductBySlugOrFallback("hautpflege-set-deluxe", 3),
+    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro", 0, products),
+    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1, products),
+    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2, products),
+    getProductBySlugOrFallback("hautpflege-set-deluxe", 3, products),
   ];
   const featuredHeroProduct = heroQuickProducts[0];
   const featuredHeroExperience = buildProductExperienceContent(featuredHeroProduct);
   const heroCategoryCards = heroCategories
     .map((category) => {
-      const categoryProducts = getProductsByCategory(category);
+      const categoryProducts = getProductsByCategory(category, products);
       const floorPrice = getLowestPrice(categoryProducts);
       return `<a href="/products?category=${encodeURIComponent(category)}" class="hero-category-card">
         <span>${escapeHtml(category)}</span>
         <strong>ab ${formatPrice(floorPrice)}</strong>
-        <small>Sichtbar starten</small>
+        <small>Jetzt entdecken</small>
       </a>`;
     })
     .join("");
   const heroSearchChoices = heroCategories
     .slice(0, 3)
     .map((category) => {
-      const categoryProducts = getProductsByCategory(category);
+      const categoryProducts = getProductsByCategory(category, products);
       const leadProduct = categoryProducts[0] || featuredHeroProduct;
       const floorPrice = getLowestPrice(categoryProducts);
       return `<a href="/products?category=${encodeURIComponent(category)}" class="hero-search-card">
@@ -2348,7 +2516,7 @@ function renderHero() {
         <div class="hero-search-card-copy">
           <p>${escapeHtml(category)}</p>
           <strong>ab ${formatPrice(floorPrice)}</strong>
-          <span>Direkt in die sichtbare Auswahl</span>
+          <span>Jetzt entdecken</span>
         </div>
       </a>`;
     })
@@ -2408,7 +2576,7 @@ function renderHero() {
         ${renderHeroIntentRail(heroQuickProducts.slice(1))}
 
         <div class="hero-note-row">
-          <span>Preis sichtbar</span>
+          <span>SSL-verschluesselt</span>
           <span>Kategorien klar</span>
           <span>Login erst spaeter</span>
         </div>
@@ -2418,12 +2586,12 @@ function renderHero() {
 </section>`;
 }
 
-function renderPromoCards() {
+function renderPromoCards(products = PRODUCTS) {
   const laneProducts = [
-    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro"),
-    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1),
-    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2),
-    getProductBySlugOrFallback("hautpflege-set-deluxe", 3),
+    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro", 0, products),
+    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1, products),
+    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2, products),
+    getProductBySlugOrFallback("hautpflege-set-deluxe", 3, products),
   ];
   return `
 <section class="shell section-gap">
@@ -2431,7 +2599,7 @@ function renderPromoCards() {
     <div>
       <p class="eyebrow">Beliebte Produkte</p>
       <h2>Produkte, mit denen viele direkt starten.</h2>
-      <p>Vier klare Einstiege mit sichtbarem Preis und schnellem Nutzen.</p>
+      <p>Klare Favoriten mit sichtbarem Preis und schnellem Nutzen.</p>
     </div>
     <a class="hero-inline-link" href="/products">Zum Sortiment</a>
   </div>
@@ -2461,20 +2629,21 @@ function renderPromoCards() {
 </section>`;
 }
 
-function renderCategoryShowcase() {
+function renderCategoryShowcase(products = PRODUCTS) {
+  const categories = getCatalogCategories(products);
   return `
 <section class="shell section-gap">
   <div class="section-header">
     <p class="eyebrow">Kategorien</p>
     <h2>Direkt zur passenden Produktwelt.</h2>
-    <p>Waehle die Kategorie, die zu deinem Bedarf passt, und starte dort mit den relevantesten Produkten.</p>
+    <p>Waehle eine Kategorie und springe direkt in die relevantesten Produkte.</p>
   </div>
 
   <div class="collection-grid">
-    ${CATEGORIES.map((category) => {
-      const categoryProducts = getProductsByCategory(category);
-      const firstProduct = categoryProducts[0] || PRODUCTS[0];
-      const previewProducts = getCategoryPreviewProducts(category, 3);
+    ${categories.map((category) => {
+      const categoryProducts = getProductsByCategory(category, products);
+      const firstProduct = categoryProducts[0] || products[0] || PRODUCTS[0];
+      const previewProducts = getCategoryPreviewProducts(category, 3, products);
       const count = categoryProducts.length;
       const lowestPrice = getLowestPrice(categoryProducts);
       const leadProductName = firstProduct?.name || category;
@@ -2507,9 +2676,9 @@ function renderCategoryShowcase() {
           <small class="collection-product-note">${escapeHtml(leadProductName)}</small>
           <div class="collection-proof">
             <span>24-48h Lieferung</span>
-            <span>Rueckgabe klar</span>
+            <span>30 Tage Rueckgabe</span>
           </div>
-          <em>Kategorie ansehen</em>
+          <em>Jetzt ansehen</em>
         </div>
       </a>`;
     }).join("")}
@@ -2543,8 +2712,8 @@ function renderCuratedCategoryDeck() {
 <section class="shell section-gap">
   <div class="section-header">
     <p class="eyebrow">Kuratiert</p>
-    <h2>Home soll fuehren, nicht alles auf einmal zeigen.</h2>
-    <p>Drei staerkere Kategoriewelten machen klar, dass die Startseite kuratiert ist und der volle Vergleich erst im Katalog passiert.</p>
+    <h2>Drei Kollektionen, die sofort Sinn ergeben.</h2>
+    <p>Jede Kollektion ist auf einen klaren Kaufanlass zugeschnitten statt auf endloses Stoebern.</p>
   </div>
   <div class="curated-category-grid">
     ${entries
@@ -2623,7 +2792,7 @@ function renderHomeSpotlights() {
           <div class="spotlight-trust">
             <span>${formatPrice(product.priceEur)}</span>
             <span>24-48h Lieferung</span>
-            <span>Rueckgabe klar</span>
+            <span>30 Tage Rueckgabe</span>
           </div>
           <div class="spotlight-price-row">
             <div>
@@ -2877,9 +3046,9 @@ function renderCatalogVisualPaths() {
   return `
 <section class="shell section-gap-tight">
   <div class="section-header">
-    <p class="eyebrow">Schnell nach Einsatzfall</p>
-    <h2>Vier Produktwelten vor dem Grid.</h2>
-    <p>Der Katalog startet nicht nur mit Filtern, sondern auch mit klaren visuellen Wegen in die passende Richtung.</p>
+    <p class="eyebrow">Kategorien</p>
+    <h2>Starte direkt in der passenden Produktwelt.</h2>
+    <p>Wenn du schon weisst, was du suchst, geh direkt in die passende Kategorie.</p>
   </div>
   <div class="catalog-path-grid">
     ${paths
@@ -2905,15 +3074,15 @@ function renderCatalogCompareStrip() {
   <div class="catalog-compare-strip">
     <article>
       <p>Vergleichen</p>
-      <strong>Bild, Preis und Einsatzfall zuerst.</strong>
+      <strong>Preis, Bild und Nutzen auf einen Blick.</strong>
     </article>
     <article>
-      <p>Kurz bleiben</p>
-      <strong>Details erst auf der PDP, nicht schon im Grid.</strong>
+      <p>Schnell filtern</p>
+      <strong>Suche und Filter bringen dich schneller zu passenden Treffern.</strong>
     </article>
     <article>
-      <p>Entscheiden</p>
-      <strong>Der Katalog filtert vor, die PDP schliesst ab.</strong>
+      <p>Dann entscheiden</p>
+      <strong>Die Produktseite zeigt danach alle Details zum Kauf.</strong>
     </article>
   </div>
 </section>`;
@@ -2922,8 +3091,8 @@ function renderCatalogCompareStrip() {
 function renderCatalogBundleStrip() {
   const bundles = [
     {
-      title: "Desk + Fokus Setup",
-      copy: "Kopfhoerer, Uhr und Ladepunkt fuer einen klareren Technik-Alltag.",
+      title: "Technik im Set",
+      copy: "Kopfhoerer, Uhr und Ladegeraet fuer Arbeit, Pendeln und Alltag.",
       products: [
         getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro"),
         getProductBySlugOrFallback("smartwatch-fitness-tracker"),
@@ -2931,8 +3100,8 @@ function renderCatalogBundleStrip() {
       ],
     },
     {
-      title: "Pflege + Einstieg",
-      copy: "Pflege- und Beauty-Produkte als nachvollziehbare Routine statt Regalchaos.",
+      title: "Pflege im Set",
+      copy: "Pflege und Beauty-Produkte fuer eine einfache Routine.",
       products: [
         getProductBySlugOrFallback("hautpflege-set-deluxe"),
         getProductBySlugOrFallback("make-up-pinsel-set-12-teilig"),
@@ -2944,9 +3113,9 @@ function renderCatalogBundleStrip() {
   return `
 <section class="shell section-gap-tight">
   <div class="section-header">
-    <p class="eyebrow">Bundle Wege</p>
-    <h2>Vergleich plus kleine, sinnvolle Gruppen.</h2>
-    <p>Der Katalog bleibt Vergleichsfläche, zeigt aber zusätzlich kurze Produktgruppen mit gemeinsamem Einsatz.</p>
+    <p class="eyebrow">Kaufideen</p>
+    <h2>Kleine Gruppen fuer schnelle Entscheidungen.</h2>
+    <p>Wenn du lieber in passenden Kombinationen denkst, findest du hier direkte Einstiege.</p>
   </div>
   <div class="catalog-bundle-grid">
     ${bundles
@@ -2972,8 +3141,8 @@ function renderCatalogBundleStrip() {
 function renderCatalogSceneRail() {
   const scenes = [
     {
-      title: "Fokus am Schreibtisch",
-      copy: "Elektronik und Utility klar vorgefiltert, bevor du tiefer vergleichst.",
+      title: "Arbeiten & Pendeln",
+      copy: "Elektronik fuer Arbeit, Calls und Unterwegssein.",
       image: getCategoryVisual("Elektronik"),
       href: "/products/wireless-bluetooth-kopfhoerer-pro",
       products: [
@@ -2982,8 +3151,8 @@ function renderCatalogSceneRail() {
       ],
     },
     {
-      title: "Pflege ohne Overload",
-      copy: "Beauty als kurze Routine statt als Regal voller Einzelteile.",
+      title: "Pflege & Routine",
+      copy: "Beauty-Produkte fuer eine einfache taegliche Routine.",
       image: getCategoryVisual("Beauty & Gesundheit"),
       href: "/products/hautpflege-set-deluxe",
       products: [
@@ -2992,8 +3161,8 @@ function renderCatalogSceneRail() {
       ],
     },
     {
-      title: "Zuhause mit Nutzen",
-      copy: "Home-Produkte mit direktem Einsatz statt nur Dekostimmung.",
+      title: "Zuhause & Home Office",
+      copy: "Produkte fuer Licht, Fokus und eine ruhigere Umgebung.",
       image: getCategoryVisual("Haus & Garten"),
       href: "/products/led-schreibtischlampe-touch",
       products: [
@@ -3006,9 +3175,9 @@ function renderCatalogSceneRail() {
   return `
 <section class="shell section-gap-tight">
   <div class="section-header">
-    <p class="eyebrow">Szenen statt Listen</p>
-    <h2>Erst Bildwelt, dann Vergleich.</h2>
-    <p>Der Katalog startet jetzt nicht nur ueber Filter und Bundles, sondern auch ueber klare Alltagsszenen.</p>
+    <p class="eyebrow">Nach Einsatz</p>
+    <h2>Produkte nach Alltagssituation entdecken.</h2>
+    <p>Starte mit dem Anlass, nicht mit einer langen Liste.</p>
   </div>
   <div class="catalog-scene-grid">
     ${scenes
@@ -3042,9 +3211,9 @@ function renderCatalogFinalChoiceStrip() {
   return `
 <section class="shell section-gap-tight">
   <div class="section-header">
-    <p class="eyebrow">Finale Wahl</p>
-    <h2>Drei klare Endpunkte vor dem Grid.</h2>
-    <p>Diese Zone komprimiert den Katalog auf wenige starke Kaufentscheidungen, bevor wieder das volle Grid beginnt.</p>
+    <p class="eyebrow">Schnelle Auswahl</p>
+    <h2>Drei Produkte fuer den direkten Einstieg.</h2>
+    <p>Wenn du schnell entscheiden willst, starte hier.</p>
   </div>
   <div class="catalog-final-grid">
     ${picks
@@ -3238,8 +3407,8 @@ function renderRelatedChoiceStrip(product, related) {
 <section class="shell section-gap-tight">
   <div class="section-header">
     <p class="eyebrow">Naechster Blick</p>
-    <h2>Wenige visuelle Folgeentscheidungen statt weiterer Listen.</h2>
-    <p>Nach der PDP kommen jetzt kurze Folgeoptionen mit Bild, Modus und Preis statt nur ein weiteres neutrales Produktgrid.</p>
+    <h2>Sinnvolle Alternativen und Ergaenzungen.</h2>
+    <p>Wenn du noch vergleichst, findest du hier aehnliche Produkte mit klarem Preis und Nutzen.</p>
   </div>
   <div class="related-choice-grid">
     ${related
@@ -3282,8 +3451,8 @@ function renderAccountEntrySection() {
           <span>Lieferfenster direkt am Produkt statt erst im Checkout.</span>
         </article>
         <article class="account-role-mini-card">
-          <strong>Rueckgabe klar</strong>
-          <span>Rueckweg und Kontakt bleiben vor dem Kauf sichtbar.</span>
+          <strong>30 Tage Rueckgabe</strong>
+          <span>Rueckgabe und Kontakt bleiben vor dem Kauf sichtbar.</span>
         </article>
       </div>
       <div class="account-inline-trust">
@@ -3373,7 +3542,7 @@ function renderTechnologySections() {
 </section>`;
 }
 
-function renderHomePage(pathname) {
+function renderHomePage(pathname, products = PRODUCTS) {
   if (!LIVE_STORE_READY) {
     const content = `
 ${renderHero()}
@@ -3409,21 +3578,22 @@ ${renderTechnologySections()}
   }
 
 const content = `
-${renderHero()}
-${renderPromoCards()}
-${renderCategoryShowcase()}
+${renderHero(products)}
+${renderPromoCards(products)}
+${renderCategoryShowcase(products)}
 ${renderServiceVisualStrip()}
 `;
 
   return renderDocument({
     pathname,
-    title: "Simone Shop - Produkte schneller verstehen. Sicherer entscheiden.",
-    description: "Klarer Shop mit Sortiment, Kundencenter, Admincenter und fokussiertem Checkout.",
-    content,
-  });
+      title: "Simone Shop - Ausgewaehlte Produkte fuer Alltag, Zuhause und Arbeit.",
+      description: "Moderner Full-Stack-Webshop mit kuratiertem Sortiment, sicherem Checkout und klarer Nutzerfuehrung.",
+      content,
+      runtimeProducts: products,
+    });
 }
 
-function renderProductsPage(pathname, options = {}) {
+function renderProductsPage(pathname, options = {}, products = PRODUCTS) {
   const { asHomepage = false } = options;
   if (!LIVE_STORE_READY) {
     const content = `
@@ -3466,15 +3636,16 @@ ${renderCatalogFinalChoiceStrip()}
   const copy = asHomepage
     ? "Finde Produkte schnell ueber Suche, Kategorien und klare Preisinfos."
     : "Suche, filtere und vergleiche Produkte schnell nach Preis, Einsatz und Lieferzeit.";
-  const resultCount = `${PRODUCTS.length} Produkte`;
-  const lowestPrice = getLowestPrice(PRODUCTS);
-  const topRated = [...PRODUCTS].sort((left, right) => right.rating - left.rating)[0] || PRODUCTS[0];
-  const topRatedExperience = buildProductExperienceContent(topRated);
+  const resultCount = `${products.length} Produkte`;
+  const lowestPrice = getLowestPrice(products);
+  const topRated = [...products].sort((left, right) => (right.rating || 0) - (left.rating || 0))[0] || products[0] || PRODUCTS[0];
+  const categories = getCatalogCategories(products);
+  const categoryCounts = new Map(categories.map((category) => [category, getProductsByCategory(category, products).length]));
   const catalogQuickProducts = [
-    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro"),
-    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1),
-    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2),
-    getProductBySlugOrFallback("hautpflege-set-deluxe", 3),
+    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro", 0, products),
+    getProductBySlugOrFallback("smartwatch-fitness-tracker", 1, products),
+    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2, products),
+    getProductBySlugOrFallback("hautpflege-set-deluxe", 3, products),
   ];
 
   const content = `
@@ -3496,7 +3667,7 @@ ${renderCatalogFinalChoiceStrip()}
               <option value="featured">Empfohlen</option>
               <option value="price-asc">Preis aufsteigend</option>
               <option value="price-desc">Preis absteigend</option>
-              <option value="rating-desc">Beste Bewertung</option>
+              <option value="rating-desc">Beliebt im Shop</option>
               <option value="name-asc">Name A-Z</option>
             </select>
           </label>
@@ -3504,11 +3675,11 @@ ${renderCatalogFinalChoiceStrip()}
 
         <div class="category-chips" id="categoryChips" role="radiogroup" aria-label="Produktkategorie filtern">
           <button type="button" role="radio" tabindex="0" class="chip active" data-category-filter="all" aria-checked="true"><strong>Alle</strong><small>Gesamtes Sortiment</small></button>
-          ${CATEGORIES.map(
+          ${categories.map(
             (category) =>
               `<button type="button" role="radio" tabindex="-1" class="chip" data-category-filter="${escapeHtml(category)}" aria-checked="false"><strong>${escapeHtml(
                 category,
-              )}</strong><small>Kategorie</small></button>`,
+              )}</strong><small>${categoryCounts.get(category) || 0} Produkte</small></button>`,
           ).join("")}
         </div>
         <div class="catalog-toolbar-meta">
@@ -3532,7 +3703,6 @@ ${renderCatalogFinalChoiceStrip()}
 
       <p class="result-count" id="catalogCount"><strong>${resultCount}</strong><small>Produkte gefunden</small></p>
     </div>
-
   </div>
 </section>
 
@@ -3550,7 +3720,7 @@ ${renderCatalogFinalChoiceStrip()}
     <div class="catalog-selection-grid" id="catalogSelectionGrid"></div>
   </div>
   <div class="product-grid" id="catalogGrid">
-    ${PRODUCTS.map((product) => renderProductCard(product, { showDescription: false, compareMode: true })).join("")}
+    ${products.map((product) => renderProductCard(product, { showDescription: false, compareMode: true })).join("")}
   </div>
   <div class="catalog-empty-state" id="catalogEmptyState" hidden>
     <div class="catalog-empty-copy">
@@ -3558,9 +3728,9 @@ ${renderCatalogFinalChoiceStrip()}
       <h3>Nichts passt zu dieser Auswahl.</h3>
       <p>Loese Suche oder Filter und starte wieder mit dem vollen Sortiment.</p>
       <div class="catalog-empty-trust">
-        <span>Preis sichtbar</span>
+        <span>SSL-verschluesselt</span>
         <span>24-48h Lieferung</span>
-        <span>Rueckgabe klar</span>
+        <span>30 Tage Rueckgabe</span>
       </div>
       <button type="button" class="btn-primary" id="catalogEmptyResetButton">Filter loesen</button>
     </div>
@@ -3580,8 +3750,9 @@ ${renderCatalogFinalChoiceStrip()}
     content,
     shareImage: topRated.imageUrl,
     breadcrumbLabel: "Sortiment",
-    structuredData: [buildProductListStructuredData(pathname, PRODUCTS, "Sortiment | Simone Shop")],
+    structuredData: [buildProductListStructuredData(pathname, products, "Sortiment | Simone Shop")],
     headExtra: `<link rel="preload" as="image" href="${topRated.imageUrl}" />`,
+    runtimeProducts: products,
   });
 }
 
@@ -3897,19 +4068,19 @@ ${renderRelatedChoiceStrip(product, related)}
   });
 }
 
-function renderCartRecoveryStrip() {
+function renderCartRecoveryStrip(products = PRODUCTS) {
   const entries = [
-    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro"),
-    getProductBySlugOrFallback("led-schreibtischlampe-touch"),
-    getProductBySlugOrFallback("hautpflege-set-deluxe"),
+    getProductBySlugOrFallback("wireless-bluetooth-kopfhoerer-pro", 0, products),
+    getProductBySlugOrFallback("led-schreibtischlampe-touch", 2, products),
+    getProductBySlugOrFallback("hautpflege-set-deluxe", 3, products),
   ];
 
   return `
 <section class="shell section-gap-tight">
   <div class="section-header">
     <p class="eyebrow">Schnell zurueck</p>
-    <h2>Drei klare Rueckwege statt leerer Sackgasse.</h2>
-    <p>Warenkorb und leerer Zustand bleiben jetzt ueber wenige bildgefuehrte Rueckwege direkt ans Sortiment angebunden.</p>
+    <h2>Drei schnelle Wege zurueck ins Sortiment.</h2>
+    <p>Wenn dein Warenkorb leer ist, kommst du hier direkt wieder zu passenden Produkten.</p>
   </div>
   <div class="cart-recovery-grid">
     ${entries
@@ -3976,20 +4147,20 @@ function renderCheckoutConfidenceStrip() {
 function renderServiceVisualStrip() {
   const entries = [
     {
-      title: "Kontakt ohne Umweg",
-      copy: "Fragen, Versand und Rueckgabe bleiben sichtbar statt in toten Supportseiten zu enden.",
+      title: "Persoenlicher Support",
+      copy: "Fragen zu Versand, Rueckgabe oder Produktwahl klaeren wir schnell und persoenlich.",
       image: homeVisualUrl("brand"),
       href: "/kontakt",
     },
     {
-      title: "Versand im Blick",
-      copy: "Lieferfenster und Ablauf gehoeren zur Kaufklarheit, nicht nur in den Footer.",
+      title: "Schneller Versand",
+      copy: "Du weisst vor dem Kauf, wann dein Paket voraussichtlich bei dir ist.",
       image: homeVisualUrl("essentials"),
       href: "/versand",
     },
     {
-      title: "Rueckgabe klar",
-      copy: "Auch Service-Seiten muessen schnell beruhigen statt mit Textwaenden zu starten.",
+      title: "30 Tage Rueckgabe",
+      copy: "Wenn etwas nicht passt, schickst du es innerhalb von 30 Tagen unkompliziert zurueck.",
       image: homeVisualUrl("wellness"),
       href: "/rueckgabe",
     },
@@ -4017,14 +4188,14 @@ function renderRecoveryChoiceStrip(mode = "shop") {
   const isSuccess = mode === "success";
   const entries = isSuccess
     ? [
-        { href: "/kontakt", title: "Rueckfrage direkt", copy: "Der aktuelle Stand bleibt ueber den Kontaktweg statt ueber ein Schein-Center erreichbar.", image: homeVisualUrl("brand") },
+        { href: "/kontakt", title: "Rueckfrage direkt", copy: "Der aktuelle Stand bleibt ueber den Kontaktweg direkt erreichbar.", image: homeVisualUrl("brand") },
         { href: "/products", title: "Weiter einkaufen", copy: "Mit denselben klaren Kaufbildern direkt zurueck ins Sortiment.", image: homeVisualUrl("hero") },
         { href: "/kontakt", title: "Hilfe direkt", copy: "Kontakt und Rueckgabe bleiben direkt erreichbar.", image: homeVisualUrl("wellness") },
       ]
     : [
-        { href: "/", title: "Zur Startseite", copy: "Zurueck in die visuelle Shopfuehrung statt in eine Sackgasse.", image: homeVisualUrl("hero") },
-        { href: "/products", title: "Ins Sortiment", copy: "Direkt in die klaren Kaufpfade des Katalogs.", image: homeVisualUrl("electronics") },
-        { href: "/kontakt", title: "Support finden", copy: "Kontakt bleibt ein direkter Weg, kein Seitenfriedhof.", image: homeVisualUrl("brand") },
+        { href: "/", title: "Zur Startseite", copy: "Zurueck zur Startseite und direkt weiter einkaufen.", image: homeVisualUrl("hero") },
+        { href: "/products", title: "Ins Sortiment", copy: "Direkt zu den passenden Produkten im Sortiment.", image: homeVisualUrl("electronics") },
+        { href: "/kontakt", title: "Support finden", copy: "Kontakt bleibt direkt erreichbar, wenn du Hilfe brauchst.", image: homeVisualUrl("brand") },
       ];
 
   return `
@@ -4053,9 +4224,9 @@ function renderRecoveryChoiceStrip(mode = "shop") {
 function renderCenterVisualStrip(mode = "customer") {
   const adminMode = mode === "admin";
   const entries = adminMode
-    ? [
+      ? [
         { title: "Produkte steuern", copy: "Sortiment, Pflege und Sichtbarkeit bleiben in einer eigenen Adminflaeche.", image: homeVisualUrl("electronics") },
-        { title: "Bestellungen sehen", copy: "Operative Wege bleiben klar getrennt vom oeffentlichen Kaufpfad.", image: homeVisualUrl("brand") },
+        { title: "Bestellungen sehen", copy: "Bestellungen und Verwaltung bleiben klar vom Shop getrennt.", image: homeVisualUrl("brand") },
         { title: "Shop ruhig halten", copy: "Admin-Logik bleibt intern, Storefront bleibt schnell und visuell.", image: homeVisualUrl("essentials") },
       ]
     : [
@@ -4110,7 +4281,7 @@ function renderLoginPathStrip() {
 function renderInfoScenarioStrip(pathname) {
   const scenarioMap = {
     "/kontakt": [
-      { title: "Frage vor dem Kauf", copy: "Kontakt bleibt ein direkter Rueckweg vor Warenkorb und Checkout.", image: homeVisualUrl("brand") },
+      { title: "Frage vor dem Kauf", copy: "Kontakt bleibt vor Warenkorb und Checkout direkt erreichbar.", image: homeVisualUrl("brand") },
       { title: "Versand klaeren", copy: "Lieferfenster und Ablauf bleiben ohne Support-Wand sichtbar.", image: homeVisualUrl("essentials") },
       { title: "Rueckgabe beruhigen", copy: "Auch nach dem Kauf bleibt Hilfe ein sichtbarer Serviceweg.", image: homeVisualUrl("wellness") },
     ],
@@ -4122,7 +4293,7 @@ function renderInfoScenarioStrip(pathname) {
     "/versand": [
       { title: "Lieferfenster", copy: "Versand wird als sichtbarer Teil der Kaufentscheidung erklaert.", image: homeVisualUrl("essentials") },
       { title: "Preis plus Versand", copy: "Warenkorb und Checkout verlieren den Lieferkontext nicht.", image: homeVisualUrl("hero") },
-      { title: "Rueckweg klar", copy: "Bei Fragen bleibst du direkt in Service und Shop angebunden.", image: homeVisualUrl("brand") },
+      { title: "Hilfe direkt", copy: "Bei Fragen bleibst du direkt in Service und Shop angebunden.", image: homeVisualUrl("brand") },
     ],
     "/rueckgabe": [
       { title: "Rueckgabe ruhig", copy: "Die Seite beruhigt zuerst und fuehrt dann weiter.", image: homeVisualUrl("wellness") },
@@ -4162,130 +4333,6 @@ function renderInfoShortcutCards(supportLinks = []) {
       <p>Direkter Weg ${index + 1}</p>
       <strong>${escapeHtml(link.label)}</strong>
       <span>Sichtbar statt versteckt im Footer.</span>
-    </a>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderCenterRoleStrip(mode = "customer") {
-  const adminMode = mode === "admin";
-  const entries = adminMode
-    ? [
-        { title: "Produkte steuern", copy: "Sortiment und Sichtbarkeit bleiben klar in der Adminflaeche." },
-        { title: "Bestellungen sehen", copy: "Operative Aufgaben stoeren nicht im oeffentlichen Kaufpfad." },
-        { title: "Shop ruhig halten", copy: "Der Storefront-Weg bleibt schnell, offen und getrennt." },
-      ]
-    : [
-        { title: "Bestellungen sehen", copy: "Kundencenter als klarer Rueckweg nach dem Kauf." },
-        { title: "Profil pflegen", copy: "Adressen und Verlauf bleiben vom Shop getrennt, aber nah." },
-        { title: "Weiter shoppen", copy: "Der Shop bleibt ohne Pflicht-Login weiter offen erreichbar." },
-      ];
-  return `
-<section class="shell section-gap-tight">
-  <div class="center-role-grid">
-    ${entries
-      .map(
-        (entry) => `<article class="center-role-card">
-      <p>${escapeHtml(entry.title)}</p>
-      <strong>${escapeHtml(entry.copy)}</strong>
-    </article>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderLoginBenefitStrip(mode = "customer") {
-  const adminMode = mode === "admin";
-  const entries = adminMode
-    ? [
-        { title: "Rolle direkt klar", copy: "Admincenter bleibt strikt vom Storefront-Weg getrennt." },
-        { title: "Ein gemeinsamer Einstieg", copy: "Trotzdem kein zweiter Login-Einstieg fuer dieselbe Plattform." },
-        { title: "Shop bleibt offen", copy: "Besucher koennen parallel weiter normal einkaufen." },
-      ]
-    : [
-        { title: "Nach dem Kauf weiter", copy: "Bestellungen und Profil bleiben schnell erreichbar." },
-        { title: "Einfacher Zugang", copy: "Ein Formular reicht fuer Kundencenter oder Admincenter." },
-        { title: "Shop ohne Huerde", copy: "Login ist nur fuer Center noetig, nicht fuer das Sortiment." },
-      ];
-  return `
-<section class="shell section-gap-tight">
-  <div class="login-benefit-grid">
-    ${entries
-      .map(
-        (entry) => `<article class="login-benefit-card">
-      <p>${escapeHtml(entry.title)}</p>
-      <strong>${escapeHtml(entry.copy)}</strong>
-    </article>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderEmptyChoiceStrip(mode = "cart") {
-  const entries =
-    mode === "checkout"
-      ? [
-          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Direkt zu Kopfhoerern, Trackern und Ladegeraeten." },
-          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Direkt zu Pflegeprodukten und Essentials." },
-          { href: "/cart", title: "Zum Warenkorb", copy: "Zurueck zu deinen ausgewaehlten Produkten." },
-        ]
-      : [
-          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Tech-Produkte direkt wieder sichtbar." },
-          { href: "/products?category=Haus%20%26%20Garten", title: "Haus & Garten", copy: "Direkt zu Licht, Duft und Home-Office-Helfern." },
-          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Pflegeprodukte ohne Umweg wieder oeffnen." },
-        ];
-  return `
-<div class="empty-choice-grid">
-  ${entries
-    .map(
-      (entry) => `<a class="empty-choice-card" href="${entry.href}">
-    <p>${escapeHtml(entry.title)}</p>
-    <strong>${escapeHtml(entry.copy)}</strong>
-  </a>`,
-    )
-    .join("")}
-</div>`;
-}
-
-function renderSuccessFollowupStrip() {
-  const entries = [
-    { href: "/kontakt", title: "Kontaktweg oeffnen", copy: "Rueckfragen und der naechste Schritt bleiben direkt erreichbar." },
-    { href: "/products", title: "Weiter im Shop", copy: "Mit denselben klaren Bildwelten zurueck ins Sortiment." },
-    { href: "/kontakt", title: "Support direkt", copy: "Hilfe bleibt erreichbar ohne lange Service-Suche." },
-  ];
-  return `
-<section class="shell section-gap-tight">
-  <div class="success-followup-grid">
-    ${entries
-      .map(
-        (entry) => `<a class="success-followup-card" href="${entry.href}">
-      <p>${escapeHtml(entry.title)}</p>
-      <strong>${escapeHtml(entry.copy)}</strong>
-    </a>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderNotFoundCategoryStrip() {
-  const entries = [
-    { href: "/products?category=Elektronik", title: "Elektronik", copy: "Direkt in sichtbare Tech-Produkte springen." },
-    { href: "/products?category=Haus%20%26%20Garten", title: "Haus & Garten", copy: "Ruhiger Rueckweg in Home-Produkte." },
-    { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Pflegewelt ohne tote Seite weiter oeffnen." },
-  ];
-  return `
-<section class="shell section-gap-tight">
-  <div class="notfound-category-grid">
-    ${entries
-      .map(
-        (entry) => `<a class="notfound-category-card" href="${entry.href}">
-      <p>${escapeHtml(entry.title)}</p>
-      <strong>${escapeHtml(entry.copy)}</strong>
     </a>`,
       )
       .join("")}
@@ -4460,6 +4507,130 @@ ${requestContext ? `<section class="shell section-gap-tight">
   });
 }
 
+function renderCenterRoleStrip(mode = "customer") {
+  const adminMode = mode === "admin";
+  const entries = adminMode
+    ? [
+        { title: "Produkte steuern", copy: "Sortiment und Sichtbarkeit bleiben klar in der Adminflaeche." },
+        { title: "Bestellungen sehen", copy: "Operative Aufgaben bleiben klar vom Shop getrennt." },
+        { title: "Shop ruhig halten", copy: "Der Shop bleibt schnell, offen und getrennt." },
+      ]
+      : [
+        { title: "Bestellungen sehen", copy: "Bestellungen und Profil bleiben nach dem Kauf direkt erreichbar." },
+        { title: "Profil pflegen", copy: "Adressen und Verlauf bleiben vom Shop getrennt, aber nah." },
+        { title: "Weiter shoppen", copy: "Der Shop bleibt ohne Pflicht-Login weiter offen erreichbar." },
+      ];
+  return `
+<section class="shell section-gap-tight">
+  <div class="center-role-grid">
+    ${entries
+      .map(
+        (entry) => `<article class="center-role-card">
+      <p>${escapeHtml(entry.title)}</p>
+      <strong>${escapeHtml(entry.copy)}</strong>
+    </article>`,
+      )
+      .join("")}
+  </div>
+</section>`;
+}
+
+function renderLoginBenefitStrip(mode = "customer") {
+  const adminMode = mode === "admin";
+  const entries = adminMode
+    ? [
+        { title: "Rolle direkt klar", copy: "Admincenter bleibt klar vom Shop getrennt." },
+        { title: "Ein gemeinsamer Einstieg", copy: "Trotzdem kein zweiter Login-Einstieg fuer dieselbe Plattform." },
+        { title: "Shop bleibt offen", copy: "Besucher koennen parallel weiter normal einkaufen." },
+      ]
+    : [
+        { title: "Nach dem Kauf weiter", copy: "Bestellungen und Profil bleiben schnell erreichbar." },
+        { title: "Einfacher Zugang", copy: "Ein Formular reicht fuer Kundencenter oder Admincenter." },
+        { title: "Shop ohne Huerde", copy: "Login ist nur fuer Center noetig, nicht fuer das Sortiment." },
+      ];
+  return `
+<section class="shell section-gap-tight">
+  <div class="login-benefit-grid">
+    ${entries
+      .map(
+        (entry) => `<article class="login-benefit-card">
+      <p>${escapeHtml(entry.title)}</p>
+      <strong>${escapeHtml(entry.copy)}</strong>
+    </article>`,
+      )
+      .join("")}
+  </div>
+</section>`;
+}
+
+function renderEmptyChoiceStrip(mode = "cart") {
+  const entries =
+    mode === "checkout"
+      ? [
+          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Direkt zu Kopfhoerern, Trackern und Ladegeraeten." },
+          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Direkt zu Pflegeprodukten und Essentials." },
+          { href: "/cart", title: "Zum Warenkorb", copy: "Zurueck zu deinen ausgewaehlten Produkten." },
+        ]
+      : [
+          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Tech-Produkte direkt wieder sichtbar." },
+          { href: "/products?category=Haus%20%26%20Garten", title: "Haus & Garten", copy: "Direkt zu Licht, Duft und Home-Office-Helfern." },
+          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Pflegeprodukte ohne Umweg wieder oeffnen." },
+        ];
+  return `
+<div class="empty-choice-grid">
+  ${entries
+    .map(
+      (entry) => `<a class="empty-choice-card" href="${entry.href}">
+    <p>${escapeHtml(entry.title)}</p>
+    <strong>${escapeHtml(entry.copy)}</strong>
+  </a>`,
+    )
+    .join("")}
+</div>`;
+}
+
+function renderSuccessFollowupStrip() {
+  const entries = [
+    { href: "/kontakt", title: "Kontaktweg oeffnen", copy: "Rueckfragen und der naechste Schritt bleiben direkt erreichbar." },
+    { href: "/products", title: "Weiter im Shop", copy: "Mit denselben klaren Bildwelten zurueck ins Sortiment." },
+    { href: "/kontakt", title: "Support direkt", copy: "Hilfe bleibt erreichbar ohne lange Service-Suche." },
+  ];
+  return `
+<section class="shell section-gap-tight">
+  <div class="success-followup-grid">
+    ${entries
+      .map(
+        (entry) => `<a class="success-followup-card" href="${entry.href}">
+      <p>${escapeHtml(entry.title)}</p>
+      <strong>${escapeHtml(entry.copy)}</strong>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>`;
+}
+
+function renderNotFoundCategoryStrip() {
+  const entries = [
+    { href: "/products?category=Elektronik", title: "Elektronik", copy: "Direkt in sichtbare Tech-Produkte springen." },
+    { href: "/products?category=Haus%20%26%20Garten", title: "Haus & Garten", copy: "Direkt zu Licht, Duft und Home-Produkten." },
+    { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Pflegewelt ohne tote Seite weiter oeffnen." },
+  ];
+  return `
+<section class="shell section-gap-tight">
+  <div class="notfound-category-grid">
+    ${entries
+      .map(
+        (entry) => `<a class="notfound-category-card" href="${entry.href}">
+      <p>${escapeHtml(entry.title)}</p>
+      <strong>${escapeHtml(entry.copy)}</strong>
+    </a>`,
+      )
+      .join("")}
+  </div>
+</section>`;
+}
+
 function merchModeForProduct(product) {
   if (!product) return "Ausgewaehlt";
   if (product.category === "Elektronik") return "Elektronik";
@@ -4611,8 +4782,8 @@ function renderServerSuccessItems(items) {
     .join("");
 }
 
-function renderCartPage(pathname, cartSnapshot = null, responseCookies = []) {
-  const emptyStartProduct = PRODUCTS[0];
+function renderCartPage(pathname, cartSnapshot = null, responseCookies = [], products = PRODUCTS) {
+  const emptyStartProduct = products[0] || PRODUCTS[0];
   const state = buildStoreCartRenderState(cartSnapshot);
   const hasItems = state.items.length > 0;
   const content = `
@@ -4622,11 +4793,10 @@ function renderCartPage(pathname, cartSnapshot = null, responseCookies = []) {
   <p>Produkte pruefen, Mengen anpassen und direkt weiter zur Kasse.</p>
   <div class="cart-hero-pills">
     <span>Direkt zur Kasse</span>
-    <span>Preis sichtbar</span>
+    <span>SSL-verschluesselt</span>
     <span>Mengen direkt anpassbar</span>
   </div>
 </section>
-
 <section class="shell section-gap-tight" id="cartPage">
   <div class="cart-layout" id="cartLayout"${hasItems ? "" : " hidden"}>
     <section>
@@ -4723,6 +4893,7 @@ function renderCartPage(pathname, cartSnapshot = null, responseCookies = []) {
     cacheControl: "private, no-store",
     responseCookies,
     bootstrapState: { cart: cartSnapshot },
+    runtimeProducts: products,
   });
 }
 
@@ -4925,13 +5096,12 @@ function renderOrderSuccessPage(pathname, orderSnapshot = null, responseCookies 
   <h1>${hasOrder ? "Bestellung bestaetigt." : "Bestellstatus wird geladen."}</h1>
   <p>${hasOrder ? "Hier findest du Lieferung, Zahlung und Bestelluebersicht auf einen Blick." : "Sobald die Bestellung bestaetigt ist, erscheint hier die Uebersicht."}</p>
 </section>
-
 <section class="shell section-gap-tight">
   <article class="success-card ${hasOrder ? merchThemeClass : ""}" id="successCard">
     <div class="success-topline">
       <span>${escapeHtml(hasOrder ? orderSnapshot.payment_status || "Im Prozess" : "Im Prozess")}</span>
       <span>Lieferung 24-48h</span>
-      <span>Rueckgabe klar</span>
+      <span>30 Tage Rueckgabe</span>
     </div>
     <div class="success-hero-block">
       <div>
@@ -5116,6 +5286,69 @@ ${renderInfoShortcutCards(supportLinks)}`;
   });
 }
 
+function renderLegalInfoPage(pathname) {
+  if (pathname === STOREFRONT_LEGAL_PAGES.impressum.path) {
+    return renderInfoPage(pathname, {
+      kicker: STOREFRONT_LEGAL_PAGES.impressum.title,
+      title: STOREFRONT_LEGAL_PAGES.impressum.title,
+      copy: STOREFRONT_LEGAL_PAGES.impressum.intro,
+      pills: ["Anbieter", "Kontakt", "Adresse"],
+      facts: [
+        {
+          title: "Anbieterin",
+          headline: STOREFRONT_LEGAL_CONTACT.ownerName,
+          copy: STOREFRONT_LEGAL_CONTACT.address,
+        },
+        {
+          title: "Kontakt",
+          headline: STOREFRONT_LEGAL_CONTACT.legalEmail,
+          copy: `Telefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone}`,
+        },
+        {
+          title: "Steuerangaben",
+          headline: "Derzeit nicht hinterlegt",
+          copy: "Im Live-Store sind aktuell keine Steuer- oder USt-Angaben veroeffentlicht.",
+        },
+      ],
+      supportLinks: [
+        { href: "/kontakt", label: "Kontakt" },
+        { href: "/faq", label: "FAQ" },
+        { href: "/versand", label: "Versand" },
+      ],
+      primaryHref: "/",
+      primaryLabel: "Zum Shop",
+      secondaryHref: "/kontakt",
+      secondaryLabel: "Kontakt",
+    });
+  }
+
+  const page = Object.values(STOREFRONT_LEGAL_PAGES).find((entry) => entry.path === pathname);
+  if (!page || !page.sections) {
+    return null;
+  }
+
+  return renderInfoPage(pathname, {
+    kicker: page.title,
+    title: page.title,
+    copy: page.intro,
+    pills: page.sections.map((section) => section.title).slice(0, 3),
+    facts: page.sections.map((section) => ({
+      title: section.title,
+      headline: section.body,
+      copy: "",
+    })),
+    supportLinks: [
+      { href: "/kontakt", label: "Kontakt" },
+      { href: "/impressum", label: "Impressum" },
+      { href: "/faq", label: "FAQ" },
+    ],
+    primaryHref: "/",
+    primaryLabel: "Zum Shop",
+    secondaryHref: "/kontakt",
+    secondaryLabel: "Kontakt",
+  });
+}
+
 function renderAccessPage(pathname, mode = "customer") {
   const adminMode = mode === "admin";
   const centerMode =
@@ -5137,7 +5370,7 @@ function renderAccessPage(pathname, mode = "customer") {
       : "Kundencenter anmelden";
   const intro = adminMode
     ? centerMode
-      ? "Das Admincenter bleibt strikt vom Kaufpfad getrennt. Produktpflege, Bestellungen und operative Aufgaben laufen hier in einer eigenen Verwaltungsflaeche."
+      ? "Im Admincenter laufen Produktpflege, Bestellungen und operative Aufgaben getrennt vom Shop."
       : "Der Zugang fuer das Admincenter wird auf die neue Shop-Struktur umgestellt. Die Live-Auth folgt mit der finalen Produktionskonfiguration."
     : centerMode
       ? "Im Kundencenter findest du Bestellungen, Adressen und Profil an einem Ort. Der Shop bleibt dabei weiter schnell und offen."
@@ -5149,7 +5382,7 @@ function renderAccessPage(pathname, mode = "customer") {
   const loginHref = `/login?next=${adminMode ? "/admin" : "/kundencenter"}`;
   const guestTitle = adminMode ? "Geschuetzter Adminzugang folgt" : "Geschuetzter Centerzugang folgt";
   const guestCopy = adminMode
-    ? "Die sichere Admin-Anmeldung wird ausserhalb der oeffentlichen Storefront ausgerollt. Diese Seite zeigt nur Struktur, Rolle und den kuenftigen Weg."
+    ? "Die sichere Admin-Anmeldung wird gerade vorbereitet. Diese Seite zeigt nur Struktur, Rolle und den kuenftigen Weg."
     : "Die sichere Anmeldung fuer Bestellungen und Profil wird gerade vorbereitet. Bis dahin bleibt der Shop ohne Login offen.";
   const content = `
 <section class="shell page-hero">
@@ -12275,6 +12508,16 @@ img { display: block; max-width: 100%; }
   font-size: 0.8rem;
 }
 
+.footer-legal-links {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 0.9rem;
+}
+
+.site-footer-minimal .footer-legal-links {
+  justify-content: flex-start;
+}
+
 .toast {
   position: fixed;
   left: 50%;
@@ -12699,9 +12942,10 @@ img { display: block; max-width: 100%; }
 `;
 }
 
-function renderGlobalScript(bootstrapState = null) {
-  const publicProducts = PRODUCTS.map((product) => ({
+function renderGlobalScript(bootstrapState = null, products = PRODUCTS) {
+  const publicProducts = products.map((product) => ({
     id: product.id,
+    sku: product.sku || product.id,
     slug: product.slug,
     name: product.name,
     category: product.category,
@@ -12725,7 +12969,13 @@ function renderGlobalScript(bootstrapState = null) {
     return ${JSON.stringify(`${API_ORIGIN}/api/v1/store`)};
   })();
   const UNSPLASH_HOST = 'images.unsplash.com';
-  const PRODUCT_BY_ID = new Map(SHOP_PRODUCTS.map((product) => [product.id, product]));
+  const PRODUCT_BY_ID = new Map();
+  for (const product of SHOP_PRODUCTS) {
+    PRODUCT_BY_ID.set(product.id, product);
+    if (product.sku) {
+      PRODUCT_BY_ID.set(product.sku, product);
+    }
+  }
   const CHECKOUT_DRAFT_KEY = 'aurum_checkout_draft_v1';
   const FREE_SHIPPING_THRESHOLD = 50;
   const MAX_ITEM_QTY = 20;
@@ -13690,13 +13940,13 @@ function renderGlobalScript(bootstrapState = null) {
         const contextCopy = parts.length > 0
           ? parts.join(' · ') + ' · Detailseiten mit Anwendung und Fit-Check'
           : 'Alle Produkte. Detailseiten mit Anwendung, FAQ und Fit-Check.';
-        contextNode.innerHTML = '<strong>Bild vor Tiefgang</strong><small>' + escapeHtmlText(contextCopy) + '</small>';
+        contextNode.innerHTML = '<strong>Schnell vergleichen</strong><small>' + escapeHtmlText(contextCopy) + '</small>';
       }
 
       if (countNode) {
         const countCopy = visibleCards.length === 0
           ? 'Filter loesen'
-          : hasFilters ? 'Auswahl aktiv' : 'Sichtbare Auswahl';
+          : hasFilters ? 'Auswahl aktiv' : 'Produkte gefunden';
         countNode.innerHTML = '<strong>' + escapeHtmlText(String(visibleCards.length) + ' Produkte') + '</strong><small>' + escapeHtmlText(countCopy) + '</small>';
       }
 
@@ -14667,7 +14917,8 @@ function renderDocument({
   cacheControl = "public, max-age=120",
   responseHeaders = {},
   responseCookies = [],
-  bootstrapState = null,
+    bootstrapState = null,
+    runtimeProducts = PRODUCTS,
 }) {
   const canonicalUrl = absoluteUrl(canonicalPath);
   const metaImage = absoluteUrl(shareImage || homeVisualUrl("hero"));
@@ -14721,7 +14972,7 @@ function renderDocument({
     </main>
     ${renderCartDrawer()}
     ${renderFooter(pathname)}
-    ${renderGlobalScript(bootstrapState)}
+    ${renderGlobalScript(bootstrapState, runtimeProducts)}
   </body>
 </html>`;
 
@@ -14785,8 +15036,14 @@ function buildContactRequestContext(url) {
 
 export default {
   async fetch(request, env, ctx) {
+    const processApiOrigin =
+      typeof process !== "undefined" && process?.env?.INTERNAL_API_URL
+        ? String(process.env.INTERNAL_API_URL).trim()
+        : "";
     if (env && env.INTERNAL_API_URL) {
       API_ORIGIN = env.INTERNAL_API_URL;
+    } else if (processApiOrigin) {
+      API_ORIGIN = processApiOrigin;
     }
     const url = new URL(request.url);
     const pathname = normalizePath(url.pathname);
@@ -14839,9 +15096,10 @@ export default {
     }
 
     if (pathname === "/api/products") {
+      const runtimeProducts = await resolveCatalogProducts(request);
       return jsonResponse({
-        count: LIVE_STORE_READY ? PRODUCTS.length : 0,
-        items: LIVE_STORE_READY ? PRODUCTS : [],
+        count: LIVE_STORE_READY ? runtimeProducts.length : 0,
+        items: LIVE_STORE_READY ? runtimeProducts : [],
       });
     }
 
@@ -14849,8 +15107,9 @@ export default {
 	      if (!LIVE_STORE_READY) {
 	        return jsonResponse({ error: "catalog_not_live" }, 404);
 	      }
+	      const runtimeProducts = await resolveCatalogProducts(request);
 	      const slug = pathname.replace("/api/products/", "");
-	      const product = PRODUCT_BY_SLUG.get(slug);
+	      const product = runtimeProducts.find((entry) => entry.slug === slug);
 	      if (!product) {
 	        return jsonResponse({ error: "not_found" }, 404);
 	      }
@@ -14859,7 +15118,8 @@ export default {
 
 	    if (pathname.startsWith("/api/v1/store") || pathname.startsWith("/api/v1/catalog") || pathname.startsWith("/api/v1/admin") || pathname.startsWith("/api/webhooks")) {
 	      if (isLocalPreviewHost(url.hostname)) {
-	        return handleLocalStoreApi(request, url, pathname);
+	        const runtimeProducts = await resolveCatalogProducts(request);
+	        return handleLocalStoreApi(request, url, pathname, runtimeProducts);
 	      }
 	      // Proxy to Go API on HF Space
 	      const upstreamUrl = new URL(pathname + url.search, API_ORIGIN);
@@ -14897,7 +15157,8 @@ export default {
 	    }
 
     if (pathname === "/") {
-      return renderHomePage(pathname);
+	      const runtimeProducts = await resolveCatalogProducts(request);
+	      return renderHomePage(pathname, runtimeProducts);
     }
 
     if (pathname === "/login") {
@@ -14910,7 +15171,8 @@ export default {
     }
 
     if (pathname === "/products") {
-      return renderProductsPage(pathname);
+	      const runtimeProducts = await resolveCatalogProducts(request);
+	      return renderProductsPage(pathname, {}, runtimeProducts);
     }
 
     if (pathname.startsWith("/products/")) {
@@ -14926,21 +15188,23 @@ export default {
           secondaryLabel: "Kontakt",
         });
       }
+	      const runtimeProducts = await resolveCatalogProducts(request);
       const slug = pathname.replace("/products/", "");
-      const product = PRODUCT_BY_SLUG.get(slug);
+	      const product = runtimeProducts.find((entry) => entry.slug === slug);
       if (!product) {
         return renderNotFoundPage(pathname);
       }
-      return renderProductDetailPage(pathname, product);
+	      return renderProductDetailPage(pathname, product, runtimeProducts);
     }
 
 	    if (pathname === "/cart") {
+	      const runtimeProducts = await resolveCatalogProducts(request);
 	      if (isLocalPreviewHost(url.hostname)) {
-	        const cartSnapshot = buildLocalCartSnapshot(parseLocalCartCookie(request.headers.get("cookie") || ""));
-	        return renderCartPage(pathname, cartSnapshot);
+	        const cartSnapshot = buildLocalCartSnapshot(parseLocalCartCookie(request.headers.get("cookie") || ""), runtimeProducts);
+	        return renderCartPage(pathname, cartSnapshot, [], runtimeProducts);
 	      }
 	      const cartResult = await fetchStorefrontJson(request, "/api/v1/store/cart");
-	      return renderCartPage(pathname, cartResult.ok ? cartResult.data : null, cartResult.setCookies);
+	      return renderCartPage(pathname, cartResult.ok ? cartResult.data : null, cartResult.setCookies, runtimeProducts);
 	    }
 
     if (
@@ -14960,6 +15224,13 @@ export default {
 
     if (pathname === "/admin/login") {
       return renderUnifiedLoginPage("/login", "admin");
+    }
+
+    if (STOREFRONT_LEGAL_LINKS.some((link) => link.href === pathname)) {
+      const legalPage = renderLegalInfoPage(pathname);
+      if (legalPage) {
+        return legalPage;
+      }
     }
 
     if (pathname === "/kontakt") {
@@ -14987,8 +15258,8 @@ export default {
           },
           {
             title: "Rueckgabe",
-            headline: "Rueckwege bleiben sichtbar und verlinkt.",
-            copy: "Rueckgabe und Kontakt sind Teil des Vertrauensclusters, nicht ein nachgelagerter Pflichtlink.",
+            headline: "Rueckgabe und Kontakt bleiben direkt erreichbar.",
+            copy: "Rueckgabe und Kontakt sind sichtbar verlinkt und leicht erreichbar.",
           },
         ],
         supportLinks: [
@@ -15069,12 +15340,12 @@ export default {
         title: "Rueckgaben klar erklaert",
         copy:
           "Die Rueckgabe wird als fester Vertrauensbaustein gezeigt, nicht als versteckte Pflichtseite. Das schafft Sicherheit vor dem Kauf.",
-        pills: ["Rueckgabe klar", "Kontakt erreichbar", "Keine Versteckspiele"],
+        pills: ["30 Tage Rueckgabe", "Kontakt erreichbar", "Sicherer Checkout"],
         facts: [
           {
             title: "Vor dem Kauf",
             headline: "Rueckgabe ist Teil der sichtbaren Kaufentscheidung.",
-            copy: "Besucher sehen den Rueckweg bereits an Produkt, Warenkorb und Checkout.",
+            copy: "Besucher sehen Hilfe und Kontakt bereits an Produkt, Warenkorb und Checkout.",
           },
           {
             title: "Im Checkout",
@@ -15084,7 +15355,7 @@ export default {
           {
             title: "Nach dem Kauf",
             headline: "Kontakt und Bestelluebersicht bleiben direkt erreichbar.",
-            copy: "Die Success-Seite fuehrt nicht in eine Sackgasse, sondern in Service und Kundencenter weiter.",
+            copy: "Die Bestellseite fuehrt direkt zu Service und Kundencenter weiter.",
           },
         ],
         supportLinks: [
@@ -15110,12 +15381,13 @@ export default {
     }
 
 	    if (pathname === "/checkout") {
+	      const runtimeProducts = await resolveCatalogProducts(request);
 	      if (isLocalPreviewHost(url.hostname)) {
-	        const cartSnapshot = buildLocalCartSnapshot(parseLocalCartCookie(request.headers.get("cookie") || ""));
-	        return renderCheckoutPage(pathname, cartSnapshot);
+	        const cartSnapshot = buildLocalCartSnapshot(parseLocalCartCookie(request.headers.get("cookie") || ""), runtimeProducts);
+	        return renderCheckoutPage(pathname, cartSnapshot, [], runtimeProducts);
 	      }
 	      const cartResult = await fetchStorefrontJson(request, "/api/v1/store/cart");
-	      return renderCheckoutPage(pathname, cartResult.ok ? cartResult.data : null, cartResult.setCookies);
+	      return renderCheckoutPage(pathname, cartResult.ok ? cartResult.data : null, cartResult.setCookies, runtimeProducts);
 	    }
 
 	    if (pathname === "/order-success" || pathname === "/checkout/success") {
