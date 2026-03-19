@@ -1001,29 +1001,29 @@ function getProductMerchSignature(product, experience) {
   const signatures = {
     Elektronik: {
       themeClass: "theme-tech",
-      mode: "Fokus Setup",
-      support: "Desk, Calls und Alltag klar gebuendelt",
+      mode: "Elektronik",
+      support: "Technik fuer Arbeit, Pendeln und Alltag",
     },
     "Haus & Garten": {
       themeClass: "theme-home",
-      mode: "Zuhause Nutzen",
-      support: "Ruhige Umgebung mit direktem Alltagswert",
+      mode: "Haus & Garten",
+      support: "Produkte fuer Zuhause und Home Office",
     },
     "Beauty & Gesundheit": {
       themeClass: "theme-beauty",
-      mode: "Routine Start",
-      support: "Pflege als einfache Folge statt Regalchaos",
+      mode: "Beauty & Gesundheit",
+      support: "Pflege und Essentials fuer deine Routine",
     },
     "Sport & Freizeit": {
       themeClass: "theme-sport",
-      mode: "Unterwegs Klar",
-      support: "Greifen, mitnehmen, direkt einsetzen",
+      mode: "Sport & Freizeit",
+      support: "Praktisch fuer unterwegs und Training",
     },
   };
 
   const fallback = {
     themeClass: "theme-default",
-    mode: "Direkt greifen",
+    mode: "Ausgewaehlt",
     support: experience.useCases[0]?.title || product.category,
   };
 
@@ -1942,16 +1942,15 @@ function isActive(pathname, href) {
 
 function renderHeader(pathname) {
   const minimalHeader = pathname === "/checkout" || pathname === "/order-success";
-  const showQuickStrip = pathname === "/";
   const navItems = [
-    { label: "Shop", href: "/" },
-    { label: "Sortiment", href: "/products" },
+    { label: "Produkte", href: "/products" },
+    { label: "Hilfe", href: "/kontakt" },
   ];
   const mobileNavItems = [
-    { label: "Shop", copy: "Start", href: "/", active: pathname === "/" },
+    { label: "Start", copy: "Shop", href: "/", active: pathname === "/" },
     {
-      label: "Sortiment",
-      copy: "Produkte",
+      label: "Produkte",
+      copy: "Alle ansehen",
       href: "/products",
       active:
         pathname === "/products" ||
@@ -1959,10 +1958,16 @@ function renderHeader(pathname) {
         pathname.startsWith("/products/"),
     },
     {
-      label: "Service",
-      copy: "Hilfe",
+      label: "Bestellung",
+      copy: "Status & Login",
+      href: "/kundencenter",
+      active: pathname === "/kundencenter" || pathname === "/login",
+    },
+    {
+      label: "Hilfe",
+      copy: "Kontakt & FAQ",
       href: "/kontakt",
-      active: ["/kontakt", "/faq", "/versand", "/rueckgabe"].includes(pathname),
+      active: ["/kontakt", "/faq", "/versand", "/rueckgabe", ...STOREFRONT_LEGAL_LINKS.map((link) => link.href)].includes(pathname),
     },
   ];
 
@@ -1972,39 +1977,21 @@ function renderHeader(pathname) {
     return `
 <header id="siteHeader" class="site-header site-header-minimal">
   <div class="shell nav-row nav-row-minimal">
-    <a href="/" class="logo">Simone Shop <span>Preis. Lieferung. Klarheit.</span></a>
+    <a href="/" class="logo">Simone Shop <span>Produkte fuer Alltag, Zuhause und Arbeit</span></a>
     <div class="checkout-nav-trust" aria-label="Kaufpfad Hinweise">
-      <article class="mini-trust-card"><p>Preis</p><strong>Sichtbar</strong></article>
+      <article class="mini-trust-card"><p>Preis</p><strong>Klar</strong></article>
       <article class="mini-trust-card"><p>Lieferung</p><strong>24-48h</strong></article>
-      <article class="mini-trust-card"><p>Rueckgabe</p><strong>Klar</strong></article>
+      <article class="mini-trust-card"><p>Rueckgabe</p><strong>30 Tage</strong></article>
     </div>
     <a href="${utilityHref}" class="checkout-utility-link">${utilityLabel}</a>
   </div>
 </header>`;
   }
 
-  const headerQuickPaths = [
-    {
-      href: "/products?category=Elektronik",
-      title: "Fokus Setup",
-      copy: "Tech direkt sichtbar",
-    },
-    {
-      href: "/products?category=Beauty%20%26%20Gesundheit",
-      title: "Routine Start",
-      copy: "Pflege ohne Overload",
-    },
-    {
-      href: "/products?category=Haus%20%26%20Garten",
-      title: "Zuhause Nutzen",
-      copy: "Home klar sortiert",
-    },
-  ];
-
 	  return `
 	<header id="siteHeader" class="site-header">
 	  <div class="shell nav-row">
-	    <a href="/" class="logo">Simone Shop <span>Preis. Lieferung. Klarheit.</span></a>
+	    <a href="/" class="logo">Simone Shop <span>Produkte fuer Alltag, Zuhause und Arbeit</span></a>
 	
 	    <nav class="desktop-nav" aria-label="Hauptnavigation">
 	      ${navItems
@@ -2020,24 +2007,24 @@ function renderHeader(pathname) {
 	        <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
 	        <path d="M20 20l-3.2-3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 	      </svg>
-	      <input name="q" type="search" inputmode="search" autocomplete="off" placeholder="Produkte suchen" />
+	      <input name="q" type="search" inputmode="search" autocomplete="off" placeholder="Produkt oder Kategorie suchen" />
 	    </form>
 	
 	    <div class="nav-actions">
-	      <a href="/login" class="mini-pill icon-only" data-login-pill aria-label="Zugang / Login">
-	        <span class="sr-only" data-login-pill-label>Zugang / Login</span>
+	      <a href="/kundencenter" class="mini-pill nav-action-pill" data-login-pill aria-label="Bestellung verfolgen oder anmelden">
 	        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 	          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	          <circle cx="12" cy="7" r="4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	        </svg>
+	        <span class="nav-action-label" data-login-pill-label>Bestellung</span>
 	      </a>
-	      <a href="/cart" class="cart-link icon-only" aria-label="Warenkorb oeffnen">
-	        <span class="sr-only">Warenkorb</span>
+	      <a href="/cart" class="cart-link nav-action-pill" aria-label="Warenkorb oeffnen">
 	        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 	          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	          <path d="M3 6h18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	          <path d="M16 10a4 4 0 0 1-8 0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	        </svg>
+	        <span class="nav-action-label">Warenkorb</span>
 	        <span class="cart-count" data-cart-count hidden>0</span>
 	      </a>
 	    </div>
@@ -2049,20 +2036,6 @@ function renderHeader(pathname) {
 	      })
 	      .join("")}
 	  </div>
-	  ${
-	    showQuickStrip
-	      ? `<div class="shell header-quick-strip" aria-label="Schnelle Kaufwege">
-	    ${headerQuickPaths
-	      .map(
-	        (item) => `<a href="${item.href}" class="header-quick-card">
-	      <p>${item.title}</p>
-	      <span>${item.copy}</span>
-	    </a>`,
-	      )
-	      .join("")}
-	  </div>`
-	      : ""
-	  }
 	</header>`;
 }
 
@@ -2384,9 +2357,9 @@ function renderHero() {
 <section class="hero-wrap">
   <div class="shell hero-grid">
     <div class="hero-copy animate-reveal">
-      <p class="kicker-badge">Shop-Startseite</p>
-      <h1>Produkte sehen.<br/>Verstehen. Kaufen.</h1>
-      <p>Mehr Bild, weniger Huerde: Preis, Lieferung und Einsatzfall stehen sichtbar vor jeder langen Erklaerung.</p>
+      <p class="kicker-badge">Simone Shop</p>
+      <h1>Finde praktische Produkte fuer Alltag, Zuhause und Arbeit.</h1>
+      <p>Suche direkt nach einem Produkt oder starte mit einer Kategorie und unseren beliebtesten Artikeln.</p>
 
       <form class="hero-search" action="/products" method="get" role="search">
         <label for="heroSearch" class="sr-only">Produkte suchen</label>
@@ -2408,10 +2381,10 @@ function renderHero() {
       <a class="hero-inline-link hero-primary-link" href="/products">Alle Produkte ansehen</a>
 
       <div class="hero-proof-row">
-        <article class="micro-proof-card"><p>Preis</p><strong>Sofort sichtbar</strong></article>
-        <article class="micro-proof-card"><p>Lieferung</p><strong>24-48h Fenster</strong></article>
-        <article class="micro-proof-card"><p>Rueckgabe</p><strong>Klar erklaert</strong></article>
-        <article class="micro-proof-card"><p>Zugang</p><strong>Kein Pflicht-Login</strong></article>
+        <article class="micro-proof-card"><p>Preis</p><strong>Direkt klar</strong></article>
+        <article class="micro-proof-card"><p>Lieferung</p><strong>24-48h</strong></article>
+        <article class="micro-proof-card"><p>Rueckgabe</p><strong>30 Tage</strong></article>
+        <article class="micro-proof-card"><p>Support</p><strong>Meist unter 24h</strong></article>
       </div>
     </div>
 
@@ -3491,8 +3464,8 @@ ${renderCatalogFinalChoiceStrip()}
   const kicker = asHomepage ? "Shop" : "Sortiment";
   const title = asHomepage ? "Produkte" : "Alle Produkte";
   const copy = asHomepage
-    ? "Produkte schnell sehen, einordnen und direkt aus dem Grid weiter zur passenden Detailseite gehen."
-    : "Im Grid zaehlen Bild, Preis und kurzer Einsatzfall. Die eigentliche Entscheidung passiert erst auf der bildstarken Detailseite.";
+    ? "Finde Produkte schnell ueber Suche, Kategorien und klare Preisinfos."
+    : "Suche, filtere und vergleiche Produkte schnell nach Preis, Einsatz und Lieferzeit.";
   const resultCount = `${PRODUCTS.length} Produkte`;
   const lowestPrice = getLowestPrice(PRODUCTS);
   const topRated = [...PRODUCTS].sort((left, right) => right.rating - left.rating)[0] || PRODUCTS[0];
@@ -3547,13 +3520,13 @@ ${renderCatalogFinalChoiceStrip()}
       <div class="catalog-hero-proof">
         <article class="micro-proof-card"><p>Sortiment</p><strong>${resultCount}</strong></article>
         <article class="micro-proof-card"><p>Einstieg</p><strong>ab ${formatPrice(lowestPrice)}</strong></article>
-        <article class="micro-proof-card"><p>Lieferung</p><strong>24-48h sichtbar</strong></article>
-        <article class="micro-proof-card"><p>Rueckgabe</p><strong>Klar im Blick</strong></article>
+        <article class="micro-proof-card"><p>Lieferung</p><strong>24-48h</strong></article>
+        <article class="micro-proof-card"><p>Rueckgabe</p><strong>30 Tage</strong></article>
       </div>
 
       <div class="section-header catalog-start-header">
-        <p class="eyebrow">Sofort starten</p>
-        <h2>Drei direkte Kaufpfade vor dem Filter.</h2>
+        <p class="eyebrow">Beliebte Einstiege</p>
+        <h2>Starte mit Produkten, die viele direkt verstehen.</h2>
       </div>
       ${renderCatalogHeroStartStrip(catalogQuickProducts.slice(0, 3))}
 
@@ -5560,6 +5533,14 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   gap: 0.45rem;
+}
+
+.nav-action-pill {
+  gap: 0.45rem;
+}
+
+.nav-action-label {
+  display: none;
 }
 
 .header-quick-strip {
@@ -12363,6 +12344,7 @@ img { display: block; max-width: 100%; }
   .mobile-nav { display: none; }
   .desktop-nav { display: flex; }
   .nav-search { display: inline-flex; }
+  .nav-action-label { display: inline; }
   .header-quick-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -12845,11 +12827,11 @@ function renderGlobalScript(bootstrapState = null) {
     if (!pill) {
       return;
     }
-    pill.setAttribute('href', '/login');
-    pill.setAttribute('aria-label', 'Zugang / Login');
+    pill.setAttribute('href', '/kundencenter');
+    pill.setAttribute('aria-label', 'Bestellung verfolgen oder anmelden');
     const labelNode = pill.querySelector('[data-login-pill-label]');
     if (labelNode) {
-      labelNode.textContent = 'Zugang / Login';
+      labelNode.textContent = 'Bestellung';
     }
   }
 
