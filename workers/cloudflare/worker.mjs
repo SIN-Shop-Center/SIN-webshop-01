@@ -2383,7 +2383,7 @@ function renderProductCard(product, options = {}) {
   <a href="/products/${product.slug}" class="product-image-wrap">
     ${renderResponsiveImage({ src: product.imageUrl, alt: product.name, loading: imageLoading, fetchpriority: imageFetchPriority, sizes: "(min-width: 1100px) 25vw, (min-width: 720px) 33vw, 92vw", width: 960, height: 960, srcsetWidths: [360, 540, 720, 960, 1280] })}
     <span class="product-badge">${escapeHtml(product.badge || "Empfohlen")}</span>
-    <span class="product-mode-badge">${escapeHtml(merchSignature.mode)}</span>
+    ${compareMode ? "" : `<span class="product-mode-badge">${escapeHtml(merchSignature.mode)}</span>`}
     ${
       discountPercent(product) > 0
         ? `<span class="product-discount">-${discountPercent(product)}%</span>`
@@ -2394,10 +2394,14 @@ function renderProductCard(product, options = {}) {
   <div class="product-body">
     ${effectiveShowCategory ? `<p class="product-category">${escapeHtml(product.category)}</p>` : ""}
     <a class="product-title" href="/products/${product.slug}">${escapeHtml(product.name)}</a>
-    <div class="product-scene-row">
+    ${
+      compareMode
+        ? `<p class="product-support-line">${escapeHtml(merchSignature.support)}</p>`
+        : `<div class="product-scene-row">
       <span>${escapeHtml(merchSignature.mode)}</span>
       <span>${escapeHtml(merchSignature.support)}</span>
-    </div>
+    </div>`
+    }
 
     ${
       effectiveShowDescription
@@ -2410,10 +2414,16 @@ function renderProductCard(product, options = {}) {
       <span>${escapeHtml(compareHint)}</span>
       <span>${formatPrice(product.priceEur)}</span>
     </div>
-    <div class="product-context-row">
+    ${
+      compareMode
+        ? `<div class="product-context-row product-context-row-compact">
       <span>${escapeHtml(productContext)}</span>
-      <span>${compareMode ? "Zum Produkt" : "Mehr sehen"}</span>
-    </div>
+    </div>`
+        : `<div class="product-context-row">
+      <span>${escapeHtml(productContext)}</span>
+      <span>Mehr sehen</span>
+    </div>`
+    }
 
     ${
       compact
@@ -2421,14 +2431,15 @@ function renderProductCard(product, options = {}) {
       <span>24-48h Lieferung</span>
       <span>30 Tage Rueckgabe</span>
     </div>`
-        : `<div class="product-meta-line">
-      <span class="${stockClass}">${stockText}</span>
+        : `<div class="product-meta-line${compareMode ? " compare-mode" : ""}">
+      ${compareMode ? "" : `<span class="${stockClass}">${stockText}</span>`}
       <span>24-48h Lieferung</span>
       <span>30 Tage Rueckgabe</span>
     </div>
-    <div class="product-trust">
+    ${compareMode ? "" : `<div class="product-trust">
       <span>Preis, Lieferung und Rueckgabe klar auf einen Blick.</span>
-    </div>`
+    </div>`}
+    `
     }
 
     <div class="product-price-row">
@@ -4920,7 +4931,7 @@ function renderCheckoutPage(pathname, cartSnapshot = null, responseCookies = [],
   </div>
 </section>
 
-${renderCheckoutConfidenceStrip()}
+${hasItems ? renderCheckoutConfidenceStrip() : ""}
 <section class="shell section-gap-tight">
   <div id="checkoutPage" class="checkout-layout"${hasItems ? "" : " hidden"}>
     <form id="checkoutForm" class="checkout-form" novalidate>
@@ -5927,10 +5938,11 @@ img { display: block; max-width: 100%; }
 }
 
 .mobile-nav {
-  padding-bottom: 0.8rem;
-  display: flex;
-  gap: 0.42rem;
-  overflow-x: auto;
+  padding-bottom: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  overflow: visible;
   scrollbar-width: none;
 }
 
@@ -5939,15 +5951,14 @@ img { display: block; max-width: 100%; }
 }
 
 .mobile-nav-link {
-  flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.95);
   color: var(--ink-muted);
-  min-height: var(--control-height);
-  padding: 0.52rem 0.72rem;
+  min-height: 4rem;
+  padding: 0.72rem 0.82rem;
   display: grid;
-  gap: 0.06rem;
+  gap: 0.12rem;
   align-content: center;
 }
 
@@ -6435,15 +6446,15 @@ img { display: block; max-width: 100%; }
 .hero-category-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
 .hero-category-card {
   border: 1px solid var(--line);
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.96);
-  min-height: 3rem;
-  padding: 0.72rem 0.8rem;
+  min-height: 3.55rem;
+  padding: 0.82rem 0.88rem;
   display: grid;
   gap: 0.16rem;
   color: var(--ink);
@@ -7437,7 +7448,14 @@ img { display: block; max-width: 100%; }
 }
 
 .product-body {
-  padding: 0.85rem;
+  padding: 0.95rem;
+}
+
+.product-support-line {
+  margin: 0.38rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
 }
 
 .product-category {
@@ -7532,6 +7550,14 @@ img { display: block; max-width: 100%; }
   padding: 0.24rem 0.48rem;
 }
 
+.product-context-row-compact {
+  justify-content: flex-start;
+}
+
+.product-context-row-compact span {
+  color: var(--ink-muted);
+}
+
 .product-compare-line {
   margin-top: 0.42rem;
   display: flex;
@@ -7573,6 +7599,10 @@ img { display: block; max-width: 100%; }
   gap: 0.42rem;
   color: var(--ink-muted);
   font-size: 0.8rem;
+}
+
+.product-meta-line.compare-mode {
+  margin-top: 0.6rem;
 }
 
 .product-meta-line span:not(.stock-state) {
@@ -7632,10 +7662,8 @@ img { display: block; max-width: 100%; }
 
 .product-price-row {
   margin-top: 0.62rem;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0.55rem;
 }
 
 .old-price {
@@ -7649,13 +7677,17 @@ img { display: block; max-width: 100%; }
   font-size: 1.28rem;
 }
 
+.product-price-row .btn-primary {
+  width: 100%;
+}
+
 .btn-primary,
 .btn-secondary {
   border-radius: 999px;
-  min-height: var(--control-height);
-  padding: 0.55rem 0.95rem;
+  min-height: 3.15rem;
+  padding: 0.7rem 1rem;
   border: 1px solid transparent;
-  font-size: 0.83rem;
+  font-size: 0.86rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -8500,7 +8532,7 @@ img { display: block; max-width: 100%; }
 .catalog-controls {
   margin-top: 0.9rem;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.8rem;
 }
 
 .catalog-toolbar {
@@ -8609,19 +8641,19 @@ img { display: block; max-width: 100%; }
 .category-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.55rem;
 }
 
 .chip {
   border: 1px solid var(--line);
   border-radius: 999px;
   min-width: 5rem;
-  min-height: var(--control-height);
+  min-height: 3.15rem;
   background: #fff;
   color: var(--ink);
-  padding: 0.4rem 0.74rem;
+  padding: 0.55rem 0.82rem;
   display: inline-grid;
-  gap: 0.04rem;
+  gap: 0.08rem;
   text-align: left;
   cursor: pointer;
   align-content: center;
@@ -11350,7 +11382,7 @@ img { display: block; max-width: 100%; }
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.95);
   box-shadow: var(--shadow-soft);
-  padding: 0.95rem;
+  padding: 1rem;
 }
 
 .checkout-form h2 {
@@ -11358,7 +11390,7 @@ img { display: block; max-width: 100%; }
 }
 
 .checkout-step + .checkout-step {
-  margin-top: 0.8rem;
+  margin-top: 0.95rem;
 }
 
 .checkout-step-kicker {
@@ -11380,7 +11412,7 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.96);
-  padding: 0.85rem 0.9rem;
+  padding: 1rem;
 }
 
 .checkout-optional {
@@ -11463,18 +11495,18 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   border-radius: 0.95rem;
   background: #fff;
-  padding: 0.65rem 0.72rem;
+  padding: 0.82rem 0.84rem;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.6rem;
+  gap: 0.72rem;
   align-items: start;
   cursor: pointer;
 }
 
 .payment-option-card input {
-  margin: 0.15rem 0 0;
-  width: 1rem;
-  height: 1rem;
+  margin: 0.12rem 0 0;
+  width: 1.15rem;
+  height: 1.15rem;
   min-height: auto;
 }
 
@@ -12741,6 +12773,13 @@ img { display: block; max-width: 100%; }
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .product-price-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: flex-end;
+  }
+  .product-price-row .btn-primary {
+    width: auto;
+  }
   .catalog-start-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -12874,6 +12913,16 @@ img { display: block; max-width: 100%; }
   .cart-link {
     min-height: var(--control-height-compact);
     padding: 0.38rem 0.72rem;
+  }
+  .checkout-hero-card {
+    padding: 0.9rem;
+    gap: 0.65rem;
+  }
+  .checkout-confidence-card img {
+    display: none;
+  }
+  .checkout-confidence-copy {
+    padding: 0.8rem;
   }
   .section-header-with-action {
     grid-template-columns: 1fr;
