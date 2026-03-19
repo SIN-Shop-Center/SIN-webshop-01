@@ -1967,7 +1967,7 @@ function renderHeader(pathname) {
       label: "Hilfe",
       copy: "Kontakt & FAQ",
       href: "/kontakt",
-      active: ["/kontakt", "/faq", "/versand", "/rueckgabe", ...STOREFRONT_LEGAL_LINKS.map((link) => link.href)].includes(pathname),
+      active: ["/kontakt", "/faq", "/versand", "/rueckgabe"].includes(pathname),
     },
   ];
 
