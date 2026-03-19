@@ -107,17 +107,6 @@
 - Critical: NEVER force push to main/master without explicit request
 - Last Verified: 2026-01-26
 
-**Playwright Automation** (Browser Testing)
-- URL: `https://github.com/microsoft/playwright`
-- Purpose: Browser automation, visual testing, web scraping
-- Key Capabilities:
-  - Multi-browser support (Chromium, Firefox, WebKit)
-  - Screenshot capture
-  - Form filling & interaction
-  - Network interception & replay
-- OpenCode Integration: visual-engineering category delegation
-- Documentation: `https://playwright.dev`
-- Last Verified: 2026-01-26
 
 ---
 

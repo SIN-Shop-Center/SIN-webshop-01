@@ -791,13 +791,6 @@ jobs:
 
 ## 📊 INTEGRATION TESTING & DEPLOYMENT
 
-### E2E Test Automation
-
-**File:** `tests/e2e.test.ts`
-
-```typescript
-import { test, expect } from '@playwright/test';
-
 test.describe('OpenCode Integration Tests', () => {
   test('Multi-agent orchestration workflow', async ({ page }) => {
     // 1. Create task

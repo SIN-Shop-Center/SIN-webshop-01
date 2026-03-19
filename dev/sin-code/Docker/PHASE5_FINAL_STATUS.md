@@ -102,7 +102,6 @@ Docker/monitoring/
 - agent-05-steel-browser
 - agent-06-skyvern-solver
 - agent-07-stagehand-research
-- agent-08-playwright-tester
 - agent-09-clawdbot-social
 - agent-10-surfsense-knowledge
 - agent-11-evolution-optimizer

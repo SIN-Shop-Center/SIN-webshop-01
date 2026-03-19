@@ -271,22 +271,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # ============================================================
-  # BROWSER AUTOMATION - For API Key Acquisition
-  # Enable with: docker-compose --profile automation up -d
-  # ============================================================
-  playwright:
-    image: mcr.microsoft.com/playwright:v1.40.0-focal
-    container_name: simone-webshop-playwright
-    profiles:
-      - automation
-    environment:
-      - DISPLAY=:99
-    volumes:
-      - ./automation:/app
-    networks:
-      - simone-network
-    command: tail -f /dev/null
 
 # ============================================================
 # VOLUMES - Persistent Storage
