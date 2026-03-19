@@ -2,11 +2,14 @@ import type { Metadata } from 'next'
 import { InfoPage } from '@/components/content/InfoPage'
 import { getLegalProfile } from '@/lib/legal-profile'
 import { buildPageMetadata } from '@/lib/page-metadata'
+import { STOREFRONT_LEGAL_PAGES } from '@/lib/storefront-legal'
+
+const IMPRESSUM_PAGE = STOREFRONT_LEGAL_PAGES.impressum
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Impressum',
-  description: 'Anbieterkennzeichnung, Kontakt und steuerliche Pflichtangaben für Simone Shop.',
-  path: '/impressum',
+  title: IMPRESSUM_PAGE.title,
+  description: IMPRESSUM_PAGE.description,
+  path: IMPRESSUM_PAGE.path,
 })
 
 export default function ImpressumPage() {
@@ -14,8 +17,8 @@ export default function ImpressumPage() {
 
   return (
     <InfoPage
-      title="Impressum"
-      intro="Pflichtangaben für Simone Shop mit Anbieterangaben und direktem Kontakt für rechtliche Anfragen."
+      title={IMPRESSUM_PAGE.title}
+      intro={IMPRESSUM_PAGE.intro}
       sections={[
         {
           title: 'Anbieter',
