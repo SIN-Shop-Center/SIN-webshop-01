@@ -1,6 +1,6 @@
 import { PRODUCT_VISUALS } from "./product-visuals.mjs";
 
-const BUILD_DATE = "2026-03-08";
+const BUILD_DATE = "2026-03-19";
 const SITE_ORIGIN = "https://delqhi.com";
 let API_ORIGIN = "https://api.delqhi.com";
 const SUPPORT_EMAIL = "support@delqhi.com";
@@ -2090,13 +2090,13 @@ function renderFooter(pathname) {
 <footer class="site-footer">
   <div class="shell footer-grid">
     <section class="footer-brand">
-      <p class="footer-kicker">Shop-first</p>
+      <p class="footer-kicker">Klar einkaufen</p>
       <p class="footer-brand-title">Simone Shop</p>
-      <p>Klare Produktwelten, sichtbare Preise und ein ruhiger Kaufpfad bis zur Bestellung.</p>
+      <p>Ausgewaehlte Produkte, schnelle Lieferung und klare Hilfe vor und nach dem Kauf.</p>
       <div class="trust-row">
         <span>Lieferung 24-48h</span>
-        <span>Rueckgabe klar</span>
-        <span>Kontakt schnell auffindbar</span>
+        <span>30 Tage Rueckgabe</span>
+        <span>Support meist unter 24h</span>
       </div>
     </section>
 
@@ -2123,7 +2123,7 @@ function renderFooter(pathname) {
 
     <section>
       <p class="footer-section-title">Nach dem Kauf</p>
-      <p class="footer-link-note">Bestellstatus, Hilfe und Rueckwege bleiben erreichbar, ohne den Shop zu ueberladen.</p>
+      <p class="footer-link-note">Bestellstatus, Hilfe und Rueckwege bleiben mit wenigen Klicks erreichbar.</p>
       <ul>
         <li><a href="/kundencenter">Kundencenter</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
@@ -2148,9 +2148,9 @@ function renderCartDrawer() {
       <button type="button" class="cart-drawer-close" id="cartDrawerClose" aria-label="Warenkorb schliessen" hidden>×</button>
     </div>
     <div class="cart-drawer-topline">
-      <span><strong>Preis</strong><small>Sichtbar</small></span>
+      <span><strong>Preis</strong><small>Klar</small></span>
       <span><strong>Lieferung</strong><small>24-48h</small></span>
-      <span><strong>Rueckgabe</strong><small>Klar</small></span>
+      <span><strong>Rueckgabe</strong><small>30 Tage</small></span>
     </div>
     <div class="shipping-progress" id="drawerShippingProgress">
       <p id="drawerShippingProgressText" role="status" aria-live="polite">Lege Produkte hinzu, um kostenlosen Versand zu erreichen.</p>
@@ -2179,12 +2179,12 @@ function renderCartDrawer() {
         </div>
         <div class="cart-drawer-checkout-meta">
           <span id="drawerCheckoutDelivery"><strong>Lieferung</strong><small>24-48h</small></span>
-          <span><strong>Rueckgabe</strong><small>Klar</small></span>
+          <span><strong>Rueckgabe</strong><small>30 Tage</small></span>
         </div>
       </div>
       <a href="/checkout" class="btn-primary full">Zur Kasse</a>
       <a href="/cart" class="cart-drawer-secondary-link">Warenkorb bearbeiten</a>
-      <p class="cart-drawer-note">Ein Kaufweg zur Kasse, der volle Warenkorb bleibt erreichbar.</p>
+      <p class="cart-drawer-note">Alles fuer den naechsten Schritt bleibt hier sichtbar.</p>
     </div>
   </aside>
 </div>`;
