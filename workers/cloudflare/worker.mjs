@@ -330,10 +330,10 @@ const CATEGORY_VISUALS = {
 };
 
 const CATEGORY_TAGLINES = {
-  Elektronik: "Technik mit sofort erkennbarem Nutzen statt Datenblatt-Overload.",
-  "Haus & Garten": "Home-Tools fuer Licht, Ordnung und Alltag ohne Krempel-Optik.",
-  "Beauty & Gesundheit": "Pflege, die sich klar und ruhig anfuehlt statt ueberfordernd.",
-  "Sport & Freizeit": "Praktische Begleiter fuer unterwegs, Training und Routine.",
+  Elektronik: "Kopfhoerer, Tracker und Ladegeraete fuer Arbeit und Alltag.",
+  "Haus & Garten": "Licht, Duft und Helfer fuer Zuhause und Home Office.",
+  "Beauty & Gesundheit": "Pflege und Essentials fuer die taegliche Routine.",
+  "Sport & Freizeit": "Praktische Produkte fuer unterwegs und Training.",
 };
 
 const CATEGORY_AMBIENT_VISUALS = {
@@ -2201,8 +2201,8 @@ function renderProductCard(product, options = {}) {
   const productContext = experience.useCases[0]?.title || product.category;
   const compareHint =
     discountPercent(product) > 0
-      ? `${discountPercent(product)}% unter UVP`
-      : "Preis klar sichtbar";
+      ? `${discountPercent(product)}% sparen`
+      : "Preis direkt sichtbar";
   const effectiveShowCategory = compact ? false : showCategory;
   const effectiveShowDescription = compact ? false : showDescription;
 
@@ -2244,14 +2244,14 @@ function renderProductCard(product, options = {}) {
     </div>
     <div class="product-context-row">
       <span>${escapeHtml(productContext)}</span>
-      <span>${compareMode ? "Details & Preis" : "Mehr sehen"}</span>
+      <span>${compareMode ? "Zum Produkt" : "Mehr erfahren"}</span>
     </div>
 
     ${
       compact
         ? `<div class="product-compact-meta">
       <span>24-48h Lieferung</span>
-      <span>Rueckgabe klar</span>
+      <span>30 Tage Rueckgabe</span>
     </div>`
         : `<div class="product-meta-line">
       <span class="stars">${renderStars(product.rating)}</span>
@@ -2259,7 +2259,7 @@ function renderProductCard(product, options = {}) {
       <span class="${stockClass}">${stockText}</span>
     </div>
     <div class="product-trust">
-      <span>24-48h Lieferung · Rueckgabe klar</span>
+      <span>Preis, Lieferung und Rueckgabe klar auf einen Blick.</span>
     </div>`
     }
 
@@ -2429,9 +2429,9 @@ function renderPromoCards() {
 <section class="shell section-gap">
   <div class="section-header section-header-with-action">
     <div>
-      <p class="eyebrow">Heute beliebt</p>
-      <h2>Vier klare Einstiege statt ein uebergewichteter Bildblock.</h2>
-      <p>Jedes Produkt startet mit kompakter Vorschau, Preis und direktem Weg in den Vergleich.</p>
+      <p class="eyebrow">Beliebte Produkte</p>
+      <h2>Produkte, mit denen viele direkt starten.</h2>
+      <p>Vier klare Einstiege mit sichtbarem Preis und schnellem Nutzen.</p>
     </div>
     <a class="hero-inline-link" href="/products">Zum Sortiment</a>
   </div>
@@ -2440,7 +2440,7 @@ function renderPromoCards() {
     ${laneProducts
       .map((product, index) => {
         const experience = buildProductExperienceContent(product);
-        const accent = index === 0 ? "Top Pick heute" : product.category;
+        const accent = index === 0 ? "Beliebt" : product.category;
         return `
       <a class="merch-quad-card" href="/products/${product.slug}">
         <div class="merch-quad-media">
@@ -2465,9 +2465,9 @@ function renderCategoryShowcase() {
   return `
 <section class="shell section-gap">
   <div class="section-header">
-    <p class="eyebrow">Nach Kategorien</p>
-    <h2>Direkt in die passende Produktwelt.</h2>
-    <p>Vier Kategorien, jeweils mit Bild, Preissignal und klarem Einstieg.</p>
+    <p class="eyebrow">Kategorien</p>
+    <h2>Direkt zur passenden Produktwelt.</h2>
+    <p>Waehle die Kategorie, die zu deinem Bedarf passt, und starte dort mit den relevantesten Produkten.</p>
   </div>
 
   <div class="collection-grid">
@@ -2509,7 +2509,7 @@ function renderCategoryShowcase() {
             <span>24-48h Lieferung</span>
             <span>Rueckgabe klar</span>
           </div>
-          <em>Jetzt ansehen</em>
+          <em>Kategorie ansehen</em>
         </div>
       </a>`;
     }).join("")}
@@ -3558,8 +3558,8 @@ ${renderCatalogFinalChoiceStrip()}
   </div>
   <div class="catalog-selection-strip" id="catalogSelectionStrip" hidden>
     <div class="catalog-selection-head">
-      <p class="eyebrow" id="catalogSelectionEyebrow">Aktive Auswahl</p>
-      <h3 id="catalogSelectionTitle">Drei sichtbare Treffer aus deiner aktuellen Auswahl.</h3>
+      <p class="eyebrow" id="catalogSelectionEyebrow">Passende Produkte</p>
+      <h3 id="catalogSelectionTitle">Drei passende Treffer fuer deine Auswahl.</h3>
     </div>
     <div class="catalog-selection-grid" id="catalogSelectionGrid"></div>
   </div>
@@ -3570,7 +3570,7 @@ ${renderCatalogFinalChoiceStrip()}
     <div class="catalog-empty-copy">
       <p class="eyebrow">Keine Treffer</p>
       <h3>Nichts passt zu dieser Auswahl.</h3>
-      <p>Loese Suche oder Kategorie und gehe wieder in das volle Sortiment.</p>
+      <p>Loese Suche oder Filter und starte wieder mit dem vollen Sortiment.</p>
       <div class="catalog-empty-trust">
         <span>Preis sichtbar</span>
         <span>24-48h Lieferung</span>
@@ -13634,11 +13634,11 @@ function renderGlobalScript(bootstrapState = null) {
       }
 
       selectionStrip.hidden = false;
-      selectionEyebrow.textContent = activeCategory !== 'all' ? activeCategory : query.length > 0 ? 'Suche aktiv' : 'Aktive Auswahl';
+      selectionEyebrow.textContent = activeCategory !== 'all' ? activeCategory : query.length > 0 ? 'Suche aktiv' : 'Passende Produkte';
       selectionTitle.textContent =
         visibleCards.length === 1
-          ? 'Ein klarer Treffer aus deiner aktuellen Auswahl.'
-          : 'Drei sichtbare Treffer aus deiner aktuellen Auswahl.';
+          ? 'Ein passender Treffer fuer deine Auswahl.'
+          : 'Drei passende Treffer fuer deine Auswahl.';
 
       selectionGrid.innerHTML = visibleCards.slice(0, 3).map((card) => {
         const imageSrc = card.querySelector('.product-image-wrap img')?.getAttribute('src') || '';
