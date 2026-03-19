@@ -33,6 +33,7 @@
     "check:migrations": "node scripts/migration-audit.mjs",
     "check:fallbacks": "node scripts/ensure-supported-node.mjs && node scripts/check-prod-fallbacks.mjs",
     "check:routes": "node scripts/check-web-routes.mjs",
+    "check:browser-automator": "node scripts/check-browser-automator-py.mjs",
     "check:web:runtime": "node scripts/ensure-supported-node.mjs && WEB_RUNTIME_AUTO_STUB_API=true node scripts/check-web-runtime.mjs",
     "check:web:runtime:lenient": "node scripts/ensure-supported-node.mjs && WEB_RUNTIME_REQUIRE_HEALTHY_API=false node scripts/check-web-runtime.mjs",
     "check:web:runtime:strict": "node scripts/ensure-supported-node.mjs && WEB_RUNTIME_REQUIRE_HEALTHY_API=true node scripts/check-web-runtime.mjs",
@@ -59,7 +60,7 @@
     "sin-a2a:install:opencode": "node scripts/install-opencode-sin-a2a.mjs",
     "smoke:go-live": "node scripts/ensure-supported-node.mjs && node scripts/go-live-smoke.mjs",
     "go-live:today": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && pnpm run check:env:live -- --with-smoke && pnpm run ci && pnpm run check:web:runtime:strict && pnpm smoke:go-live",
-    "ci": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && pnpm lint && node scripts/with-web-production-env.mjs pnpm build && pnpm check:fallbacks && pnpm check:web:runtime && pnpm typecheck && pnpm guard:lines && pnpm guard:baseline && pnpm guard:complexity && pnpm check:env:template && pnpm check:migrations && pnpm check:routes && pnpm test"
+    "ci": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && pnpm lint && node scripts/with-web-production-env.mjs pnpm build && pnpm check:fallbacks && pnpm check:web:runtime && pnpm typecheck && pnpm guard:lines && pnpm guard:baseline && pnpm guard:complexity && pnpm check:env:template && pnpm check:migrations && pnpm check:routes && pnpm check:browser-automator && pnpm test"
   },
   "engines": {
     "node": ">=20.0.0 <23"
