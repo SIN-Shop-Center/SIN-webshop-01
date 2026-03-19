@@ -58,7 +58,6 @@
 | **agent-07-vnc-browser-web** | VNC Web | **50017** | 6901 | `Docker/agents/agent-07-vnc-browser/` | Active |
 | **agent-07-vnc-browser-cdp** | VNC CDP | **50027** | 9222 | `Docker/agents/agent-07-vnc-browser/` | Active |
 | **agent-08-stagehand-research** | Stagehand | **50008** | 3000 | `Docker/agents/agent-08-stagehand/` | Planned |
-| **agent-09-playwright-tester** | Playwright | **50009** | 8080 | `Docker/agents/agent-09-playwright/` | Planned |
 | **agent-09-clawdbot-social** | Clawdbot | **50009** | 8080 | `Docker/agents/agent-09-clawdbot-messenger/` | Planned |
 | **agent-10-surfsense-knowledge** | Surfsense | **50010** | 6333 | `Docker/agents/agent-10-surfsense/` | Planned |
 
