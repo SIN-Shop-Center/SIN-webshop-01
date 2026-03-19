@@ -2096,7 +2096,7 @@ function renderFooter(pathname) {
 
     <section>
       <p class="footer-section-title">Nach dem Kauf</p>
-      <p class="footer-link-note">Bestellstatus, Hilfe und Rueckwege bleiben mit wenigen Klicks erreichbar.</p>
+      <p class="footer-link-note">Bestellstatus, Hilfe und Service bleiben mit wenigen Klicks erreichbar.</p>
       <ul>
         <li><a href="/kundencenter">Kundencenter</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
@@ -3491,7 +3491,7 @@ ${renderCatalogFinalChoiceStrip()}
 
           <label class="catalog-sort-wrap" for="catalogSort">
             <span>Sortierung</span>
-            <small>Preis, Bewertung oder A-Z sichtbar ordnen</small>
+            <small>Preis, Bewertung oder A-Z</small>
             <select id="catalogSort" class="catalog-sort" aria-label="Produkte sortieren">
               <option value="featured">Empfohlen</option>
               <option value="price-asc">Preis aufsteigend</option>
@@ -3508,11 +3508,11 @@ ${renderCatalogFinalChoiceStrip()}
             (category) =>
               `<button type="button" role="radio" tabindex="-1" class="chip" data-category-filter="${escapeHtml(category)}" aria-checked="false"><strong>${escapeHtml(
                 category,
-              )}</strong><small>Direkt filtern</small></button>`,
+              )}</strong><small>Kategorie</small></button>`,
           ).join("")}
         </div>
         <div class="catalog-toolbar-meta">
-          <p class="catalog-context-note" id="catalogContextNote"><strong>Bild vor Tiefgang</strong><small>Alle Produkte. Bild, Preis und Einsatzfall zuerst, Detailtiefe erst auf der PDP.</small></p>
+          <p class="catalog-context-note" id="catalogContextNote"><strong>Schnell finden</strong><small>Suche, Filter und Sortierung helfen dir direkt zum passenden Produkt.</small></p>
           <button type="button" class="btn-secondary catalog-reset-btn" id="catalogResetButton" hidden><span>Filter</span><strong>Zuruecksetzen</strong></button>
         </div>
       </div>
@@ -3525,36 +3525,22 @@ ${renderCatalogFinalChoiceStrip()}
       </div>
 
       <div class="section-header catalog-start-header">
-        <p class="eyebrow">Beliebte Einstiege</p>
-        <h2>Starte mit Produkten, die viele direkt verstehen.</h2>
+        <p class="eyebrow">Beliebte Produkte</p>
+        <h2>Starte mit Produkten, die vielen sofort helfen.</h2>
       </div>
       ${renderCatalogHeroStartStrip(catalogQuickProducts.slice(0, 3))}
 
-      <p class="result-count" id="catalogCount"><strong>${resultCount}</strong><small>Sichtbare Auswahl</small></p>
+      <p class="result-count" id="catalogCount"><strong>${resultCount}</strong><small>Produkte gefunden</small></p>
     </div>
 
-    <section class="catalog-visual-card" aria-label="Top Produkt im Sortiment">
-      ${renderResponsiveImage({ src: topRated.imageUrl, alt: topRated.name, loading: "eager", fetchpriority: "high", sizes: "(min-width: 1100px) 26vw, 92vw", width: 960, height: 960, srcsetWidths: [480, 720, 960, 1280] })}
-      <div class="catalog-visual-copy">
-        <p class="catalog-visual-kicker">Direkt sichtbar</p>
-        <strong>${escapeHtml(topRated.name)}</strong>
-        <span>${escapeHtml(topRatedExperience.useCases[0]?.copy || "Bildstarke Detailseite mit Anwendung, FAQ und klarem Fit-Check.")}</span>
-        <a href="/products/${topRated.slug}" class="hero-inline-link">Top Produkt ansehen</a>
-      </div>
-      <div class="catalog-visual-pills">
-        <span>${formatPrice(topRated.priceEur)}</span>
-        <span>${topRated.rating.toFixed(1)} Sterne</span>
-        <span>${escapeHtml(topRatedExperience.useCases[0]?.title || "Anwendung & FAQ")}</span>
-      </div>
-    </section>
   </div>
 </section>
 
 <section class="shell section-gap-tight">
   <div class="section-header">
     <p class="eyebrow">Produkte</p>
-    <h2>Schneller Vergleich im Grid.</h2>
-      <p>Das Grid bleibt kurz. Die tiefere Entscheidung passiert erst auf der bildstarken Produktseite.</p>
+    <h2>Alle Produkte auf einen Blick.</h2>
+      <p>Vergleiche Preis, Bewertung und Lieferzeit direkt im Grid.</p>
   </div>
   <div class="catalog-selection-strip" id="catalogSelectionStrip" hidden>
     <div class="catalog-selection-head">
@@ -4633,15 +4619,14 @@ function renderCartPage(pathname, cartSnapshot = null, responseCookies = []) {
 <section class="shell page-hero">
   <p class="kicker-badge">Warenkorb</p>
   <h1>Dein Warenkorb</h1>
-  <p>Produkte pruefen, Mengen anpassen und ohne Nebenpfade weiter zum Checkout.</p>
+  <p>Produkte pruefen, Mengen anpassen und direkt weiter zur Kasse.</p>
   <div class="cart-hero-pills">
-    <span>Ein Weg zur Kasse</span>
+    <span>Direkt zur Kasse</span>
     <span>Preis sichtbar</span>
     <span>Mengen direkt anpassbar</span>
   </div>
 </section>
 
-${renderCartRecoveryStrip()}
 <section class="shell section-gap-tight" id="cartPage">
   <div class="cart-layout" id="cartLayout"${hasItems ? "" : " hidden"}>
     <section>
@@ -4650,8 +4635,8 @@ ${renderCartRecoveryStrip()}
 
     <section class="cart-summary" aria-label="Warenkorb Zusammenfassung">
       <div class="cart-summary-topline">
-        <span><strong>Lieferung</strong><small>${hasItems ? "Sichtbar" : "24-48h"}</small></span>
-        <span><strong>Rueckgabe</strong><small>Klar</small></span>
+        <span><strong>Lieferung</strong><small>24-48h</small></span>
+        <span><strong>Rueckgabe</strong><small>30 Tage</small></span>
       </div>
       <h2>Zusammenfassung</h2>
       <div class="cart-summary-visual ${hasItems ? state.merchThemeClass : ""}" id="cartSummaryVisual"${hasItems && state.firstItem ? "" : " hidden"}>
@@ -4662,7 +4647,7 @@ ${renderCartRecoveryStrip()}
           <span id="cartSummaryVisualMeta">${escapeHtml(
             hasItems
               ? `${state.itemCount} Artikel insgesamt · ${state.merchMode} · ${state.firstItem?.category || "Produkt"}`
-              : "Preis, Lieferung sowie Anwendung und FAQ bleiben erreichbar.",
+              : "Preis, Lieferung und Hilfe bleiben bis zur Kasse sichtbar.",
           )}</span>
         </div>
       </div>
@@ -4693,17 +4678,17 @@ ${renderCartRecoveryStrip()}
         <div class="cart-summary-cluster-pills" id="cartSummaryClusterPills">
           ${hasItems
             ? `<span><strong>Modus</strong><small>${escapeHtml(state.merchMode)}</small></span><span><strong>Kontext</strong><small>${escapeHtml(state.firstItem?.category || "Produkt")}</small></span><span><strong>Lieferung</strong><small>${state.shippingAmount === 0 ? "Gratis Versand" : "24-48h"}</small></span>`
-            : `<span><strong>Lieferung</strong><small>24-48h</small></span><span><strong>Rueckgabe</strong><small>Klar</small></span>`}
+            : `<span><strong>Lieferung</strong><small>24-48h</small></span><span><strong>Rueckgabe</strong><small>30 Tage</small></span>`}
         </div>
       </div>
       <a href="/checkout" class="btn-primary full">Zur Kasse</a>
       <button type="button" class="cart-clear-link" id="clearCartButton">Warenkorb leeren</button>
       <div class="cart-summary-support">
         <a href="/versand" class="support-link-card"><p>Versand</p><strong>Lieferung sichtbar</strong></a>
-        <a href="/rueckgabe" class="support-link-card"><p>Rueckgabe</p><strong>Regeln klar erklaert</strong></a>
-        <a href="/kontakt" class="support-link-card"><p>Kontakt</p><strong>Direkter Serviceweg</strong></a>
+        <a href="/rueckgabe" class="support-link-card"><p>Rueckgabe</p><strong>30 Tage Rueckgabe</strong></a>
+        <a href="/kontakt" class="support-link-card"><p>Kontakt</p><strong>Hilfe direkt</strong></a>
       </div>
-      <p class="summary-note">Produktseiten mit Anwendung und FAQ bleiben erreichbar, der Warenkorb bleibt serverseitig erhalten.</p>
+      <p class="summary-note">Deine Produkte bleiben im Warenkorb, waehrend du Versand, Rueckgabe oder Hilfe ansiehst.</p>
     </section>
   </div>
 
@@ -4714,18 +4699,18 @@ ${renderCartRecoveryStrip()}
       ${renderResponsiveImage({ src: emptyStartProduct.imageUrl, alt: emptyStartProduct.name, loading: "lazy", sizes: "(min-width: 1100px) 28vw, 92vw", width: 960, height: 960, srcsetWidths: [480, 720, 960, 1280] })}
       <div class="cart-empty-visual-copy">
         <p>Direkt wieder starten</p>
-        <strong>Shoppen ohne Pflicht-Login und ohne Umwege.</strong>
-        <span>Beliebte Kategorien bleiben direkt erreichbar.</span>
+        <strong>Starte wieder mit einer passenden Kategorie.</strong>
+        <span>Produkte, Warenkorb und Checkout bleiben ohne Login erreichbar.</span>
       </div>
     </div>
     <div class="cart-empty-shortcuts">
-      <a href="/products?category=Elektronik"><strong>Elektronik</strong><small>Direkt in Tech</small></a>
-      <a href="/products?category=Haus%20%26%20Garten"><strong>Haus & Garten</strong><small>Ruhig neu starten</small></a>
-      <a href="/products?category=Beauty%20%26%20Gesundheit"><strong>Beauty & Gesundheit</strong><small>Pflege ohne Umweg</small></a>
+      <a href="/products?category=Elektronik"><strong>Elektronik</strong><small>Kopfhoerer, Tracker und Ladegeraete</small></a>
+      <a href="/products?category=Haus%20%26%20Garten"><strong>Haus & Garten</strong><small>Licht, Duft und Home-Office-Helfer</small></a>
+      <a href="/products?category=Beauty%20%26%20Gesundheit"><strong>Beauty & Gesundheit</strong><small>Pflegeprodukte und Essentials</small></a>
     </div>
     ${renderEmptyChoiceStrip("cart")}
     <a href="/products" class="btn-primary">Zum Sortiment</a>
-    <p class="summary-note">Der Warenkorb wird serverseitig pro Browser-Sitzung gehalten. Nach dem ersten Hinzufuegen bleibt er konsistent ueber die gesamte Kaufstrecke.</p>
+    <p class="summary-note">Sobald du Produkte hinzufuegst, bleiben sie bis zum Checkout im Warenkorb.</p>
   </div>
 </section>
 `;
@@ -4937,27 +4922,25 @@ function renderOrderSuccessPage(pathname, orderSnapshot = null, responseCookies 
   const content = `
 <section class="shell page-hero">
   <p class="kicker-badge">Bestellung</p>
-  <h1>${hasOrder ? "Bestellung bestaetigt." : "Bestellung wird geladen."}</h1>
-  <p>${hasOrder ? "Diese Seite zeigt den serverseitigen Status fuer Lieferung, Zahlung und Bestelluebersicht." : "Sobald Stripe und Order-Zuordnung bestaetigt sind, erscheint hier die Bestelluebersicht."}</p>
+  <h1>${hasOrder ? "Bestellung bestaetigt." : "Bestellstatus wird geladen."}</h1>
+  <p>${hasOrder ? "Hier findest du Lieferung, Zahlung und Bestelluebersicht auf einen Blick." : "Sobald die Bestellung bestaetigt ist, erscheint hier die Uebersicht."}</p>
 </section>
 
-${renderRecoveryChoiceStrip("success")}
-${renderSuccessFollowupStrip()}
 <section class="shell section-gap-tight">
   <article class="success-card ${hasOrder ? merchThemeClass : ""}" id="successCard">
     <div class="success-topline">
       <span>${escapeHtml(hasOrder ? orderSnapshot.payment_status || "Im Prozess" : "Im Prozess")}</span>
-      <span>Lieferung sichtbar</span>
+      <span>Lieferung 24-48h</span>
       <span>Rueckgabe klar</span>
     </div>
     <div class="success-hero-block">
       <div>
         <p class="success-kicker" id="successKicker">${escapeHtml(hasOrder ? merchMode : "Bestelluebersicht")}</p>
-        <h2>${hasOrder ? "Deine Bestellung ist im System gespeichert." : "Bestellstatus wird verifiziert."}</h2>
+        <h2>${hasOrder ? "Deine Bestellung ist eingegangen." : "Bestellstatus wird geprueft."}</h2>
         <p id="successLead">${escapeHtml(
           hasOrder
             ? `${orderSnapshot.items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0} Artikel, Lieferung und Zahlung bleiben hier kurz und klar zusammengefasst.`
-            : "Sobald der Checkout-Status bestaetigt ist, erscheinen hier Artikel, Lieferung und Zahlung.",
+            : "Sobald der Checkout bestaetigt ist, erscheinen hier Artikel, Lieferung und Zahlung.",
         )}</p>
       </div>
       <div class="success-hero-note">
@@ -4980,7 +4963,7 @@ ${renderSuccessFollowupStrip()}
         </div>
         <div class="success-service-box">
           <strong>Hilfe bleibt direkt erreichbar.</strong>
-          <span>Kontakt, Rueckgabe und Versand bleiben ohne Umweg erreichbar.</span>
+          <span>Kontakt, Rueckgabe und Versand bleiben auch nach dem Kauf offen erreichbar.</span>
         </div>
       </section>
 
@@ -4996,12 +4979,12 @@ ${renderSuccessFollowupStrip()}
     <div id="successItems" class="success-item-list">${hasOrder ? renderServerSuccessItems(orderSnapshot.items || []) : ""}</div>
     <div class="success-links">
       <a href="/versand" class="support-link-card"><p>Versand</p><strong>Lieferung im Blick</strong></a>
-      <a href="/rueckgabe" class="support-link-card"><p>Rueckgabe</p><strong>Regeln direkt offen</strong></a>
-      <a href="/kontakt" class="support-link-card"><p>Kontakt</p><strong>Service ohne Umweg</strong></a>
+      <a href="/rueckgabe" class="support-link-card"><p>Rueckgabe</p><strong>30 Tage Rueckgabe</strong></a>
+      <a href="/kontakt" class="support-link-card"><p>Kontakt</p><strong>Hilfe direkt</strong></a>
     </div>
     <div class="success-actions">
       <a href="/products" class="btn-secondary"><span>Weiter einkaufen</span><strong>Zurueck ins Sortiment</strong></a>
-      <a href="${hasOrder ? "/kontakt" : "/cart"}" class="btn-primary"><span>${hasOrder ? "Zum Kontaktweg" : "Zurueck zum Warenkorb"}</span><strong>${hasOrder ? "Rueckfrage oder naechsten Schritt klaeren" : "Erneut pruefen oder Checkout neu starten"}</strong></a>
+      <a href="${hasOrder ? "/kontakt" : "/cart"}" class="btn-primary"><span>${hasOrder ? "Brauchst du Hilfe?" : "Zurueck zum Warenkorb"}</span><strong>${hasOrder ? "Kontakt direkt oeffnen" : "Erneut pruefen oder Checkout neu starten"}</strong></a>
     </div>
   </article>
 </section>
