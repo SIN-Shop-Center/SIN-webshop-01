@@ -826,53 +826,53 @@ function getProductSellingConfig(product, experience) {
   switch (product.category) {
     case "Elektronik":
       return {
-        buyboxPills: ["Sofort einsatzbereit", "Preis bis Checkout sichtbar"],
-        serviceLead: "Schneller Versand fuer Alltag und Routine",
-        serviceCopy: "Lieferung bleibt sichtbar, damit Technik nicht nach verstecktem Aufwand aussieht.",
-        supportLead: "Rueckgabe klar, Hilfe schnell",
-        supportCopy: "Gerade bei Technik muss Hilfe direkt erreichbar bleiben.",
-        trustCluster: ["Ein CTA", "Kein Pflicht-Login", "Technik ohne Setup-Stress"],
-        decisionBand: ["In 15 Sekunden", "Preisbild", "Kauflogik"],
+        buyboxPills: ["Sofort einsatzbereit", "30 Tage Rueckgabe"],
+        serviceLead: "Lieferung in 24-48h",
+        serviceCopy: "Du siehst vor dem Kauf, wann dein Paket voraussichtlich ankommt.",
+        supportLead: "Rueckgabe und Hilfe",
+        supportCopy: "Wenn etwas nicht passt, helfen Rueckgabe und Support ohne Umwege weiter.",
+        trustCluster: ["Schneller Versand", "30 Tage Rueckgabe", "Sicherer Checkout"],
+        decisionBand: ["Ideal fuer", "Preis & Versand", "Sicher kaufen"],
       };
     case "Haus & Garten":
       return {
-        buyboxPills: ["Ruhiger Alltagsnutzen", "Preis bis Checkout sichtbar"],
-        serviceLead: "Schnell im Zuhause nutzbar",
-        serviceCopy: "Lieferung bleibt direkt am Kaufblock, damit der Einsatz im Zuhause sofort planbar ist.",
-        supportLead: "Rueckgabe klar, Service unaufgeregt",
-        supportCopy: "Keine Reibung zwischen Kauf, Nutzung und spaeterem Support.",
-        trustCluster: ["Ein CTA", "Kein Pflicht-Login", "Nutzen statt Deko-Versprechen"],
-        decisionBand: ["Im Alltag", "Preisbild", "Wohnlicher Nutzen"],
+        buyboxPills: ["Alltagstauglich", "30 Tage Rueckgabe"],
+        serviceLead: "Lieferung in 24-48h",
+        serviceCopy: "Schnell geliefert, damit du das Produkt direkt zuhause nutzen kannst.",
+        supportLead: "Rueckgabe und Hilfe",
+        supportCopy: "Rueckgabe und Support bleiben klar und einfach erreichbar.",
+        trustCluster: ["Schneller Versand", "30 Tage Rueckgabe", "Sicherer Checkout"],
+        decisionBand: ["Ideal fuer", "Preis & Versand", "Sicher kaufen"],
       };
     case "Beauty & Gesundheit":
       return {
-        buyboxPills: ["Routine statt Overload", "Preis bis Checkout sichtbar"],
-        serviceLead: "Schnell in die taegliche Routine",
-        serviceCopy: "Lieferung bleibt sichtbar, damit der Einstieg als Set oder Routine planbar bleibt.",
-        supportLead: "Rueckgabe klar, Fragen leicht",
-        supportCopy: "Gerade bei Pflege muss die Entscheidung ruhig und reversibel wirken.",
-        trustCluster: ["Ein CTA", "Kein Pflicht-Login", "Klare Routine statt Regalchaos"],
-        decisionBand: ["Routine zuerst", "Preisbild", "Set- oder Pflege-Logik"],
+        buyboxPills: ["Einfacher Einstieg", "30 Tage Rueckgabe"],
+        serviceLead: "Lieferung in 24-48h",
+        serviceCopy: "Schnell geliefert, damit du ohne Wartezeit starten kannst.",
+        supportLead: "Rueckgabe und Hilfe",
+        supportCopy: "Wenn ein Produkt nicht passt, kannst du es einfach zurueckgeben oder Hilfe bekommen.",
+        trustCluster: ["Schneller Versand", "30 Tage Rueckgabe", "Sicherer Checkout"],
+        decisionBand: ["Ideal fuer", "Preis & Versand", "Sicher kaufen"],
       };
     case "Sport & Freizeit":
       return {
-        buyboxPills: ["Robust fuer unterwegs", "Preis bis Checkout sichtbar"],
-        serviceLead: "Schnell auf dem Weg zu dir",
-        serviceCopy: "Lieferung bleibt sichtbar, damit Alltag und Bewegung direkt planbar werden.",
-        supportLead: "Rueckgabe klar, Hilfe direkt",
-        supportCopy: "Praktische Produkte muessen ohne Huerde kaufbar und rueckgebbar bleiben.",
-        trustCluster: ["Ein CTA", "Kein Pflicht-Login", "Alltag und Bewegung klar lesbar"],
-        decisionBand: ["Unterwegs", "Preisbild", "Robust und praktisch"],
+        buyboxPills: ["Robust fuer unterwegs", "30 Tage Rueckgabe"],
+        serviceLead: "Lieferung in 24-48h",
+        serviceCopy: "Schnell geliefert, damit du direkt loslegen kannst.",
+        supportLead: "Rueckgabe und Hilfe",
+        supportCopy: "Rueckgabe und Support bleiben auch nach dem Kauf direkt erreichbar.",
+        trustCluster: ["Schneller Versand", "30 Tage Rueckgabe", "Sicherer Checkout"],
+        decisionBand: ["Ideal fuer", "Preis & Versand", "Sicher kaufen"],
       };
     default:
       return {
-        buyboxPills: ["Direkt kaufbar", "Preis bis Checkout sichtbar"],
-        serviceLead: "Lieferung bleibt sichtbar",
-        serviceCopy: "Versand bleibt direkt neben dem Kaufknopf sichtbar.",
-        supportLead: "Rueckgabe klar, Hilfe erreichbar",
-        supportCopy: "Keine versteckten Bedingungen oder toten Servicewege.",
-        trustCluster: ["Ein CTA", "Kein Pflicht-Login", "Preis, Lieferung und Rueckgabe sichtbar"],
-        decisionBand: ["In 15 Sekunden", "Preisbild", "Kauflogik"],
+        buyboxPills: ["Direkt kaufbar", "30 Tage Rueckgabe"],
+        serviceLead: "Lieferung in 24-48h",
+        serviceCopy: "Schnelle Lieferung ohne versteckte Huerden.",
+        supportLead: "Rueckgabe und Hilfe",
+        supportCopy: "Klare Hilfe und einfache Rueckgabe, wenn etwas nicht passt.",
+        trustCluster: ["Schneller Versand", "30 Tage Rueckgabe", "Sicherer Checkout"],
+        decisionBand: ["Ideal fuer", "Preis & Versand", "Sicher kaufen"],
       };
   }
 }
@@ -930,25 +930,25 @@ function getCrossSellCombos(product) {
   const bySlug = {
     "wireless-bluetooth-kopfhoerer-pro": [
       {
-        title: "Desk + Fokus Setup",
-        copy: "Kopfhoerer plus Ladestation halten Calls, Laden und Konzentration in einem ruhigeren Setup.",
+        title: "Technik fuer Arbeit und Alltag",
+        copy: "Kopfhoerer plus Ladestation passen gut zu Calls, Laden und konzentriertem Arbeiten.",
         items: ["kabellose-ladestation-3-in-1", "smartwatch-fitness-tracker"],
       },
       {
-        title: "Pendeln + Alltag",
-        copy: "Audio und Wearable bilden zusammen den mobilen Technik-Alltag statt Einzelkauf ohne Zusammenhang.",
+        title: "Pendeln und Alltag",
+        copy: "Audio und Wearable passen gut zusammen, wenn du viel unterwegs bist.",
         items: ["smartwatch-fitness-tracker", "edelstahl-wasserflasche-1l"],
       },
     ],
     "hautpflege-set-deluxe": [
       {
-        title: "Routine + Ruhe",
-        copy: "Pflege funktioniert im Alltag oft besser zusammen mit einer ruhigeren Abendroutine.",
+        title: "Pflege und Routine",
+        copy: "Pflegeprodukte passen oft gut zu einer ruhigeren Abendroutine.",
         items: ["aromatherapie-diffuser", "make-up-pinsel-set-12-teilig"],
       },
       {
-        title: "Set + Einstieg",
-        copy: "Pflege-Set und Pinsel-Set bilden zusammen einen klareren Einstieg als viele Einzelteile.",
+        title: "Set fuer den Einstieg",
+        copy: "Pflege-Set und Pinsel-Set ergeben zusammen einen einfachen Einstieg.",
         items: ["make-up-pinsel-set-12-teilig", "aromatherapie-diffuser"],
       },
     ],
@@ -1061,19 +1061,19 @@ function renderDetailModeStrip(product, experience, decisionGuide) {
   return `
 <div class="detail-mode-strip">
   <article class="detail-mode-card">
-    <p>Kaufmodus</p>
+    <p>Kategorie</p>
     <strong>${escapeHtml(merchSignature.mode)}</strong>
     <span>${escapeHtml(merchSignature.support)}</span>
   </article>
   <article class="detail-mode-card">
-    <p>Preisbild</p>
+    <p>Preis & Lieferung</p>
     <strong>${formatPrice(product.priceEur)}</strong>
-    <span>Preis, Lieferung und Rueckgabe bleiben direkt am Kaufblock.</span>
+    <span>inkl. schneller Lieferung und 30 Tage Rueckgabe.</span>
   </article>
   <article class="detail-mode-card">
-    <p>Fit</p>
+    <p>Ideal fuer</p>
     <strong>${escapeHtml(decisionGuide.goodFit[0])}</strong>
-    <span>Schneller als erst weiter unten in lange Listen zu gehen.</span>
+    <span>Hilft dir sofort zu pruefen, ob das Produkt zu deinem Alltag passt.</span>
   </article>
 </div>`;
 }
@@ -3599,8 +3599,8 @@ ${renderCatalogFinalChoiceStrip()}
   });
 }
 
-function renderProductDetailPage(pathname, product) {
-  const related = getRelatedProducts(product);
+function renderProductDetailPage(pathname, product, products = PRODUCTS) {
+  const related = getRelatedProducts(product, products);
   const isSoldOut = product.stock <= 0;
   const isLowStock = !isSoldOut && product.stock <= 8;
   const detailQtyMax = Math.max(1, Math.min(20, product.stock || 1));
@@ -3681,8 +3681,8 @@ function renderProductDetailPage(pathname, product) {
           .join("")}
       </div>
       <div class="detail-media-note">
-        <p>Bilder zuerst</p>
-        <span>Ansicht, Einsatz und Fit-Check bleiben vor dem CTA sichtbar.</span>
+        <p>Produktbilder</p>
+        <span>Sieh Produkt, Einsatz und Details zuerst - dann entscheide in Ruhe.</span>
       </div>
     </article>
 
@@ -3713,8 +3713,8 @@ function renderProductDetailPage(pathname, product) {
       </div>
 
       <div class="detail-rating">
-        <span class="stars">${renderStars(product.rating)}</span>
-        <span>${product.rating.toFixed(1)} (${product.reviewCount})</span>
+        <span>24-48h Lieferung</span>
+        <span>30 Tage Rueckgabe</span>
       </div>
 
       <div class="detail-buybox">
@@ -3730,14 +3730,14 @@ function renderProductDetailPage(pathname, product) {
               ${
                 discountPercent(product) > 0
                   ? `<p class="detail-saving">Du sparst ${formatPrice(savingsValue)} (${discountPercent(product)}%) gegenueber UVP.</p>`
-                  : `<p class="detail-saving neutral">Preis bleibt bis zum Checkout sichtbar.</p>`
+                  : `<p class="detail-saving neutral">Preis bleibt bis zum letzten Schritt klar sichtbar.</p>`
               }
             </div>
           </div>
           <article class="detail-selection-card" aria-live="polite">
             <p>Deine Auswahl</p>
             <strong id="detailSelectionTotal">1 x ${formatPrice(product.priceEur)} = ${formatPrice(product.priceEur)}</strong>
-            <span id="detailSelectionMeta">Menge 1 · Preis bleibt bis zum Checkout sichtbar</span>
+            <span id="detailSelectionMeta">Menge 1 · Gesamt wird direkt aktualisiert</span>
             <small class="detail-selection-tags"><span>${escapeHtml(merchSignature.mode)}</span><span>${escapeHtml(product.context || product.category)}</span></small>
           </article>
         </div>
@@ -3758,7 +3758,7 @@ function renderProductDetailPage(pathname, product) {
             <p>Lieferung</p>
             <strong id="detailDeliveryText">Lieferfenster wird geladen</strong>
             <span>${escapeHtml(selling.serviceCopy)}</span>
-            <small class="detail-service-tags"><span>Lieferung</span><span>Preis bleibt klar</span></small>
+            <small class="detail-service-tags"><span>Lieferung</span><span>Preis klar</span></small>
           </article>
           <article class="detail-service-card">
             <p>Rueckgabe & Kontakt</p>
@@ -3794,7 +3794,7 @@ function renderProductDetailPage(pathname, product) {
           ${selling.trustCluster.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
         </div>
 
-        <a href="/checkout" class="detail-secondary-link">Zum Checkout mit Warenkorb</a>
+        <a href="/checkout" class="detail-secondary-link">Direkt zum Checkout</a>
       </div>
     </article>
   </div>
@@ -3836,7 +3836,7 @@ function renderProductDetailPage(pathname, product) {
     <div class="section-header">
       <p class="eyebrow">Anwendungsbeispiele</p>
       <h2>So passt ${escapeHtml(product.name)} in den Alltag.</h2>
-      <p>${escapeHtml(experience.useCaseIntro)}</p>
+      <p>Drei typische Situationen, in denen das Produkt direkt Sinn ergibt.</p>
     </div>
     <div class="detail-use-case-grid">
       ${experience.useCases
@@ -3854,19 +3854,19 @@ function renderProductDetailPage(pathname, product) {
     </div>
   </article>
 
-  <section class="detail-why-card" aria-label="Kaufklarheit zum Produkt">
-    <p class="eyebrow">Kaufklarheit</p>
-    <h2>Nicht nur was es kann, sondern warum es fuer Besucher Sinn macht.</h2>
+  <section class="detail-why-card" aria-label="Darum lohnt es sich">
+    <p class="eyebrow">Darum lohnt es sich</p>
+    <h2>Warum dieses Produkt fuer viele direkt passt.</h2>
     <p>${escapeHtml(experience.reasonCopy)}</p>
     <div class="detail-why-columns">
       <article class="detail-why-mini">
         <p>Vor dem Kauf</p>
-        <strong>Besucher muessen den Einsatzfall sofort greifen.</strong>
+        <strong>Passt es zu deinem Alltag?</strong>
         <span>${escapeHtml(experience.positioning)}</span>
       </article>
       <article class="detail-why-mini">
         <p>Nach der Entscheidung</p>
-        <strong>Preis, Nutzen und Trust bleiben zusammen sichtbar.</strong>
+        <strong>Preis, Nutzen und Lieferung bleiben zusammen sichtbar.</strong>
         <span>${escapeHtml(product.longDescription)}</span>
       </article>
     </div>
@@ -3880,7 +3880,7 @@ function renderProductDetailPage(pathname, product) {
   <div class="section-header">
     <p class="eyebrow">Vor dem Kauf</p>
     <h2>Haeufige Fragen zum Produkt</h2>
-    <p>Diese Zone erklaert Einsatz und Nutzen, bevor Besucher wieder nur nach nackten Daten suchen muessen.</p>
+    <p>Die wichtigsten Fragen vor dem Kauf sind hier kurz und klar beantwortet.</p>
   </div>
   <div class="detail-faq-list">
     ${experience.faq
@@ -3907,6 +3907,7 @@ ${renderRelatedChoiceStrip(product, related)}
     metaType: "product",
     structuredData: [structuredData, buildFaqStructuredData(experience.faq)],
     headExtra: [`<link rel="preload" as="image" href="${escapeHtml(galleryImages[0])}" />`].join(""),
+    runtimeProducts: products,
   });
 }
 
@@ -3946,18 +3947,18 @@ function renderCartRecoveryStrip() {
 function renderCheckoutConfidenceStrip() {
   const scenes = [
     {
-      title: "Preis sichtbar",
-      copy: "Keine versteckte Mehrdeutigkeit zwischen Artikeln, Versand und Gesamtpreis.",
+      title: "Gesamtpreis klar",
+      copy: "Du siehst vor dem Bezahlen genau, was Artikel, Versand und Gesamtpreis kosten.",
       image: productVisualUrl("wireless-bluetooth-kopfhoerer-pro"),
     },
     {
-      title: "Lieferung sichtbar",
-      copy: "Lieferfenster und Versand bleiben im selben Sichtfeld wie die Bestellung.",
+      title: "Schnelle Lieferung",
+      copy: "Das Lieferfenster bleibt direkt an deiner Bestellung sichtbar - ohne versteckte Ueberraschungen.",
       image: homeVisualUrl("essentials"),
     },
     {
-      title: "Rueckgabe klar",
-      copy: "Auch im letzten Schritt bleibt die Rueckgabe sichtbar statt in Footer-Links zu verschwinden.",
+      title: "30 Tage Rueckgabe",
+      copy: "Wenn etwas nicht passt, kannst du deine Bestellung einfach und transparent retournieren.",
       image: homeVisualUrl("wellness"),
     },
   ];
@@ -3966,8 +3967,8 @@ function renderCheckoutConfidenceStrip() {
 <section class="shell section-gap-tight">
   <div class="section-header">
     <p class="eyebrow">Vor dem Absenden</p>
-    <h2>Drei letzte Sichtfenster statt Checkout-Nebel.</h2>
-    <p>Der Checkout fuehrt jetzt noch klarer ueber Preis, Lieferung und Rueckgabe als sichtbare Bildanker.</p>
+    <h2>Alles Wichtige bleibt sichtbar.</h2>
+    <p>Gesamtpreis, Lieferung und Rueckgabe bleiben bis zum letzten Klick klar.</p>
   </div>
   <div class="checkout-confidence-grid">
     ${scenes
@@ -4072,9 +4073,9 @@ function renderCenterVisualStrip(mode = "customer") {
         { title: "Shop ruhig halten", copy: "Admin-Logik bleibt intern, Storefront bleibt schnell und visuell.", image: homeVisualUrl("essentials") },
       ]
     : [
-        { title: "Bestellungen im Blick", copy: "Kundencenter als klarer Rueckweg nach dem Kauf.", image: homeVisualUrl("brand") },
-        { title: "Profil ohne Umweg", copy: "Adressen und Verlauf bleiben getrennt vom Shop, aber leicht erreichbar.", image: homeVisualUrl("wellness") },
-        { title: "Shop bleibt offen", copy: "Auch mit Konto bleibt die Storefront visuell und loginfrei erreichbar.", image: homeVisualUrl("hero") },
+        { title: "Bestellungen im Blick", copy: "Bestellstatus, Adressen und Verlauf findest du hier nach dem Kauf.", image: homeVisualUrl("brand") },
+        { title: "Profil schnell erreichbar", copy: "Adressen und Kontodaten bleiben getrennt vom Shop, aber nah dran.", image: homeVisualUrl("wellness") },
+        { title: "Shop bleibt offen", copy: "Du kannst jederzeit ohne Pflicht-Login weiter einkaufen.", image: homeVisualUrl("hero") },
       ];
 
   return `
@@ -4097,9 +4098,9 @@ function renderCenterVisualStrip(mode = "customer") {
 
 function renderLoginPathStrip() {
   const entries = [
-    { title: "Kundencenter", copy: "Bestellungen, Profil und Verlauf als klarer Nachkauf-Pfad.", image: homeVisualUrl("brand") },
-    { title: "Admincenter", copy: "Produkte, Auftraege und Steuerung bleiben getrennt vom Shop.", image: homeVisualUrl("electronics") },
-    { title: "Shop bleibt offen", copy: "Besucher koennen weiter ohne Pflicht-Login kaufen.", image: homeVisualUrl("hero") },
+    { title: "Kundencenter", copy: "Bestellungen, Adressen und Verlauf an einem Ort.", image: homeVisualUrl("brand") },
+    { title: "Admincenter", copy: "Produkte und Auftraege bleiben klar vom Shop getrennt.", image: homeVisualUrl("electronics") },
+    { title: "Shop bleibt offen", copy: "Produkte, Warenkorb und Checkout bleiben ohne Login erreichbar.", image: homeVisualUrl("hero") },
   ];
 
   return `
@@ -4219,8 +4220,8 @@ function renderLoginBenefitStrip(mode = "customer") {
         { title: "Shop bleibt offen", copy: "Besucher koennen parallel weiter normal einkaufen." },
       ]
     : [
-        { title: "Nach dem Kauf weiter", copy: "Bestellungen und Profil bleiben ein eigener klarer Rueckweg." },
-        { title: "Ein gemeinsamer Einstieg", copy: "Kundencenter und Admincenter bleiben fuer Besucher trotzdem verstaendlich." },
+        { title: "Nach dem Kauf weiter", copy: "Bestellungen und Profil bleiben schnell erreichbar." },
+        { title: "Einfacher Zugang", copy: "Ein Formular reicht fuer Kundencenter oder Admincenter." },
         { title: "Shop ohne Huerde", copy: "Login ist nur fuer Center noetig, nicht fuer das Sortiment." },
       ];
   return `
@@ -4242,14 +4243,14 @@ function renderEmptyChoiceStrip(mode = "cart") {
   const entries =
     mode === "checkout"
       ? [
-          { href: "/products?category=Elektronik", title: "Fokus Setup", copy: "Direkt aus leerem Checkout zur klaren Tech-Auswahl." },
-          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Routine Start", copy: "Pflege wieder sichtbar statt leerem Formular." },
-          { href: "/cart", title: "Zum Warenkorb", copy: "Zurueck in den letzten sichtbaren Kaufzustand." },
+          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Direkt zu Kopfhoerern, Trackern und Ladegeraeten." },
+          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Direkt zu Pflegeprodukten und Essentials." },
+          { href: "/cart", title: "Zum Warenkorb", copy: "Zurueck zu deinen ausgewaehlten Produkten." },
         ]
       : [
-          { href: "/products?category=Elektronik", title: "Fokus Setup", copy: "Tech direkt wieder sichtbar." },
-          { href: "/products?category=Haus%20%26%20Garten", title: "Zuhause Nutzen", copy: "Home-Produkte als ruhiger Rueckweg." },
-          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Routine Start", copy: "Pflege ohne Umweg wieder oeffnen." },
+          { href: "/products?category=Elektronik", title: "Elektronik", copy: "Tech-Produkte direkt wieder sichtbar." },
+          { href: "/products?category=Haus%20%26%20Garten", title: "Haus & Garten", copy: "Direkt zu Licht, Duft und Home-Office-Helfern." },
+          { href: "/products?category=Beauty%20%26%20Gesundheit", title: "Beauty & Gesundheit", copy: "Pflegeprodukte ohne Umweg wieder oeffnen." },
         ];
   return `
 <div class="empty-choice-grid">
@@ -4474,12 +4475,12 @@ ${requestContext ? `<section class="shell section-gap-tight">
 }
 
 function merchModeForProduct(product) {
-  if (!product) return "Direkt greifen";
-  if (product.category === "Elektronik") return "Fokus Setup";
-  if (product.category === "Haus & Garten") return "Zuhause Nutzen";
-  if (product.category === "Beauty & Gesundheit") return "Routine Start";
-  if (product.category === "Sport & Freizeit") return "Unterwegs Klar";
-  return "Direkt greifen";
+  if (!product) return "Ausgewaehlt";
+  if (product.category === "Elektronik") return "Elektronik";
+  if (product.category === "Haus & Garten") return "Haus & Garten";
+  if (product.category === "Beauty & Gesundheit") return "Beauty & Gesundheit";
+  if (product.category === "Sport & Freizeit") return "Sport & Freizeit";
+  return "Ausgewaehlt";
 }
 
 function merchThemeClassForProduct(product) {
@@ -4740,7 +4741,7 @@ ${renderCartRecoveryStrip()}
   });
 }
 
-function renderCheckoutPage(pathname, cartSnapshot = null, responseCookies = []) {
+function renderCheckoutPage(pathname, cartSnapshot = null, responseCookies = [], products = PRODUCTS) {
   const state = buildStoreCartRenderState(cartSnapshot);
   const hasItems = state.items.length > 0;
   const content = `
@@ -4748,17 +4749,17 @@ function renderCheckoutPage(pathname, cartSnapshot = null, responseCookies = [])
   <div class="checkout-hero-card">
     <div>
       <p class="kicker-badge">Checkout</p>
-      <h1>Adresse. Zahlung. Abschluss.</h1>
-      <p>Nur die Pflichtschritte fuer Versand, Zahlung und die finale Bestellung.</p>
+      <h1>Bestellung abschliessen.</h1>
+      <p>Adresse eingeben, Zahlungsart waehlen und Bestellung sicher absenden.</p>
       <div class="checkout-hero-pills">
-        <span>Preis sichtbar</span>
-        <span>Nur Pflichtfelder</span>
-        <span>Rueckgabe klar</span>
+        <span>SSL-verschluesselt</span>
+        <span>Schneller Versand</span>
+        <span>30 Tage Rueckgabe</span>
       </div>
     </div>
     <div class="checkout-hero-note">
-      <strong>Ein Kaufpfad. Kein Zusatzlaerm.</strong>
-      <span>Preis, Lieferung und Rueckgabe bleiben direkt neben der Bestelluebersicht sichtbar. Produktseiten mit Anwendung und FAQ bleiben bei Bedarf rueckwaerts offen.</span>
+      <strong>Ohne Umwege zum letzten Schritt.</strong>
+      <span>Gesamtpreis, Lieferung und Rueckgabe bleiben bis zum letzten Klick sichtbar.</span>
     </div>
   </div>
 </section>
@@ -4770,7 +4771,7 @@ ${renderCheckoutConfidenceStrip()}
       <section class="checkout-step">
         <p class="checkout-step-kicker">1. Lieferung</p>
         <h2>Lieferadresse</h2>
-        <p class="checkout-step-copy">Nur die Daten, die fuer Versand und Kontakt wirklich gebraucht werden.</p>
+        <p class="checkout-step-copy">Wir fragen nur die Daten ab, die wir fuer Versand und Rueckfragen brauchen.</p>
         <div class="form-grid two">
           <label>Vorname<input required name="firstName" autocomplete="given-name" /></label>
           <label>Nachname<input required name="lastName" autocomplete="family-name" /></label>
@@ -4783,7 +4784,7 @@ ${renderCheckoutConfidenceStrip()}
         </div>
 
         <details class="checkout-optional">
-          <summary><strong>Weitere Angaben</strong><small>Nur wenn Rueckfragen wirklich noetig werden</small></summary>
+          <summary><strong>Weitere Angaben</strong><small>Nur fuer Rueckfragen</small></summary>
           <label>Telefon<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="Optional fuer Rueckfragen" /></label>
         </details>
       </section>
@@ -4791,22 +4792,22 @@ ${renderCheckoutConfidenceStrip()}
       <section class="checkout-step">
         <p class="checkout-step-kicker">2. Zahlung</p>
         <h2>Zahlungsart</h2>
-        <p class="checkout-step-copy">Eine native Auswahl ohne UI-Spielerei oder versteckte Kosten.</p>
+        <p class="checkout-step-copy">Waehle den Zahlungsweg, der fuer dich am bequemsten ist.</p>
         <fieldset class="payment-options">
           <legend class="sr-only">Zahlungsart waehlen</legend>
           <label class="payment-option-card">
             <input type="radio" name="paymentMethod" value="card" checked />
             <span class="payment-option-copy">
               <strong>Kreditkarte</strong>
-              <span>Direkt und klassisch fuer schnelle Freigabe.</span>
-              <small class="payment-option-meta"><span>Sofort klar</span><span>Direkter Weg</span></small>
+              <span>Sicher und direkt mit deiner Karte bezahlen.</span>
+              <small class="payment-option-meta"><span>Sicher</span><span>Direkter Weg</span></small>
             </span>
           </label>
           <label class="payment-option-card">
             <input type="radio" name="paymentMethod" value="paypal" />
             <span class="payment-option-copy">
               <strong>PayPal</strong>
-              <span>Bekannter Express-Weg mit externem Login.</span>
+              <span>Schnell bezahlen ueber dein bestehendes PayPal-Konto.</span>
               <small class="payment-option-meta"><span>Express</span><span>Externer Login</span></small>
             </span>
           </label>
@@ -4814,8 +4815,8 @@ ${renderCheckoutConfidenceStrip()}
             <input type="radio" name="paymentMethod" value="klarna" />
             <span class="payment-option-copy">
               <strong>Klarna</strong>
-              <span>Alternative Zahlungswahl ohne zweite Checkout-Oberflaeche hier.</span>
-              <small class="payment-option-meta"><span>Alternative</span><span>Preis sichtbar</span></small>
+              <span>Flexible Zahlungsoption fuer mehr Spielraum beim Einkauf.</span>
+              <small class="payment-option-meta"><span>Alternative</span><span>SSL-verschluesselt</span></small>
             </span>
           </label>
         </fieldset>
@@ -4824,14 +4825,14 @@ ${renderCheckoutConfidenceStrip()}
       <section class="checkout-step checkout-submit-step">
         <p class="checkout-step-kicker">3. Pruefung</p>
         <h2>Letzte Pruefung</h2>
-        <p class="checkout-step-copy">Vor dem Bezahlfenster bleiben Preis, Lieferung und Rueckgabe im selben Sichtbereich.</p>
+        <p class="checkout-step-copy">Pruefe Adresse, Versand und Gesamtpreis noch einmal, bevor du zu Stripe weitergehst.</p>
         <div class="checkout-review-points">
-          <article class="review-point-card"><p>Preis</p><strong>Gesamt und Versand bleiben sichtbar.</strong><small>Keine versteckte Endsumme im letzten Schritt.</small></article>
-          <article class="review-point-card"><p>Lieferung</p><strong>Das Lieferfenster bleibt im selben Blickfeld.</strong><small>Zeitraum und Versandlogik bleiben am CTA.</small></article>
-          <article class="review-point-card"><p>Rueckgabe</p><strong>Service und Rueckgabe verschwinden nicht im Footer.</strong><small>Kontakt und Bedingungen bleiben ohne Umweg offen.</small></article>
+          <article class="review-point-card"><p>Preis</p><strong>Keine versteckten Kosten.</strong><small>Artikel, Versand und Gesamtpreis bleiben bis zum Schluss klar.</small></article>
+          <article class="review-point-card"><p>Lieferung</p><strong>Lieferung bleibt planbar.</strong><small>Du siehst weiterhin, wann dein Paket voraussichtlich ankommt.</small></article>
+          <article class="review-point-card"><p>Rueckgabe</p><strong>Rueckgabe bleibt erreichbar.</strong><small>Kontakt und Retouren sind auch nach dem Kauf direkt verfuegbar.</small></article>
         </div>
-        <button type="submit" class="btn-primary full">Sicher zu Stripe weiter</button>
-        <p class="form-note"><strong>Serverseitiger Checkout</strong><small>Adresse, Cart und Zahlungsweiterleitung werden serverseitig vorbereitet. Erst Stripe bestaetigt die Zahlung.</small></p>
+        <button type="submit" class="btn-primary full">Sicher zu Stripe</button>
+        <p class="form-note"><strong>Sichere Weiterleitung</strong><small>Bezahlt wird erst nach deiner finalen Freigabe bei Stripe.</small></p>
       </section>
     </form>
 
@@ -4839,8 +4840,8 @@ ${renderCheckoutConfidenceStrip()}
       <p class="eyebrow">Bestelluebersicht</p>
       <h2>Preis, Lieferung und Artikel auf einen Blick</h2>
       <div class="checkout-summary-topline">
-        <span><strong>Rueckgabe</strong><small>Klar erklaert</small></span>
-        <span><strong>Kontakt</strong><small>Sichtbar</small></span>
+        <span><strong>Rueckgabe</strong><small>30 Tage</small></span>
+        <span><strong>Kontakt</strong><small>Direkt erreichbar</small></span>
       </div>
       <div class="shipping-progress" id="checkoutShippingProgress">
         <p id="checkoutShippingProgressText" role="status" aria-live="polite">${escapeHtml(
@@ -4870,15 +4871,15 @@ ${renderCheckoutConfidenceStrip()}
         <div class="checkout-summary-cluster-pills" id="checkoutSummaryClusterPills">
           ${hasItems
             ? `<span><strong>Modus</strong><small>${escapeHtml(state.merchMode)}</small></span><span><strong>Kontext</strong><small>${escapeHtml(state.firstItem?.category || "Produkt")}</small></span><span><strong>Lieferung</strong><small>${state.shippingAmount === 0 ? "Gratis Versand" : "Sichtbar"}</small></span>`
-            : `<span><strong>Lieferung</strong><small>24-48h</small></span><span><strong>Rueckgabe</strong><small>Klar</small></span>`}
+            : `<span><strong>Lieferung</strong><small>24-48h</small></span><span><strong>Rueckgabe</strong><small>30 Tage</small></span>`}
         </div>
       </div>
       <div class="checkout-summary-note ${hasItems ? state.merchThemeClass : ""}" id="checkoutSummaryNote">
-        <strong id="checkoutSummaryNoteTitle">${escapeHtml(hasItems ? `${state.merchMode}, Preis und Lieferung bleiben sichtbar.` : "Rueckgabe, Kontakt und Preis bleiben sichtbar.")}</strong>
+        <strong id="checkoutSummaryNoteTitle">${escapeHtml(hasItems ? `${state.merchMode}, Preis und Lieferung bleiben im Blick.` : "Preis, Lieferung und Hilfe bleiben im Blick.")}</strong>
         <span id="checkoutSummaryNoteCopy">${escapeHtml(
           hasItems
-            ? `Die Detailseite fuer ${state.merchMode} und ${state.firstItem?.category || "Produkt"} bleibt bei Bedarf rueckwaerts erreichbar, ohne dass dein Checkout verloren geht.`
-            : "Kein Promo-Laerm im letzten Schritt und kein Verlust von Produktkontext aus der Detailseite.",
+            ? `Die Produktseite fuer ${state.firstItem?.name || state.merchMode} bleibt bei Bedarf erreichbar, ohne dass dein Checkout verloren geht.`
+            : "Alle Kosten, Lieferinfos und Hilfelinks bleiben auch im letzten Schritt griffbereit.",
         )}</span>
       </div>
       <div class="checkout-summary-links">
@@ -4895,7 +4896,7 @@ ${renderCheckoutConfidenceStrip()}
     <p>Lege erst Produkte in den Warenkorb, bevor du den Checkout startest.</p>
     ${renderEmptyChoiceStrip("checkout")}
     <a href="/products" class="btn-primary">Zum Sortiment</a>
-    <p class="summary-note">Der Checkout ist an einen serverseitigen Warenkorb gebunden. Sobald Produkte vorhanden sind, bleiben Preis, Menge und Adresse konsistent im Flow.</p>
+    <p class="summary-note">Sobald Produkte im Warenkorb liegen, kannst du hier Adresse, Zahlung und Bestellung abschliessen.</p>
   </div>
 </section>
 `;
@@ -4903,11 +4904,12 @@ ${renderCheckoutConfidenceStrip()}
   return renderDocument({
     pathname,
     title: "Checkout | Simone Shop",
-    description: "Serverseitiger Checkout mit Adresse, Zahlung und klarer Bestelluebersicht.",
+    description: "Sicherer Checkout mit Adresse, Zahlung und klarer Bestelluebersicht.",
     content,
     cacheControl: "private, no-store",
     responseCookies,
     bootstrapState: { cart: cartSnapshot },
+    runtimeProducts: products,
   });
 }
 
@@ -5155,8 +5157,8 @@ function renderAccessPage(pathname, mode = "customer") {
       ? "Das Admincenter bleibt strikt vom Kaufpfad getrennt. Produktpflege, Bestellungen und operative Aufgaben laufen hier in einer eigenen Verwaltungsflaeche."
       : "Der Zugang fuer das Admincenter wird auf die neue Shop-Struktur umgestellt. Die Live-Auth folgt mit der finalen Produktionskonfiguration."
     : centerMode
-      ? "Das Kundencenter wird als eigener Bereich fuer Bestellungen, Adressen und Profil gefuehrt. So bleibt der eigentliche Shop schnell und klar."
-      : "Das Kundencenter wird in die neue Shop-Struktur uebernommen. Bis die finale Live-Auth aktiv ist, bleibt der Shop selbst frei zuganglich.";
+      ? "Im Kundencenter findest du Bestellungen, Adressen und Profil an einem Ort. Der Shop bleibt dabei weiter schnell und offen."
+      : "Bestellungen und Profil laufen kuenftig ueber das Kundencenter. Der Shop selbst bleibt frei zugaenglich.";
   const primaryHref = adminMode ? "/admin" : "/kundencenter";
   const primaryLabel = adminMode ? "Admincenter" : "Kundencenter";
   const secondaryHref = "/products";
@@ -5165,7 +5167,7 @@ function renderAccessPage(pathname, mode = "customer") {
   const guestTitle = adminMode ? "Geschuetzter Adminzugang folgt" : "Geschuetzter Centerzugang folgt";
   const guestCopy = adminMode
     ? "Die sichere Admin-Anmeldung wird ausserhalb der oeffentlichen Storefront ausgerollt. Diese Seite zeigt nur Struktur, Rolle und den kuenftigen Weg."
-    : "Die sichere Center-Anmeldung wird ausserhalb der oeffentlichen Storefront ausgerollt. Diese Seite zeigt nur Struktur, Rolle und den kuenftigen Weg.";
+    : "Die sichere Anmeldung fuer Bestellungen und Profil wird gerade vorbereitet. Bis dahin bleibt der Shop ohne Login offen.";
   const content = `
 <section class="shell page-hero">
   <p class="kicker-badge">${kicker}</p>
@@ -5195,10 +5197,10 @@ ${renderCenterRoleStrip(adminMode ? "admin" : "customer")}
 
 <section class="shell section-gap-tight">
   <div class="feature-grid">
-    <article><h3>1 Shop</h3><p>Die oeffentliche Storefront bleibt frei erreichbar und fuehrt ohne Login ins Sortiment.</p></article>
-    <article><h3>1 Kundencenter</h3><p>Bestellungen, Profil und Adressen laufen in einem eigenen Bereich statt in der Storefront.</p></article>
-    <article><h3>1 Admincenter</h3><p>Operative Aufgaben und Shop-Steuerung bleiben getrennt vom Kaufpfad.</p></article>
-    <article><h3>Naechster Schritt</h3><p>Die finale Auth-Konfiguration wird live nachgezogen, damit alle drei Bereiche sauber produktiv sind.</p></article>
+    <article><h3>Shop</h3><p>Produkte, Warenkorb und Checkout bleiben ohne Login erreichbar.</p></article>
+    <article><h3>Kundencenter</h3><p>Bestellungen, Profil und Adressen laufen in einem eigenen Bereich.</p></article>
+    <article><h3>Admincenter</h3><p>Produkte und Auftraege bleiben klar vom Shop getrennt.</p></article>
+    <article><h3>Naechster Schritt</h3><p>Die finale Anmeldung wird live nachgezogen, damit alle Bereiche sauber produktiv sind.</p></article>
   </div>
 </section>`;
 
@@ -5228,8 +5230,8 @@ function renderUnifiedLoginPage(pathname, mode = "customer", prefill = {}) {
   const content = `
 <section class="shell page-hero">
   <p class="kicker-badge">Zugangsanfrage</p>
-  <h1>Geschuetzten Zugang sauber anfragen.</h1>
-  <p>Die Storefront bleibt offen. Kundencenter und Admincenter werden ueber einen getrennten, sicheren Zugangspfad ausgerollt.</p>
+  <h1>Zugang fuer Bestellungen oder Verwaltung anfragen.</h1>
+  <p>Der Shop bleibt offen. Fuer Bestellungen oder Verwaltung kannst du hier den passenden Zugang anfragen.</p>
 
   <div class="login-hero-pills">
     <span>Ein gemeinsamer Einstieg</span>
@@ -5245,8 +5247,8 @@ ${renderLoginBenefitStrip(adminMode ? "admin" : "customer")}
     ${renderResponsiveImage({ src: showcaseImage, alt: "Loginbereich fuer Shop, Kundencenter und Admincenter", loading: "lazy", sizes: "(min-width: 1100px) 26vw, 92vw", width: 960, height: 720, srcsetWidths: [480, 720, 960, 1280] })}
     <div class="login-showcase-copy">
       <p class="eyebrow">Login & Bereiche</p>
-      <h2>Ein gemeinsamer Einstieg fuer beide Rollen.</h2>
-      <p>Kundencenter und Admincenter sind klar getrennt, aber der Zugang bleibt fuer Besucher sofort verstaendlich.</p>
+      <h2>Ein Einstieg, zwei Bereiche.</h2>
+      <p>Waehle einfach, ob du Bestellungen verwalten oder einen Admin-Zugang anfragen willst.</p>
     </div>
     <div class="login-showcase-pills">
       <span>Kundencenter fuer Bestellungen</span>
@@ -5258,13 +5260,13 @@ ${renderLoginBenefitStrip(adminMode ? "admin" : "customer")}
         <p class="eyebrow">Kundencenter</p>
         <strong>Bestellungen, Profil, Verlauf</strong>
         <span>Nach dem Login direkt erreichbar.</span>
-        <small>Nachkauf-Weg sichtbar</small>
+        <small>Fuer Bestellungen und Profil</small>
       </article>
       <article class="login-showcase-mini" data-login-preview-card="admin" data-active="${selectedRole === "admin" ? "true" : "false"}">
         <p class="eyebrow">Admincenter</p>
         <strong>Produkte, Auftraege, Steuerung</strong>
         <span>Umschalten direkt im Formular.</span>
-        <small>Storefront bleibt getrennt</small>
+        <small>Getrennt vom Shop</small>
       </article>
       <a href="/products" class="login-showcase-link">
         <p class="eyebrow">Shop ohne Login</p>
@@ -5283,7 +5285,7 @@ ${renderLoginBenefitStrip(adminMode ? "admin" : "customer")}
       <span id="loginRoleHint">${
         adminMode
           ? "Die sichere Admin-Freischaltung wird getrennt vom Kaufpfad bereitgestellt."
-          : "Die sichere Center-Freischaltung wird getrennt vom Kaufpfad bereitgestellt."
+          : "Die sichere Freischaltung fuer Bestellungen und Profil wird getrennt vom Kaufpfad bereitgestellt."
       }</span>
     </div>
 
@@ -5306,7 +5308,7 @@ ${renderLoginBenefitStrip(adminMode ? "admin" : "customer")}
       <a href="/products"><p>Ohne Login</p><strong>Direkt ins Sortiment</strong></a>
       <a href="/kontakt"><p>Kontakt</p><strong>Hilfe direkt</strong></a>
     </div>
-    <p class="form-note"><strong>Kein Fake-Login</strong><small>Diese Storefront sammelt keine Passwoerter fuer Center-Zugaenge. Der sichere Weg laeuft getrennt ueber Freigabe und Kontakt.</small></p>
+    <p class="form-note"><strong>Kein Passwort hier</strong><small>Diese Seite sammelt keine Passwoerter. Der sichere Zugang laeuft getrennt ueber Freigabe und Kontakt.</small></p>
     <p class="form-note" id="loginFormStatus" aria-live="polite"></p>
   </form>
 </section>`;
@@ -13430,7 +13432,7 @@ function renderGlobalScript(bootstrapState = null) {
       const current = readQty();
       selectionTotal.textContent =
         current + ' x ' + formatPrice(detailProduct.priceEur) + ' = ' + formatPrice(detailProduct.priceEur * current);
-      selectionMeta.textContent = 'Menge ' + current + ' · Preis bleibt bis zum Checkout sichtbar';
+      selectionMeta.textContent = 'Menge ' + current + ' · Gesamt wird direkt aktualisiert';
     }
 
     function syncQtyControls() {
@@ -14257,12 +14259,12 @@ function renderGlobalScript(bootstrapState = null) {
   }
 
   function merchModeForProduct(product) {
-    if (!product) return 'Direkt greifen';
-    if (product.category === 'Elektronik') return 'Fokus Setup';
-    if (product.category === 'Haus & Garten') return 'Zuhause Nutzen';
-    if (product.category === 'Beauty & Gesundheit') return 'Routine Start';
-    if (product.category === 'Sport & Freizeit') return 'Unterwegs Klar';
-    return 'Direkt greifen';
+    if (!product) return 'Ausgewaehlt';
+    if (product.category === 'Elektronik') return 'Elektronik';
+    if (product.category === 'Haus & Garten') return 'Haus & Garten';
+    if (product.category === 'Beauty & Gesundheit') return 'Beauty & Gesundheit';
+    if (product.category === 'Sport & Freizeit') return 'Sport & Freizeit';
+    return 'Ausgewaehlt';
   }
 
   function merchThemeClassForProduct(product) {
