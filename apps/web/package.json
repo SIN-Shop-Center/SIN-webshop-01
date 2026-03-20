@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "pretypecheck": "node ../../scripts/ensure-supported-node.mjs",
-    "typecheck": "tsc --noEmit --incremental false",
+    "typecheck": "node ../../scripts/clean-web-next-artifacts.mjs && tsc --noEmit --incremental false",
     "test": "pnpm run typecheck"
   },
   "engines": {
