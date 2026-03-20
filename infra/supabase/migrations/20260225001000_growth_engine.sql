@@ -337,6 +337,7 @@ drop trigger if exists trg_affiliate_offers_updated on public.affiliate_offers;
 create trigger trg_affiliate_offers_updated before update on public.affiliate_offers
 for each row execute procedure public.touch_updated_at();
 
+drop table if exists public.affiliate_conversions cascade;
 create table if not exists public.affiliate_conversions (
   id uuid primary key default uuid_generate_v4(),
   affiliate_offer_id uuid not null references public.affiliate_offers(id) on delete cascade,
