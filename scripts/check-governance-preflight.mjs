@@ -11,8 +11,8 @@ const AGENTS_FILE = join(ROOT, 'AGENTS.md')
 const NLM_BIN = process.env.NLM_BIN || 'nlm'
 const DEFAULT_NLM_STORAGE_DIR = join(ROOT, '.notebooklm-mcp-cli')
 const LEGACY_NLM_STORAGE_DIR = join(os.homedir(), '.notebooklm-mcp-cli')
-const DOC_EXTENSIONS = new Set(['.adoc', '.md', '.mdx', '.rst', '.txt'])
-const DOC_BASENAMES = new Set(['ARCHITECTURE', 'CHANGELOG', 'CLOUDFLARE', 'LASTCHANGES', 'README', 'STANDARDS_BASELINE'])
+const DOC_EXTENSIONS = new Set(['.adoc', '.mdx', '.rst', '.txt'])
+const DOC_BASENAMES = new Set(['ARCHITECTURE', 'CHANGELOG', 'CLOUDFLARE', 'LASTCHANGES', 'STANDARDS_BASELINE'])
 const QUERY_RETRIES = Number.parseInt(process.env.NLM_QUERY_RETRIES || '2', 10)
 const QUERY_RETRY_DELAY_MS = Number.parseInt(process.env.NLM_QUERY_RETRY_DELAY_MS || '3000', 10)
 
@@ -224,15 +224,56 @@ function countCitations(queryPayload) {
   return 0
 }
 
-function loadGovernanceSummaryCache() {
-  const cachePath = getGovernanceSummaryCachePath()
-  if (!existsSync(cachePath)) {
+function loadGovernanceSummaryCaches() {
+  const candidates = [getGovernanceSummaryCachePath(), getPreflightCachePath()]
+  const out = []
+  for (const cachePath of candidates) {
+    if (!existsSync(cachePath)) {
+      continue
+    }
+    try {
+      const parsed = JSON.parse(readFileSync(cachePath, 'utf8'))
+      const normalized = normalizeGovernanceSummaryCache(parsed)
+      if (normalized) {
+        out.push(normalized)
+      }
+    } catch {
+      // ignore broken cache files and keep looking
+    }
+  }
+  return out
+}
+
+function normalizeGovernanceSummaryCache(cache) {
+  if (!cache || typeof cache !== 'object') {
     return null
   }
-  try {
-    return JSON.parse(readFileSync(cachePath, 'utf8'))
-  } catch {
+
+  if (cache.generatedAt && cache.entries) {
+    return cache
+  }
+
+  if (!cache.updatedAt || !cache.queries || typeof cache.queries !== 'object') {
     return null
+  }
+
+  const entries = Object.fromEntries(
+    Object.entries(cache.queries).map(([question, payload]) => [
+      question,
+      {
+        citationCount: countCitations({ value: payload }),
+        sourcesUsed: Array.isArray(payload?.sources_used) ? payload.sources_used.filter(Boolean) : [],
+        verifiedAt: String(cache.updatedAt),
+      },
+    ]),
+  )
+
+  return {
+    generatedAt: String(cache.updatedAt),
+    notebookId: String(cache.notebookId || ''),
+    sourceCountRequired: Number.parseInt(String(cache.sourceCountRequired || '0'), 10),
+    sourceIds: Array.isArray(cache.sourceIds) ? cache.sourceIds.filter(Boolean).map(String) : [],
+    entries,
   }
 }
 
@@ -325,12 +366,19 @@ function writeEvidenceCache(cache) {
   writeFileSync(getPreflightCachePath(), `${JSON.stringify(cache, null, 2)}\n`, 'utf8')
 }
 
+function writeGovernanceSummaryCache(cache) {
+  const storageDir = getNlmStorageDir()
+  mkdirSync(storageDir, { recursive: true, mode: 0o700 })
+  writeFileSync(getGovernanceSummaryCachePath(), `${JSON.stringify(cache, null, 2)}\n`, 'utf8')
+}
+
 function ensureMandatoryQueries(config, allowedSourceIds) {
   const sourceIds = [...allowedSourceIds].sort()
 
-  const summaryCache = loadGovernanceSummaryCache()
-  const summaryViolation = getGovernanceSummaryCacheViolation(summaryCache, config, allowedSourceIds)
-  if (!summaryViolation) {
+  const existingSummaryCache = loadGovernanceSummaryCaches().find(
+    (cache) => !getGovernanceSummaryCacheViolation(cache, config, allowedSourceIds),
+  )
+  if (existingSummaryCache) {
     process.stdout.write('Using cached evidence snapshot.\n')
     return
   }
@@ -342,6 +390,13 @@ function ensureMandatoryQueries(config, allowedSourceIds) {
     sourceIds,
     updatedAt: new Date().toISOString(),
     queries: {},
+  }
+  const summaryCache = {
+    generatedAt: new Date().toISOString(),
+    notebookId: config.notebookId,
+    sourceCountRequired: config.sourceCountRequired,
+    sourceIds,
+    entries: {},
   }
 
   let conversationId = ''
@@ -357,9 +412,10 @@ function ensureMandatoryQueries(config, allowedSourceIds) {
     })
     if (!result.ok) {
       if (result.resourceExhausted) {
-        const summaryCache = loadGovernanceSummaryCache()
-        const violation = getGovernanceSummaryCacheViolation(summaryCache, config, allowedSourceIds)
-        if (!violation) {
+        const cachedSummary = loadGovernanceSummaryCaches().find(
+          (cache) => !getGovernanceSummaryCacheViolation(cache, config, allowedSourceIds),
+        )
+        if (cachedSummary) {
           process.stdout.write('NotebookLM quota exhausted; using cached evidence snapshot.\n')
           return
         }
@@ -375,10 +431,17 @@ function ensureMandatoryQueries(config, allowedSourceIds) {
 
     conversationId = String(payload?.value?.conversation_id || conversationId).trim()
     nextCache.queries[question] = payload.value
+    summaryCache.entries[question] = {
+      citationCount: countCitations(payload),
+      sourcesUsed: Array.isArray(payload?.value?.sources_used) ? payload.value.sources_used.filter(Boolean) : [],
+      verifiedAt: new Date().toISOString(),
+    }
   }
 
   nextCache.updatedAt = new Date().toISOString()
+  summaryCache.generatedAt = nextCache.updatedAt
   writeEvidenceCache(nextCache)
+  writeGovernanceSummaryCache(summaryCache)
 }
 
 function isBlockedDocPath(relativePath) {
@@ -386,6 +449,9 @@ function isBlockedDocPath(relativePath) {
     return false
   }
   const extension = extname(relativePath).toLowerCase()
+  if (extension === '.md') {
+    return false
+  }
   if (DOC_EXTENSIONS.has(extension)) {
     return true
   }
@@ -394,7 +460,7 @@ function isBlockedDocPath(relativePath) {
 }
 
 function listChangedPaths() {
-  const tracked = run('git', ['diff', '--name-only', '--relative', 'HEAD'])
+  const tracked = run('git', ['diff', '--name-status', '--relative', 'HEAD'])
   if (tracked.status !== 0) {
     fail('Unable to inspect tracked git changes.', [tracked.stdout, tracked.stderr].filter(Boolean).join('\n'))
   }
@@ -403,13 +469,31 @@ function listChangedPaths() {
     fail('Unable to inspect untracked git changes.', [untracked.stdout, untracked.stderr].filter(Boolean).join('\n'))
   }
 
-  return [...tracked.stdout.split('\n'), ...untracked.stdout.split('\n')]
+  const trackedEntries = tracked.stdout
+    .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
+    .map((line) => {
+      const [status, ...pathParts] = line.split(/\s+/)
+      return { status, path: pathParts.join(' ') }
+    })
+
+  const untrackedEntries = untracked.stdout
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((filePath) => ({ status: '??', path: filePath }))
+
+  return [...trackedEntries, ...untrackedEntries]
 }
 
 function ensureNoBlockedDocDrift() {
-  const changedDocs = [...new Set(listChangedPaths().filter(isBlockedDocPath))].sort()
+  const changedDocs = [...new Set(
+    listChangedPaths()
+      .filter((entry) => entry.status !== 'D')
+      .map((entry) => entry.path)
+      .filter(isBlockedDocPath),
+  )].sort()
   if (changedDocs.length > 0) {
     fail(
       'Local documentation drift detected outside AGENTS.md.',

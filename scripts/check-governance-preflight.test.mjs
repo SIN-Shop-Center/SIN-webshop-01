@@ -30,11 +30,49 @@ test('governance preflight passes with clean doc tree and citation-backed querie
   assert.match(stdout, /Governance preflight passed \(5 mandatory queries, source_count=1\)\./)
 })
 
-test('governance preflight fails on nested markdown drift outside AGENTS', async () => {
+test('governance preflight writes a reusable governance summary cache after live success', async () => {
+  const repoDir = await createRepoFixture()
+  const nlmPath = await createFakeNlm(repoDir)
+
+  await execFileAsync('node', [scriptPath], {
+    cwd: repoDir,
+    env: buildScriptEnv({ NLM_BIN: nlmPath }),
+  })
+
+  const cache = JSON.parse(
+    await fs.readFile(path.join(repoDir, '.notebooklm-mcp-cli', 'governance-preflight-cache.json'), 'utf8'),
+  )
+
+  assert.equal(cache.notebookId, '784c4f30-b524-41d9-a0cc-3752b8303cf3')
+  assert.equal(cache.sourceCountRequired, 1)
+  assert.deepEqual(cache.sourceIds, ['source-1'])
+  assert.ok(cache.generatedAt)
+  assert.ok(cache.entries)
+  assert.equal(Object.keys(cache.entries).length, mandatoryQueries.length)
+  assert.equal(cache.entries[mandatoryQueries[0]].citationCount, 1)
+  assert.deepEqual(cache.entries[mandatoryQueries[0]].sourcesUsed, ['source-1'])
+})
+
+test('governance preflight allows nested markdown drift outside AGENTS', async () => {
   const repoDir = await createRepoFixture()
   const nlmPath = await createFakeNlm(repoDir)
 
   await fs.writeFile(path.join(repoDir, 'workers', 'n8n', 'README.md'), '# changed\n', 'utf8')
+  await fs.writeFile(path.join(repoDir, 'ARCHITECTURE.md'), '# architecture\n', 'utf8')
+
+  const { stdout } = await execFileAsync('node', [scriptPath], {
+    cwd: repoDir,
+    env: buildScriptEnv({ NLM_BIN: nlmPath }),
+  })
+
+  assert.match(stdout, /Governance preflight passed \(5 mandatory queries, source_count=1\)\./)
+})
+
+test('governance preflight still fails on non-markdown doc drift outside AGENTS', async () => {
+  const repoDir = await createRepoFixture()
+  const nlmPath = await createFakeNlm(repoDir)
+
+  await fs.writeFile(path.join(repoDir, 'workers', 'n8n', 'notes.txt'), 'changed\n', 'utf8')
 
   await assert.rejects(
     execFileAsync('node', [scriptPath], {
@@ -43,7 +81,7 @@ test('governance preflight fails on nested markdown drift outside AGENTS', async
     }),
     (error) => {
       assert.match(error.stderr, /BLOCKED: Local documentation drift detected outside AGENTS\.md\./)
-      assert.match(error.stderr, /workers\/n8n\/README\.md/)
+      assert.match(error.stderr, /workers\/n8n\/notes\.txt/)
       return true
     },
   )
@@ -148,6 +186,53 @@ test('governance preflight uses cached evidence when NotebookLM is resource exha
   assert.match(stdout, /Governance preflight passed \(5 mandatory queries, source_count=1\)\./)
 })
 
+test('governance preflight falls back to legacy preflight-cache.json when quota is exhausted', async () => {
+  const repoDir = await createRepoFixture()
+  const nlmPath = await createFakeNlm(repoDir, {
+    queryFailures: Object.fromEntries(
+      mandatoryQueries.map((question) => [
+        question,
+        'Error: Google rejected the query (error code 8: RESOURCE_EXHAUSTED)',
+      ]),
+    ),
+  })
+
+  const cacheDir = path.join(repoDir, '.notebooklm-mcp-cli')
+  await fs.mkdir(cacheDir, { recursive: true })
+  await fs.writeFile(
+    path.join(cacheDir, 'preflight-cache.json'),
+    `${JSON.stringify(
+      {
+        notebookId: '784c4f30-b524-41d9-a0cc-3752b8303cf3',
+        sourceCountRequired: 1,
+        sourceIds: ['source-1'],
+        updatedAt: new Date().toISOString(),
+        queries: Object.fromEntries(
+          mandatoryQueries.map((question) => [
+            question,
+            {
+              answer: `Answer for ${question} [1]`,
+              sources_used: ['source-1'],
+              citations: { '1': 'source-1' },
+            },
+          ]),
+        ),
+      },
+      null,
+      2,
+    )}\n`,
+    'utf8',
+  )
+
+  const { stdout } = await execFileAsync('node', [scriptPath], {
+    cwd: repoDir,
+    env: buildScriptEnv({ NLM_BIN: nlmPath }),
+  })
+
+  assert.match(stdout, /Using cached evidence snapshot\./)
+  assert.match(stdout, /Governance preflight passed \(5 mandatory queries, source_count=1\)\./)
+})
+
 test('governance preflight bootstraps a local nlm profile from the readable home store', async () => {
   const repoDir = await createRepoFixture()
   const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'governance-preflight-home-'))
@@ -193,9 +278,7 @@ async function createRepoFixture() {
     ].join('\n'),
     'utf8',
   )
-  await fs.writeFile(path.join(dir, 'README.md'), '# repo\n', 'utf8')
   await fs.mkdir(path.join(dir, 'workers', 'n8n'), { recursive: true })
-  await fs.writeFile(path.join(dir, 'workers', 'n8n', 'README.md'), '# worker docs\n', 'utf8')
 
   await execFileAsync('git', ['add', '.'], { cwd: dir })
   await execFileAsync('git', ['commit', '-m', 'fixture'], { cwd: dir })
