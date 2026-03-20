@@ -1,34 +1,66 @@
-import sys, importlib, traceback, os, asyncio
+import importlib
+import os
+import shutil
+import sys
+from pathlib import Path
+
 import nodriver as uc
 
-STEPS = ["step_01_goto_cj", "step_02_fill_form"]
+STEPS = [
+    "step_01_goto_cj",
+    "step_03_extract_5_products",
+    "step_04_map_to_supabase",
+    "step_06_sync_tiktok_shop",
+]
 
-async def heal_step(step, exc_str, page):
-    print(f"[HEALER] Step {step} failed. Exception: {exc_str}")
-    await page.save_screenshot(f"{step}_error.png")
-    print(f"[HEALER] LLM fixing {step}.py...")
-    with open(f"{step}.py", "a") as f: f.write("\n# LLM patched")
+DEFAULT_PROFILE = "/Users/jeremy/dev/SIN-Solver/.worker_profiles/jeremy_runner"
 
-async def run():
-    browser = await uc.start(headless=True)
+
+def _clean_singleton_locks(profile_dir: str) -> None:
+    root = Path(profile_dir)
+    for p in root.rglob("Singleton*"):
+        try:
+            p.unlink()
+        except OSError:
+            pass
+
+
+async def _save_debug(page: uc.Tab, out_dir: Path, prefix: str) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    await page.save_screenshot(str(out_dir / f"{prefix}.png"))
+    try:
+        html = await page.get_content()
+        (out_dir / f"{prefix}.html").write_text(html, encoding="utf-8")
+    except Exception:
+        pass
+
+
+async def run() -> None:
+    profile_dir = os.environ.get("CHROME_PROFILE_DIR", "").strip() or DEFAULT_PROFILE
+    headless_raw = (os.environ.get("HEADLESS", "true") or "true").strip().lower()
+    headless = headless_raw not in ("0", "false", "no")
+    if profile_dir and os.path.isdir(profile_dir):
+        _clean_singleton_locks(profile_dir)
+        browser = await uc.start(headless=headless, user_data_dir=profile_dir)
+    else:
+        browser = await uc.start(headless=headless)
+
     page = await browser.get("about:blank")
-    for i in range(3):
-        for step in STEPS:
-            try:
-                print(f"--- Running {step} ---")
-                mod = importlib.import_module(step)
-                importlib.reload(mod)
-                await mod.execute(page)
-                await page.save_screenshot(f"{step}_success.png")
-                print(f"[OK] {step}")
-            except Exception as e:
-                await heal_step(step, str(e), page)
-                break
-        else:
-            print("Flow completed successfully!")
-            break
+    artifacts = Path(__file__).parent / ".artifacts"
+    for step in STEPS:
+        print(f"--- Running {step} ---")
+        mod = importlib.import_module(step)
+        importlib.reload(mod)
+        try:
+            await mod.execute(page)
+            await _save_debug(page, artifacts, f"{step}_success")
+            print(f"[OK] {step}")
+        except Exception as e:
+            await _save_debug(page, artifacts, f"{step}_error")
+            raise RuntimeError(f"step_failed:{step}:{e}")
     browser.stop()
+
 
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    asyncio.run(run())
+    uc.loop().run_until_complete(run())

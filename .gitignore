@@ -70,6 +70,15 @@ pnpm-lock.yaml
 apps/api/.go-tmp-exec/
 apps/api/.gotmp/
 
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Browser automation artifacts
+.artifacts/
+extracted_products.json
+probe_*.png
+
 # Wrangler temp artifacts
 .wrangler/
 
