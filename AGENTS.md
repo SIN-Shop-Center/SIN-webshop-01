@@ -3,10 +3,10 @@
 ## Project Identity
 
 - `PROJECT_ROOT=/Users/jeremy/dev/projects/family-projects/simone-webshop-01`
-- `PROJECT_NOTEBOOK_ID=784c4f30-b524-41d9-a0cc-3752b8303cf3`
-- `PROJECT_NOTEBOOK_URL=https://notebooklm.google.com/notebook/784c4f30-b524-41d9-a0cc-3752b8303cf3`
-- `PROJECT_GOOGLE_DOC_ID=1CWNvxXU7aXgO2rCA_RzCkTILuO34_e09vwCWISoOijQ`
-- `PROJECT_GOOGLE_DOC_TITLE=SIMONE-WEBSHOP-SSOT-v1`
+- `PROJECT_NOTEBOOK_ID=8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
+- `PROJECT_NOTEBOOK_URL=https://notebooklm.google.com/notebook/8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
+- `PROJECT_GOOGLE_DOC_ID=1wwA4zgr7GCmS-9fBaEi8NOi3Atd0WjRkK_WQwR9VtLQ`
+- `PROJECT_GOOGLE_DOC_TITLE=simone-webshop-01 - SSOT-v2`
 - `OPTIONAL_INFO_NOTEBOOK_ID=ab67c7ae-5e83-4316-9587-83ac5fabe396`
 - `SSOT=NotebookLM + Master Google Doc`
 - `SOURCE_COUNT_REQUIRED=1`
@@ -16,10 +16,12 @@
 1. Query NotebookLM before any architecture or code change and require at least one citation-backed answer.
 2. Return `BLOCKED` and stop immediately if citation evidence is missing, NotebookLM access fails, or the notebook is not bound to exactly one source.
 3. Treat the NotebookLM notebook and its single Google Doc source as the only authoritative source of truth for governance and design decisions.
-4. Do not create or update local documentation files other than this `AGENTS.md`; documentation changes belong in the Master Google Doc.
-5. Require explicit human approval before destructive, high-risk, or browser-automation actions.
-6. If browser-workflow rules are requested, halt until `<interaction_invariant>` and `<security_gate>` are defined in the Master Google Doc and queryable via NotebookLM.
-7. If the source terminology is being revised, keep the NotebookLM wording as the current source state and mark the replacement vocabulary as a draft until the Master Google Doc is updated.
+4. Protect local project Markdown documentation files. `README.md`, `ARCHITECTURE.md`, `docs/**`, and other project Markdown docs remain in the repo and must never be deleted solely because a Google Doc mirror exists.
+5. Treat the project Google Doc as the collaborative SSOT mirror of the local Markdown set and keep repo Markdown plus the Google Doc mirror in sync.
+6. After Google Doc documentation updates, sync the Drive source in NotebookLM before relying on citation-backed governance answers.
+7. Require explicit human approval before destructive, high-risk, or browser-automation actions.
+8. If browser-workflow rules are requested, halt until `<interaction_invariant>` and `<security_gate>` are defined in the Master Google Doc and queryable via NotebookLM.
+9. If the source terminology is being revised, keep the NotebookLM wording as the current source state and mark the replacement vocabulary as a draft until the Master Google Doc is updated.
 
 ## Mandatory Queries
 
@@ -36,13 +38,17 @@ nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche <interaction_invariant> und <s
 ## Evidence Snapshot
 
 - `2026-03-07 Q1`: Fail-closed governance, citation-first execution, single-source policy, and halt on missing evidence were confirmed from the law notebook.
-- `2026-03-07 Q2`: Local creation scope is limited to `AGENTS.md`; the notebook requires the wider documentation tree to live in the Master Google Doc, not in repo markdown files.
-- `2026-03-07 Q3`: README, architecture, security/design, backend, and standards are required artifacts, but the notebook places them in the Google Doc tab hierarchy rather than local markdown.
+- `2026-03-07 Q2`: Fail-closed governance and single-source execution were established, but the original local-doc interpretation was later superseded by the 2026-03-19 documentation mirror policy update.
+- `2026-03-07 Q3`: README, architecture, security/design, backend, and standards remain required artifacts; the current source model keeps them in local Markdown and mirrors them into the project Google Doc.
 - `2026-03-07 Q4`: `AGENTS.md` must encode NotebookLM preflight queries, fail-closed blocking behavior, project IDs, and citation requirements.
 - `2026-03-07 Q5`: Browser-workflow governance is currently `BLOCKED` because `<interaction_invariant>` and `<security_gate>` are not defined in the notebook source.
 - `2026-03-09 Q1`: Storefront governance constraints, single-source enforcement, source-count validation, and fail-closed execution were reconfirmed with citation-backed NotebookLM output.
-- `2026-03-09 Q2`: Local documentation remains restricted to `AGENTS.md`; the required project structure lives in the Master Google Doc tab hierarchy.
-- `2026-03-09 Q3`: README, architecture, security/design, backend, infrastructure, and standards remain required DoD artifacts in the Google Doc kernel, not as new local markdown files; ADR/RFC stay embedded unless the source model changes.
+- `2026-03-09 Q2`: The early "local docs restricted to AGENTS.md" interpretation is superseded by the 2026-03-19 source sync confirming that local Markdown docs stay in repo and are mirrored to Google Docs.
+- `2026-03-09 Q3`: README, architecture, security/design, backend, infrastructure, and standards remain required DoD artifacts; the current source model keeps them as local Markdown plus Google Doc mirror.
+- `2026-03-19 Q6`: Local Markdown docs such as `README.md`, `ARCHITECTURE.md`, and `docs/**` remain in the repo, must never be deleted because of the Google Doc mirror, and are protected by governance tooling.
+- `2026-03-19 Q7`: The project Google Doc mirrors the same documentation set as the repo and should use one child tab per canonical Markdown document once the approved tab-creation path is available.
+- `2026-03-19 Q8`: Each project uses its own NotebookLM notebook bound to exactly one Google Doc source for that same project, and the Drive source must be synced after documentation updates before relying on citations.
+- `2026-03-20 Q9`: The previous SSOT Google Doc had a broken API write lane; the project now uses the writable replacement doc `simone-webshop-01 - SSOT-v2`, mirrored into NotebookLM source `34567ee6-d1c6-4a9f-96c6-1d573cf3da9e` with one child tab per canonical Markdown file.
 - `2026-03-09 Q4`: `AGENTS.md` requirements were reconfirmed: mandatory preflight queries, citation minimums, `BLOCKED` on missing evidence, and SSOT project identifiers.
 - `2026-03-09 Q5`: Browser-workflow governance is now defined in `01_DESIGN/DESIGN.md` and queryable via NotebookLM after a forced Drive-source sync on source `6ec7f1bb-7184-4ff2-9af0-4625838f03d0`.
 
@@ -84,17 +90,17 @@ Use this pattern when the Master Google Doc is updated:
 - Required final outcome proof:
 ```
 
-## Notebook State Verified On 2026-03-09
+## Notebook State Verified On 2026-03-20
 
-- `notebook_id=784c4f30-b524-41d9-a0cc-3752b8303cf3`
-- `title=AIOMETRICS 10 Agent Judge Kernel - DEV`
+- `notebook_id=8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
+- `title=simone-webshop-01 - SSOT-v2`
 - `source_count=1`
-- `source_id=6ec7f1bb-7184-4ff2-9af0-4625838f03d0`
-- `source_title=AIOMETRICS-AGENT-KERNEL-MASTER-DOC-v1`
+- `source_id=34567ee6-d1c6-4a9f-96c6-1d573cf3da9e`
+- `source_title=simone-webshop-01 - SSOT-v2`
 
 ## Current Blockers
 
-- `BLOCKED`: Creating or refreshing local files such as `ARCHITECTURE.md`, `STANDARDS_BASELINE.md`, `docs/...`, or `01-NOTEBOOKLM/...` would conflict with the current NotebookLM evidence.
+- `NONE`: The current SSOT uses `simone-webshop-01 - SSOT-v2`, which is writable through the approved Docs API lane and already mirrors one child tab per canonical Markdown file.
 
 ## SIN A2A Runtime Rules
 

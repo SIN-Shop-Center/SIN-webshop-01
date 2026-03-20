@@ -21,6 +21,24 @@ cd /Users/jeremy/dev/projects/family-projects/simone-webshop-01
 pnpm deploy:cloudflare
 ```
 
+## Docs SSOT Sync
+
+- Canonical project SSOT Google Doc: `simone-webshop-01 - SSOT-v2`
+- Canonical NotebookLM source id: `34567ee6-d1c6-4a9f-96c6-1d573cf3da9e`
+- Sync local markdown docs into the SSOT child-tab mirror with:
+
+```bash
+cd /Users/jeremy/dev/projects/family-projects/simone-webshop-01
+pnpm run sync:gdoc:project-ssot
+```
+
+- After a docs sync, refresh the project NotebookLM source with:
+
+```bash
+cd /Users/jeremy/dev/projects/family-projects/simone-webshop-01
+nlm source sync "8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54" --source-ids "34567ee6-d1c6-4a9f-96c6-1d573cf3da9e" --confirm
+```
+
 ## Wahrheitsprinzip (keine Fake-Claims)
 
 Dieses Repository behauptet **nicht** blind "weltbester Shop".
