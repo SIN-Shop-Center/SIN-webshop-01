@@ -1,0 +1,23 @@
+{
+  "name": "sin-shop-finance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A2A SIN Shop Finance Agent",
+  "main": "dist/src/runtime.js",
+  "bin": {
+    "sin-shop-finance": "./bin/sin-shop-finance"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test:a2a:fleet": "node dist/src/cli.js test-fleet",
+    "test:docs:root": "node dist/src/cli.js test-docs",
+    "start": "node dist/src/runtime.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

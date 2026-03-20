@@ -1,0 +1,26 @@
+{
+  "id": "sin-shop-finance",
+  "name": "SIN-Shop-Finance",
+  "description": "Finance and payment operations agent for Stripe onboarding, webhook verification, and readiness checks.",
+  "version": "1.0.0",
+  "protocolVersion": "0.3.0",
+  "url": "https://ssf-a2a.delqhi.com/a2a/v1",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "incrementalArtifacts": true
+  },
+  "skills": [
+    {
+      "id": "core",
+      "name": "Stripe Finance Core",
+      "description": "Verify Stripe readiness, webhook planning, and finance setup for Simone storefront flows."
+    }
+  ],
+  "actions": [
+    "agent.help",
+    "sin.shop_finance.health",
+    "sin.shop_finance.stripe.verify",
+    "sin.shop_finance.stripe.webhook.plan"
+  ]
+}

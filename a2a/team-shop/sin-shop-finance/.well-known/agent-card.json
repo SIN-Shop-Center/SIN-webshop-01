@@ -1,0 +1,23 @@
+{
+  "id": "sin-shop-finance",
+  "name": "SIN-Shop-Finance",
+  "version": "1.0.0",
+  "description": "Finance and payment operations agent for Stripe onboarding, webhook verification, and readiness checks.",
+  "team": "shop",
+  "status": "active",
+  "endpoints": {
+    "a2a": "https://ssf-a2a.delqhi.com/a2a/v1",
+    "mcp": "https://ssf-mcp.delqhi.com/mcp"
+  },
+  "capabilities": [
+    "stripe-configuration-verification",
+    "stripe-account-readiness-check",
+    "stripe-webhook-endpoint-planning"
+  ],
+  "actions": [
+    "agent.help",
+    "sin.shop_finance.health",
+    "sin.shop_finance.stripe.verify",
+    "sin.shop_finance.stripe.webhook.plan"
+  ]
+}
