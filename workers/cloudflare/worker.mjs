@@ -2538,7 +2538,7 @@ function renderHero(products = PRODUCTS) {
     <div class="hero-copy animate-reveal">
       <p class="kicker-badge">Simone Shop</p>
       <h1>Finde praktische Produkte fuer Alltag, Zuhause und Arbeit.</h1>
-      <p>Suche direkt nach einem Produkt oder starte mit einer passenden Kategorie.</p>
+      <p class="hero-lead">Suche direkt nach einem Produkt oder starte mit einer passenden Kategorie.</p>
 
       <form class="hero-search" action="/products" method="get" role="search">
         <label for="heroSearch" class="sr-only">Produkte suchen</label>
@@ -3665,7 +3665,7 @@ ${renderCatalogFinalChoiceStrip()}
     <div class="catalog-hero-copy">
       <p class="kicker-badge">${kicker}</p>
       <h1>${title}</h1>
-      <p>${copy}</p>
+      <p class="catalog-hero-lead">${copy}</p>
 
       <div class="catalog-controls" role="search">
         <div class="catalog-toolbar">
@@ -12915,19 +12915,29 @@ img { display: block; max-width: 100%; }
     padding: 0.38rem 0.72rem;
   }
   .catalog-controls {
-    margin-top: 0.75rem;
+    margin-top: 0.62rem;
   }
   .catalog-toolbar-meta,
   .result-count {
     display: none;
   }
+  .catalog-hero-lead,
+  .catalog-sort-wrap small,
+  .hero-lead {
+    display: none;
+  }
   .category-chips {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: 0.42rem;
   }
   .chip {
     min-width: 0;
+    min-height: 2.8rem;
+    padding: 0.42rem 0.72rem;
+  }
+  .chip small {
+    display: none;
   }
   .catalog-hero-proof,
   .catalog-start-header,
@@ -12935,13 +12945,14 @@ img { display: block; max-width: 100%; }
   .catalog-compare-strip {
     display: none;
   }
-  .result-count {
-    margin-top: 0.35rem;
+  .catalog-hero-grid {
+    gap: 0.7rem;
   }
   .product-body {
-    padding: 0.82rem;
+    padding: 0.72rem;
   }
   .product-card.compare-mode .product-badge,
+  .product-category,
   .product-support-line,
   .product-context-row-compact,
   .product-utility,
@@ -12949,43 +12960,62 @@ img { display: block; max-width: 100%; }
   .product-meta-line.compare-mode {
     display: none;
   }
+  .product-image-wrap {
+    aspect-ratio: 16 / 11;
+  }
   .product-title {
-    font-size: 0.98rem;
-    line-height: 1.28;
+    margin-top: 0;
+    font-size: 0.95rem;
+    line-height: 1.24;
   }
   .product-price-row {
-    gap: 0.4rem;
+    margin-top: 0.48rem;
+    gap: 0.34rem;
+  }
+  .old-price {
+    font-size: 0.68rem;
   }
   .product-price-row strong {
-    font-size: 1.12rem;
+    font-size: 1.05rem;
   }
   .product-grid {
-    gap: 0.75rem;
+    margin-top: 0.72rem;
+    gap: 0.62rem;
   }
   .checkout-hero-card {
-    padding: 0.82rem;
-    gap: 0.5rem;
+    padding: 0.72rem;
+    gap: 0.38rem;
+  }
+  .checkout-hero-card .kicker-badge {
+    margin-bottom: 0.05rem;
   }
   .checkout-hero-card h1 {
-    font-size: 2.25rem;
+    font-size: 2.05rem;
+    line-height: 1.05;
+  }
+  .checkout-hero-card p {
+    font-size: 0.92rem;
+    margin-top: 0.45rem;
   }
   .checkout-hero-pills {
     display: none;
   }
   .hero-grid {
-    padding: 1.1rem;
-    gap: 0.9rem;
+    padding: 0.95rem;
+    gap: 0.7rem;
   }
   .hero-copy h1 {
-    margin-top: 0.65rem;
-    font-size: 2.35rem;
-    line-height: 1.08;
-  }
-  .hero-copy p {
-    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    font-size: 2.08rem;
+    line-height: 1.04;
   }
   .hero-search {
-    margin-top: 0.8rem;
+    margin-top: 0.62rem;
+    gap: 0.45rem;
+  }
+  .hero-search input,
+  .hero-search-btn {
+    min-height: 3rem;
   }
   .hero-search-lanes,
   .hero-proof-row,
