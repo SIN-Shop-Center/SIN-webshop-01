@@ -11,6 +11,21 @@ export const DEFAULT_LOCAL_GOOGLE_SERVICE_ACCOUNT_FILE = path.join(
   'Meine-Google-Credentials',
   'credentials.json',
 )
+export const DEFAULT_LOCAL_GOOGLE_USER_OAUTH_FILE = path.join(
+  os.homedir(),
+  '.config',
+  'google',
+  'sin-google-apps',
+  'accounts',
+  'private-main',
+  'user-oauth.json',
+)
+export const DEFAULT_LOCAL_GOOGLE_OAUTH_CLIENT_FILE = path.join(
+  os.homedir(),
+  '.config',
+  'google',
+  'sin-google-apps-oauth-client.json',
+)
 
 export function hasGoogleServiceAccount({
   encoded = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64,
@@ -47,6 +62,79 @@ export function loadGoogleServiceAccount({
     return normalizeGoogleServiceAccount(JSON.parse(fs.readFileSync(candidate, 'utf8')))
   } catch {
     throw new Error('google_service_account_file_invalid')
+  }
+}
+
+export function loadGoogleUserOAuth({
+  filePath = process.env.GOOGLE_USER_OAUTH_FILE,
+  fallbackFilePath = DEFAULT_LOCAL_GOOGLE_USER_OAUTH_FILE,
+} = {}) {
+  const candidate = String(filePath || fallbackFilePath || '').trim()
+  if (!candidate) {
+    throw new Error('google_user_oauth_missing')
+  }
+
+  try {
+    const parsed = JSON.parse(fs.readFileSync(candidate, 'utf8'))
+    const oauthClient = loadGoogleOAuthClient()
+    const clientId = String(parsed?.client_id || oauthClient?.clientId || '').trim()
+    const clientSecret = String(parsed?.client_secret || oauthClient?.clientSecret || '').trim()
+    const refreshToken = String(parsed?.refresh_token || '').trim()
+    const tokenURI = String(parsed?.token_uri || oauthClient?.tokenURI || DEFAULT_GOOGLE_TOKEN_URI).trim()
+    const accessToken = String(parsed?.access_token || '').trim()
+    const expiryDate = Number(parsed?.expiry_date || 0)
+    const scope = String(parsed?.scope || '').trim()
+
+    if ((!accessToken || expiryDate <= Date.now() + 60_000) && (!clientId || !clientSecret || !refreshToken || !tokenURI)) {
+      throw new Error('google_user_oauth_incomplete')
+    }
+
+    return {
+      filePath: candidate,
+      clientId,
+      clientSecret,
+      refreshToken,
+      tokenURI,
+      accessToken,
+      expiryDate,
+      scope,
+      oauthClient,
+      raw: parsed,
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === 'google_user_oauth_incomplete') {
+      throw error
+    }
+    throw new Error('google_user_oauth_file_invalid')
+  }
+}
+
+export function loadGoogleOAuthClient({
+  filePath = process.env.GOOGLE_OAUTH_CLIENT_FILE,
+  fallbackFilePath = DEFAULT_LOCAL_GOOGLE_OAUTH_CLIENT_FILE,
+} = {}) {
+  const candidate = String(filePath || fallbackFilePath || '').trim()
+  if (!candidate || !fs.existsSync(candidate)) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(fs.readFileSync(candidate, 'utf8'))
+    const profile = parsed?.installed || parsed?.web || parsed || {}
+    const clientId = String(profile?.client_id || '').trim()
+    const clientSecret = String(profile?.client_secret || '').trim()
+    const tokenURI = String(profile?.token_uri || DEFAULT_GOOGLE_TOKEN_URI).trim()
+    if (!clientId || !clientSecret) {
+      return null
+    }
+    return {
+      clientId,
+      clientSecret,
+      tokenURI,
+      raw: parsed,
+    }
+  } catch {
+    return null
   }
 }
 
@@ -98,6 +186,51 @@ export async function requestGoogleAccessToken({ serviceAccount, scopes }) {
   }
 
   return String(payload.access_token || '').trim()
+}
+
+export async function requestGoogleUserAccessToken({ userOAuth, persistFilePath = userOAuth?.filePath } = {}) {
+  const safeOAuth = userOAuth || loadGoogleUserOAuth({ filePath: persistFilePath, fallbackFilePath: '' })
+  if (safeOAuth.accessToken && safeOAuth.expiryDate > Date.now() + 60_000) {
+    return safeOAuth.accessToken
+  }
+  if (!safeOAuth.clientId || !safeOAuth.clientSecret || !safeOAuth.refreshToken || !safeOAuth.tokenURI) {
+    throw new Error('google_user_oauth_incomplete')
+  }
+
+  const response = await fetch(safeOAuth.tokenURI, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      client_id: safeOAuth.clientId,
+      client_secret: safeOAuth.clientSecret,
+      refresh_token: safeOAuth.refreshToken,
+      grant_type: 'refresh_token',
+    }).toString(),
+  })
+
+  const payload = await response.json().catch(() => ({}))
+  const accessToken = String(payload?.access_token || '').trim()
+  if (!response.ok || !accessToken) {
+    throw new Error(String(payload?.error_description || payload?.error || `google_user_access_token_failed:${response.status}`).trim())
+  }
+
+  if (persistFilePath) {
+    const nextState = {
+      ...safeOAuth.raw,
+      access_token: accessToken,
+      expiry_date: Date.now() + Number(payload?.expires_in || 3600) * 1000,
+      scope: String(payload?.scope || safeOAuth.scope || '').trim(),
+      token_uri: safeOAuth.tokenURI,
+      client_id: safeOAuth.clientId,
+      client_secret: safeOAuth.clientSecret,
+      refresh_token: safeOAuth.refreshToken,
+    }
+    fs.writeFileSync(persistFilePath, `${JSON.stringify(nextState, null, 2)}\n`, 'utf8')
+  }
+
+  return accessToken
 }
 
 export async function fetchGoogleDocument({

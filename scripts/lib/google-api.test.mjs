@@ -11,8 +11,10 @@ import {
   flattenGoogleDocElements,
   getGoogleDocInsertIndex,
   hasGoogleServiceAccount,
+  loadGoogleUserOAuth,
   loadGoogleServiceAccount,
   normalizeGoogleServiceAccount,
+  requestGoogleUserAccessToken,
 } from './google-api.mjs'
 
 test('normalizeGoogleServiceAccount applies defaults and preserves project id', () => {
@@ -73,6 +75,65 @@ test('hasGoogleServiceAccount returns false when no encoded or file path exists'
     filePath: '/tmp/does-not-exist-google-api.json',
     fallbackFilePath: '',
   }), false)
+})
+
+test('loadGoogleUserOAuth accepts file input', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'google-user-oauth-'))
+  const filePath = path.join(dir, 'user-oauth.json')
+  await fs.writeFile(filePath, JSON.stringify({
+    client_id: 'client-id',
+    client_secret: 'client-secret',
+    refresh_token: 'refresh-token',
+    token_uri: 'https://oauth.example/token',
+    access_token: 'cached-token',
+    expiry_date: Date.now() + 3600_000,
+    scope: 'scope-a scope-b',
+  }), 'utf8')
+
+  const result = loadGoogleUserOAuth({ filePath, fallbackFilePath: '' })
+
+  assert.equal(result.clientId, 'client-id')
+  assert.equal(result.clientSecret, 'client-secret')
+  assert.equal(result.refreshToken, 'refresh-token')
+  assert.equal(result.tokenURI, 'https://oauth.example/token')
+  assert.equal(result.accessToken, 'cached-token')
+})
+
+test('requestGoogleUserAccessToken refreshes and persists access tokens', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'google-user-oauth-refresh-'))
+  const filePath = path.join(dir, 'user-oauth.json')
+  await fs.writeFile(filePath, JSON.stringify({
+    client_id: 'client-id',
+    client_secret: 'client-secret',
+    refresh_token: 'refresh-token',
+    token_uri: 'https://oauth.example/token',
+    access_token: 'expired-token',
+    expiry_date: 1,
+    scope: 'scope-a',
+  }), 'utf8')
+
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      access_token: 'fresh-token',
+      expires_in: 1800,
+      scope: 'scope-a scope-b',
+    }),
+  })
+
+  try {
+    const userOAuth = loadGoogleUserOAuth({ filePath, fallbackFilePath: '' })
+    const accessToken = await requestGoogleUserAccessToken({ userOAuth, persistFilePath: filePath })
+    const persisted = JSON.parse(await fs.readFile(filePath, 'utf8'))
+
+    assert.equal(accessToken, 'fresh-token')
+    assert.equal(persisted.access_token, 'fresh-token')
+    assert.equal(persisted.scope, 'scope-a scope-b')
+    assert.ok(Number(persisted.expiry_date) > Date.now())
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
 
 test('flattenGoogleDocElements flattens paragraphs, tables, and table of contents', () => {

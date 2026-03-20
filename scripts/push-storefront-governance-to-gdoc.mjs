@@ -11,11 +11,12 @@ import {
   loadGoogleServiceAccount,
   requestGoogleAccessToken,
 } from './lib/google-api.mjs'
+import { PROJECT_GOOGLE_DOC_ID, PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE } from '../config/project-ssot.mjs'
 import { loadLocalEnvFiles, readArgValue } from './lib/cli-env.mjs'
 
-const DEFAULT_DOCUMENT_ID = '1CWNvxXU7aXgO2rCA_RzCkTILuO34_e09vwCWISoOijQ'
+const DEFAULT_DOCUMENT_ID = PROJECT_GOOGLE_DOC_ID
 const DOCS_SCOPE = 'https://www.googleapis.com/auth/documents'
-const DEFAULT_TAB_TITLE = '00_INDEX'
+const DEFAULT_TAB_TITLE = PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE
 const INSERT_MARKER = 'SHOP_STOREFRONT_GOVERNANCE_V1'
 
 async function main() {

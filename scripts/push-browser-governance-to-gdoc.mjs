@@ -11,11 +11,12 @@ import {
   loadGoogleServiceAccount,
   requestGoogleAccessToken,
 } from './lib/google-api.mjs'
+import { PROJECT_GOOGLE_DOC_ID, PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE } from '../config/project-ssot.mjs'
 import { loadLocalEnvFiles, readArgValue } from './lib/cli-env.mjs'
 
-const DEFAULT_DOCUMENT_ID = '1CWNvxXU7aXgO2rCA_RzCkTILuO34_e09vwCWISoOijQ'
+const DEFAULT_DOCUMENT_ID = PROJECT_GOOGLE_DOC_ID
 const DOCS_SCOPE = 'https://www.googleapis.com/auth/documents'
-const DEFAULT_TAB_TITLE = 'DESIGN.md'
+const DEFAULT_TAB_TITLE = PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE
 const INSERT_MARKER = 'BROWSER_WORKFLOW_GOVERNANCE_DEFINITIONS_V2'
 const LEGACY_INSERT_MARKERS = ['BROWSER_WORKFLOW_GOVERNANCE_DEFINITIONS_V1']
 
