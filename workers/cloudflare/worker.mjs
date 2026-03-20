@@ -12893,6 +12893,9 @@ img { display: block; max-width: 100%; }
 }
 
 @media (max-width: 540px) {
+  .hero-wrap {
+    padding-top: 0.85rem;
+  }
   .nav-row {
     min-height: 4.2rem;
     gap: 0.55rem;
@@ -12914,6 +12917,15 @@ img { display: block; max-width: 100%; }
     min-height: var(--control-height-compact);
     padding: 0.38rem 0.72rem;
   }
+  .mobile-nav-link {
+    min-height: 3.35rem;
+    padding: 0.55rem 0.7rem;
+    display: flex;
+    justify-content: center;
+  }
+  .mobile-nav-link small {
+    display: none;
+  }
   .catalog-controls {
     margin-top: 0.62rem;
   }
@@ -12924,6 +12936,10 @@ img { display: block; max-width: 100%; }
   .catalog-hero-lead,
   .catalog-sort-wrap small,
   .hero-lead {
+    display: none;
+  }
+  .catalog-hero-copy .kicker-badge,
+  .checkout-hero-card .kicker-badge {
     display: none;
   }
   .category-chips {
@@ -12949,7 +12965,7 @@ img { display: block; max-width: 100%; }
     gap: 0.7rem;
   }
   .product-body {
-    padding: 0.72rem;
+    padding: 0.64rem;
   }
   .product-card.compare-mode .product-badge,
   .product-category,
@@ -12961,11 +12977,11 @@ img { display: block; max-width: 100%; }
     display: none;
   }
   .product-image-wrap {
-    aspect-ratio: 16 / 11;
+    aspect-ratio: 16 / 10;
   }
   .product-title {
     margin-top: 0;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     line-height: 1.24;
   }
   .product-price-row {
@@ -12973,10 +12989,10 @@ img { display: block; max-width: 100%; }
     gap: 0.34rem;
   }
   .old-price {
-    font-size: 0.68rem;
+    display: none;
   }
   .product-price-row strong {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
   .product-grid {
     margin-top: 0.72rem;
@@ -12986,11 +13002,8 @@ img { display: block; max-width: 100%; }
     padding: 0.72rem;
     gap: 0.38rem;
   }
-  .checkout-hero-card .kicker-badge {
-    margin-bottom: 0.05rem;
-  }
   .checkout-hero-card h1 {
-    font-size: 2.05rem;
+    font-size: 1.85rem;
     line-height: 1.05;
   }
   .checkout-hero-card p {
