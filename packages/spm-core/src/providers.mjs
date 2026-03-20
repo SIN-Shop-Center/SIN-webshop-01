@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { syncHuggingFaceSpaceSecretViaSinAuthenticator } from './providers_huggingface_auth.mjs'
 
 const execFileAsync = promisify(execFile)
 
@@ -147,6 +148,22 @@ async function syncHuggingFaceSpaceSecret({ target, secretName, secretValue, aut
   }
 
   const targetSecretName = String(target.params?.secretName || secretName).trim()
+  try {
+    return await syncHuggingFaceSpaceSecretDirect({ repoId, targetSecretName, secretName, secretValue, authValue })
+  } catch (error) {
+    const message = String(error?.message || '').trim()
+    if (!isHuggingFaceAuthzFailure(message)) {
+      throw error
+    }
+    return syncHuggingFaceSpaceSecretViaSinAuthenticator({ repoId, secretName: targetSecretName, secretValue })
+  }
+}
+
+function isHuggingFaceAuthzFailure(message) {
+  return message.includes('403 Forbidden') || message.includes('Authorization error') || message.includes('Cannot access content at: https://huggingface.co/api/spaces/')
+}
+
+async function syncHuggingFaceSpaceSecretDirect({ repoId, targetSecretName, secretName, secretValue, authValue }) {
   const pythonProgram = [
     'import json, os, sys',
     'try:',
