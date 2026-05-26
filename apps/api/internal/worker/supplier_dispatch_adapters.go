@@ -12,6 +12,9 @@ import (
 )
 
 func (p *Processor) dispatchSupplierOrder(ctx context.Context, order *orderAggregate, placement supplierPlacement) (supplierDispatchResult, error) {
+	if isCJSupplier(placement.Supplier) {
+		return p.dispatchCJOrder(ctx, order, placement)
+	}
 	request := buildSupplierOrderRequest(order, placement)
 	switch placement.Supplier.Channel {
 	case "api":
@@ -21,6 +24,11 @@ func (p *Processor) dispatchSupplierOrder(ctx context.Context, order *orderAggre
 	default:
 		return supplierDispatchResult{}, fmt.Errorf("%w: unsupported_supplier_channel_%s", ErrPermanent, placement.Supplier.Channel)
 	}
+}
+
+func isCJSupplier(s supplierCandidate) bool {
+	return strings.Contains(strings.ToLower(s.Name), "cj") ||
+		strings.Contains(s.APIEndpoint, "cjdropshipping")
 }
 
 func (p *Processor) dispatchSupplierOrderAPI(ctx context.Context, supplier supplierCandidate, request map[string]any) (supplierDispatchResult, error) {
