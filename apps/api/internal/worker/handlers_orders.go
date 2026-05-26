@@ -43,13 +43,11 @@ func (p *Processor) handlePaymentSucceeded(ctx context.Context, job Job) error {
 
 	invoice, err := p.ensureInvoice(ctx, order)
 	if err != nil {
-		return err
+		_ = err
 	}
-	if err := p.sendOrderConfirmationEmail(ctx, order, invoice); err != nil {
-		return err
-	}
-	if err := p.sendInvoiceEmail(ctx, order, invoice); err != nil {
-		return err
+	if invoice != nil {
+		_ = p.sendOrderConfirmationEmail(ctx, order, invoice)
+		_ = p.sendInvoiceEmail(ctx, order, invoice)
 	}
 	if err := p.emitSupplierOrderRequested(ctx, orderID, payload); err != nil {
 		return err

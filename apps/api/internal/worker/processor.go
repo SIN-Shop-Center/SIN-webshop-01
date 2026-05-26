@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"simone-webshop/apps/api/internal/config"
 	"simone-webshop/apps/api/internal/objectstore"
 )
 
 type Processor struct {
 	pool    *pgxpool.Pool
 	options Options
+	cfg     config.Config
 
 	gmailTokenMu     sync.Mutex
 	cachedGmailToken string
@@ -25,10 +27,11 @@ type Processor struct {
 	r2 *objectstore.R2Client
 }
 
-func NewProcessor(pool *pgxpool.Pool, options Options) *Processor {
+func NewProcessor(pool *pgxpool.Pool, options Options, cfg config.Config) *Processor {
 	return &Processor{
 		pool:    pool,
 		options: options,
+		cfg:     cfg,
 		r2:      options.R2Client,
 	}
 }

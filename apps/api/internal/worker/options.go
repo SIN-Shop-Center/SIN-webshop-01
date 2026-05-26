@@ -24,6 +24,9 @@ type Options struct {
 	N8NSharedSecret          string
 	TikTokBrowserRunnerToken string
 
+	CJAPIKey string
+	CJOpenID  string
+
 	NVIDIAAPIKey                string
 	NVIDIAReasonURL             string
 	NVIDIAPredictURL            string

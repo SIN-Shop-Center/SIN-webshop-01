@@ -36,6 +36,9 @@ type Config struct {
 	SupplierWebhookSecret    string
 	TikTokBrowserRunnerToken string
 
+	CJAPIKey  string
+	CJOpenID  string
+
 	OpenCodeAPIKey string
 	OpenCodeModel  string
 	OpenCodeURL    string
@@ -117,6 +120,9 @@ func Load() Config {
 		N8NSharedSecret:          strings.TrimSpace(os.Getenv("N8N_SHARED_SECRET")),
 		SupplierWebhookSecret:    strings.TrimSpace(os.Getenv("SUPPLIER_WEBHOOK_SECRET")),
 		TikTokBrowserRunnerToken: strings.TrimSpace(os.Getenv("TIKTOK_BROWSER_RUNNER_TOKEN")),
+
+		CJAPIKey: strings.TrimSpace(os.Getenv("CJ_API_KEY")),
+		CJOpenID: strings.TrimSpace(os.Getenv("CJ_OPEN_ID")),
 
 		OpenCodeAPIKey: strings.TrimSpace(os.Getenv("OPENCODE_ZEN_API_KEY")),
 		OpenCodeModel:  strings.TrimSpace(get("OPENCODE_ZEN_MODEL", "grok-code")),

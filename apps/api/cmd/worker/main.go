@@ -66,7 +66,9 @@ func main() {
 		ModalRequestTimeout:         time.Duration(cfg.ModalRequestTimeoutSeconds) * time.Second,
 		ModalMaxVariantsPerRun:      cfg.ModalMaxVariantsPerRun,
 		R2Client:                    r2Client,
-	})
+		CJAPIKey:                    cfg.CJAPIKey,
+		CJOpenID:                    cfg.CJOpenID,
+	}, cfg)
 	workerName := os.Getenv("WORKER_NAME")
 	if workerName == "" {
 		workerName = "api-worker"
