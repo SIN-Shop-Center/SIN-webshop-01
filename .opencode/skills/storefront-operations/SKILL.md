@@ -16,7 +16,12 @@ Operate the Delqhi webshop storefront (delqhi.com) and backend API (api.delqhi.c
 | Products | `/products` | All active products grid |
 | Product Detail | `/products/:slug` | Single product with add-to-cart |
 | Cart | `/cart` | Shopping cart |
-| Checkout | `/checkout` | Stripe Checkout redirect |
+| Checkout | `/checkout` | Stripe Checkout redirect (Card, SEPA, Klarna) |
+| Impressum | `/impressum` | Legal: Impressum |
+| AGB | `/agb` | Legal: Terms (Dropshipping) |
+| Datenschutz | `/datenschutz` | Legal: Privacy |
+| Widerrufsrecht | `/widerrufsrecht` | Legal: Right of withdrawal |
+| Versand | `/versand` | Legal: Shipping policy |
 
 ## API Endpoints (Go API on port 8080)
 
@@ -35,9 +40,11 @@ Operate the Delqhi webshop storefront (delqhi.com) and backend API (api.delqhi.c
 
 1. Customer adds items to cart (`POST /api/v1/cart/add`)
 2. Customer goes to checkout (`POST /api/v1/checkout/create`)
-3. API creates Stripe Checkout Session → returns `session_url`
+3. API creates Stripe Checkout Session → returns `session_url` (Card/SEPA/Klarna)
 4. Customer pays on Stripe → redirect to success page
 5. Stripe webhook → `POST /api/v1/webhooks/stripe` → updates order status
+6. Worker auto-dispatches to CJ (3-step: create→confirm→payBalance)
+7. CJ ships → webhook updates tracking → shipment email to customer
 
 ## Key Files
 
@@ -50,7 +57,7 @@ Operate the Delqhi webshop storefront (delqhi.com) and backend API (api.delqhi.c
 
 | Table | Purpose |
 |-------|---------|
-| `shop.orders` | Customer orders (status: pending→confirmed→paid→supplier_ordered→shipped→delivered) |
+| `shop.orders` | Customer orders (status: created→paid→processing→supplier_ordered→shipped→delivered) |
 | `shop.order_items` | Line items per order |
 | `shop.checkout_sessions` | Stripe checkout sessions |
 | `shop.supplier_orders` | CJ order tracking |

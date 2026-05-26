@@ -109,7 +109,22 @@ Key variables:
 - `STRIPE_SECRET_KEY=sk_live_...`
 - `STRIPE_WEBHOOK_SECRET=whsec_...`
 - `CJ_API_KEY=CJ5240573@api@d5d074918b1f434995c26af2fc932bb8`
-- `CJ_ACCESS_TOKEN=...` (auto-refreshed)
-- `CJ_REFRESH_TOKEN=...` (auto-refreshed)
+- `CJ_OPEN_ID=37995`
+- `RESEND_API_KEY=re_YAnqVXrV...` (primary email, send-only scope)
 - `JWT_REQUIRED=false`
 - `APP_ENV=development`
+
+## CJ Payment Flow (3-Step Auto-Pay)
+
+1. Go Worker creates CJ order via `createOrderV3` with `payType=2`
+2. Worker calls `confirmOrder(orderId)` → status UNPAID
+3. Worker calls `payBalance(orderId)` → **requires CJ Balance > $0**
+   - Balance currently $0 — orders created+confirmed but UNPAID
+4. Fund CJ Balance manually via PayPal/credit card in CJ Dashboard
+5. Stripe Instant Payouts auto-triggered after payment (needs Dashboard activation)
+
+## Email System
+
+- **Primary**: Resend (`onboarding@resend.dev`, upgrades to `shop@delqhi.com` after domain verification)
+- **Fallback**: Gmail API (Google Service Account)
+- From: `Delqhi Shop <onboarding@resend.dev>`
