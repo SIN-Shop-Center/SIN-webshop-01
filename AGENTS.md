@@ -118,6 +118,32 @@ Use this pattern when the Master Google Doc is updated:
 - **Stripe**: Live mode, account `acct_1TEhmvAZZTxFQVSB` (DE), webhook `we_1Tb9KHAZZTxFQVSBxnWV6N1p`
 - **Go API env**: `/home/ubuntu/simone-api.env` on VM
 - **CJ Bundle Repo**: https://github.com/SIN-Shop-Center/SIN-CJDropshipping-Bundle (CLI + MCP + docs + scripts)
+- **Supabase Bundle Repo**: https://github.com/SIN-Shop-Center/SIN-Supabase-OCI-Bundle (docker-compose + migrations + provisioning scripts)
+
+### Infisical (Primary Secrets Manager)
+
+25 secrets populated (2026-05-26), replaces SOPS for onboarding:
+- **Console**: https://eu.infisical.com/organizations/a83c52af-795b-437f-8f17-f1b68d3ab65c
+- **Project**: `secret-management` / `fa7758b4-f84c-4297-966e-710056d531ef`
+- **Path**: `/SIN-Webshop-01`, **Env**: `dev`
+
+| Category | Keys |
+|----------|------|
+| Supabase/DB | `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `DATABASE_URL_EXTERNAL`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` |
+| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_ACCOUNT_ID` |
+| CJ | `CJ_API_KEY`, `CJ_OPEN_ID` |
+| Cloudflare | `CLOUDFLARE_GLOBAL_API_KEY`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_TUNNEL_ID` |
+| Infra | `OCI_VM_IP`, `N8N_ENCRYPTION_KEY` |
+| App | `JWT_REQUIRED`, `APP_ENV`, `CJ_MARKUP`, `CURRENCY`, `FX_RATE` |
+
+```bash
+# Pull all secrets
+infisical export --domain https://eu.infisical.com \
+  --project-id fa7758b4-f84c-4297-966e-710056d531ef \
+  --path /SIN-Webshop-01 --env dev -f .env
+```
+
+SOPS (`secrets/agents.enc.env`) remains in repo for backward compat but is no longer needed for onboarding.
 
 ### Schema Note
 
