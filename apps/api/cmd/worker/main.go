@@ -68,6 +68,8 @@ func main() {
 		R2Client:                    r2Client,
 		CJAPIKey:                    cfg.CJAPIKey,
 		CJOpenID:                    cfg.CJOpenID,
+		ResendAPIKey:                cfg.ResendAPIKey,
+		ResendFromDomain:            cfg.ResendFromDomain,
 	}, cfg)
 	workerName := os.Getenv("WORKER_NAME")
 	if workerName == "" {

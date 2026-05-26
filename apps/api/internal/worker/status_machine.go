@@ -10,9 +10,16 @@ var allowedOrderTransitions = map[string]map[string]struct{}{
 	"created": {
 		"payment_pending": {},
 		"confirmed":       {},
+		"paid":            {},
+		"processing":      {},
 	},
 	"payment_pending": {
 		"confirmed": {},
+		"paid":       {},
+	},
+	"paid": {
+		"confirmed":  {},
+		"processing": {},
 	},
 	"confirmed": {
 		"processing": {},

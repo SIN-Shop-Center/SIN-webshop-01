@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/mail"
 	"strings"
 	"time"
@@ -22,19 +24,80 @@ func (p *Processor) sendMail(ctx context.Context, to, subject, body string, atta
 	if strings.TrimSpace(to) == "" {
 		return "", fmt.Errorf("%w: missing_recipient", ErrPermanent)
 	}
-	if !p.gmailConfigured() {
-		return "", fmt.Errorf("%w: gmail_not_configured", ErrPermanent)
+	if strings.TrimSpace(p.options.ResendAPIKey) != "" {
+		return p.sendResendEmail(ctx, to, subject, body, attachments)
+	}
+	if p.gmailConfigured() {
+		fromHeader := strings.TrimSpace(p.options.GmailSenderFrom)
+		messageID := fmt.Sprintf("<%s@simone-shop>", uuid.NewString())
+		message := buildMailMessage(fromHeader, to, subject, messageID, body, attachments)
+		gmailMessageID, err := p.gmailSendRawMessage(ctx, message)
+		if err != nil {
+			return "", err
+		}
+		return gmailMessageID, nil
+	}
+	return "", fmt.Errorf("%w: no_email_provider_configured", ErrPermanent)
+}
+
+func (p *Processor) sendResendEmail(ctx context.Context, to, subject, body string, attachments []mailAttachment) (string, error) {
+	htmlBody := textToHTML(body)
+	fromAddr := "Delqhi Shop <onboarding@resend.dev>"
+	if strings.TrimSpace(p.options.ResendFromDomain) != "" {
+		fromAddr = fmt.Sprintf("Delqhi Shop <shop@%s>", p.options.ResendFromDomain)
+	}
+	reqPayload := map[string]any{
+		"from":    fromAddr,
+		"to":      []string{to},
+		"subject": subject,
+		"html":    htmlBody,
+	}
+	if len(attachments) > 0 {
+		resendAttachments := make([]map[string]any, 0, len(attachments))
+		for _, a := range attachments {
+			resendAttachments = append(resendAttachments, map[string]any{
+				"filename":    a.Filename,
+				"content_type": a.ContentType,
+				"content":      base64.StdEncoding.EncodeToString(a.Data),
+			})
+		}
+		reqPayload["attachments"] = resendAttachments
 	}
 
-	fromHeader := strings.TrimSpace(p.options.GmailSenderFrom)
-	messageID := fmt.Sprintf("<%s@simone-shop>", uuid.NewString())
-	message := buildMailMessage(fromHeader, to, subject, messageID, body, attachments)
-
-	gmailMessageID, err := p.gmailSendRawMessage(ctx, message)
+	payloadBytes, _ := json.Marshal(reqPayload)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.resend.com/emails", bytes.NewReader(payloadBytes))
 	if err != nil {
 		return "", err
 	}
-	return gmailMessageID, nil
+	req.Header.Set("Authorization", "Bearer "+p.options.ResendAPIKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return "", fmt.Errorf("resend_api_error: %d", resp.StatusCode)
+	}
+
+	var result map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "resend-sent", nil
+	}
+	if id, ok := result["id"].(string); ok {
+		return id, nil
+	}
+	return "resend-sent", nil
+}
+
+func textToHTML(plain string) string {
+	escaped := strings.ReplaceAll(plain, "&", "&amp;")
+	escaped = strings.ReplaceAll(escaped, "<", "&lt;")
+	escaped = strings.ReplaceAll(escaped, ">", "&gt;")
+	escaped = strings.ReplaceAll(escaped, "\n", "<br>")
+	return fmt.Sprintf(`<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#333;max-width:600px;margin:0 auto;padding:20px;">%s</body></html>`, escaped)
 }
 
 func buildMailMessage(from, to, subject, messageID, body string, attachments []mailAttachment) []byte {

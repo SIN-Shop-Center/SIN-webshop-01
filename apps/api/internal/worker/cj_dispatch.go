@@ -59,7 +59,7 @@ func (p *Processor) dispatchCJOrder(ctx context.Context, order *orderAggregate, 
 		LogisticName:        logisticName,
 		FromCountryCode:     "CN",
 		Products:            products,
-		PayType:             3,
+		PayType:             2,
 		IOSSType:            3,
 		IOSSNumber:          "CJ-IOSS",
 		Platform:            "api",
@@ -73,13 +73,13 @@ func (p *Processor) dispatchCJOrder(ctx context.Context, order *orderAggregate, 
 		"logistic_name":  logisticName,
 		"freight_error":  errStr(freightErr),
 		"variant_count":  len(vids),
+		"pay_type":       2,
 	}
 	if orderResp != nil {
 		responsePayload["cj_code"] = orderResp.Code
 		responsePayload["cj_message"] = orderResp.Message
 		if orderResp.Data != nil {
 			responsePayload["cj_order_id"] = orderResp.Data.OrderID
-			responsePayload["cj_status"] = orderResp.Data.Status
 		}
 	}
 
@@ -91,6 +91,40 @@ func (p *Processor) dispatchCJOrder(ctx context.Context, order *orderAggregate, 
 	if orderResp.Data != nil {
 		externalID = orderResp.Data.OrderID
 	}
+
+	if externalID == "" {
+		return supplierDispatchResult{
+			ExternalOrderID: externalID,
+			ResponsePayload: responsePayload,
+		}, nil
+	}
+
+	if err := client.confirmOrder(ctx, externalID); err != nil {
+		responsePayload["confirm_error"] = err.Error()
+		return supplierDispatchResult{
+			ExternalOrderID: externalID,
+			ResponsePayload: responsePayload,
+		}, fmt.Errorf("cj_confirm_order: %w", err)
+	}
+	responsePayload["confirmed"] = true
+
+	bal, balErr := client.getBalance(ctx)
+	if balErr != nil {
+		responsePayload["balance_check_error"] = balErr.Error()
+	} else {
+		responsePayload["cj_balance"] = bal
+	}
+
+	payErr := client.payWithBalance(ctx, externalID)
+	if payErr != nil {
+		responsePayload["pay_error"] = payErr.Error()
+		responsePayload["pay_status"] = "unpaid_balance_insufficient"
+		return supplierDispatchResult{
+			ExternalOrderID: externalID,
+			ResponsePayload: responsePayload,
+		}, nil
+	}
+	responsePayload["paid"] = true
 
 	return supplierDispatchResult{
 		ExternalOrderID: externalID,

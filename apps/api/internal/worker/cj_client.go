@@ -18,6 +18,9 @@ const (
 	cjFreightCalc    = "/logistic/freightCalculate"
 	cjTokenCacheKey  = "cj_access_token"
 	cjRefreshPath    = "/authentication/refreshAccessToken"
+	cjGetBalance     = "/shopping/pay/getBalance"
+	cjConfirmOrder   = "/shopping/order/confirmOrder"
+	cjPayBalance     = "/shopping/pay/payBalance"
 )
 
 type cjClient struct {
@@ -48,6 +51,20 @@ type cjOrderResponse struct {
 		CJPayURL    string `json:"cjPayUrl"`
 		Status      string `json:"status"`
 	} `json:"data"`
+}
+
+type cjBalanceResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Amount float64 `json:"amount"`
+	} `json:"data"`
+}
+
+type cjGenericResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    json.RawMessage `json:"data"`
 }
 
 type cjFreightResponse struct {
@@ -221,6 +238,53 @@ func (c *cjClient) calculateFreight(ctx context.Context, endCountryCode string, 
 		return &freightResp, fmt.Errorf("cj_freight_failed: code=%d msg=%s", freightResp.Code, freightResp.Message)
 	}
 	return &freightResp, nil
+}
+
+func (c *cjClient) getBalance(ctx context.Context) (float64, error) {
+	raw, err := c.doAuthenticated(ctx, http.MethodGet, cjGetBalance, nil)
+	if err != nil {
+		return 0, fmt.Errorf("cj_balance_call: %w", err)
+	}
+	var resp cjBalanceResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return 0, fmt.Errorf("cj_balance_parse: %w", err)
+	}
+	if resp.Code != 200 {
+		return 0, fmt.Errorf("cj_balance_failed: code=%d msg=%s", resp.Code, resp.Message)
+	}
+	return resp.Data.Amount, nil
+}
+
+func (c *cjClient) confirmOrder(ctx context.Context, orderID string) error {
+	payload := map[string]string{"orderId": orderID}
+	raw, err := c.doAuthenticated(ctx, http.MethodPatch, cjConfirmOrder, payload)
+	if err != nil {
+		return fmt.Errorf("cj_confirm_call: %w", err)
+	}
+	var resp cjGenericResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return fmt.Errorf("cj_confirm_parse: %w", err)
+	}
+	if resp.Code != 200 {
+		return fmt.Errorf("cj_confirm_failed: code=%d msg=%s", resp.Code, resp.Message)
+	}
+	return nil
+}
+
+func (c *cjClient) payWithBalance(ctx context.Context, orderID string) error {
+	payload := map[string]string{"orderId": orderID}
+	raw, err := c.doAuthenticated(ctx, http.MethodPost, cjPayBalance, payload)
+	if err != nil {
+		return fmt.Errorf("cj_pay_call: %w", err)
+	}
+	var resp cjGenericResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return fmt.Errorf("cj_pay_parse: %w", err)
+	}
+	if resp.Code != 200 {
+		return fmt.Errorf("cj_pay_failed: code=%d msg=%s", resp.Code, resp.Message)
+	}
+	return nil
 }
 
 func bestLogisticName(freightResp *cjFreightResponse) string {

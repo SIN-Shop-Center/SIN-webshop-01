@@ -36,6 +36,10 @@ func NewProcessor(pool *pgxpool.Pool, options Options, cfg config.Config) *Proce
 	}
 }
 
+func (p *Processor) logf(format string, args ...any) {
+	fmt.Printf("[processor] "+format+"\n", args...)
+}
+
 func (p *Processor) Handle(ctx context.Context, job Job) error {
 	switch {
 	case job.JobType == "checkout.session.requested":

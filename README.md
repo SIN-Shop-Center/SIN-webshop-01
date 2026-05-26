@@ -1,6 +1,6 @@
 # Simone Webshop: Cross-Category Trend-Commerce Engine
 
-Stand: **26. Februar 2026**
+Stand: **26. Mai 2026**
 
 ## Cloudflare Production
 
@@ -14,6 +14,15 @@ Stand: **26. Februar 2026**
   - `/cart` cart
   - `/checkout` checkout
   - `/order-success` success page
+- Legal pages (all verified 200):
+  - `/impressum` Impressum
+  - `/agb` AGB (Dropshipping)
+  - `/datenschutz` Datenschutz
+  - `/widerrufsrecht` Widerrufsrecht
+  - `/versand` Versand
+- Payment methods: Card, SEPA Direct Debit, Klarna
+- Email: Resend (primary) + Gmail API (fallback)
+- Supplier: CJ Dropshipping (auto-fulfill 3-step flow: create→confirm→payBalance)
 - Deploy command:
 
 ```bash
@@ -51,32 +60,39 @@ Der Shop wird nur dann als "weltbeste Ausfuehrung" bewertet, wenn die definierte
 
 ## Was heute nachweisbar implementiert ist
 
-1. **Admin Control Tower API** fuer Automation, Trends, Growth, Channels, Attribution, Kill-Switch:
+1. **Production E-Commerce Flow**: Stripe Checkout (Card+SEPA+Klarna) → CJ Dropshipping Auto-Fulfill (3-step: create→confirm→payBalance) → Shipment tracking emails
+2. **Legal Compliance**: Impressum, AGB, Datenschutz, Widerrufsrecht, Versand — all live on delqhi.com
+3. **Email System**: Resend (primary) + Gmail API (fallback), German order confirmation/invoice/shipment emails
+4. **Admin Control Tower API** fuer Automation, Trends, Growth, Channels, Attribution, Kill-Switch:
    - `apps/api/internal/http/router_admin.go`
-2. **Supplier Webhook Inbound**:
-   - `apps/api/internal/http/router_suppliers.go`
-3. **Worker-Orchestrierung** fuer zentrale Jobs (`payment.succeeded`, `supplier.order.*`, `trend.candidate.launch.requested`, `channel.*`, Fulfillment):
+5. **Supplier Webhook Inbound** (CJ order/logistic events parsed and routed):
+   - `apps/api/internal/suppliers/handler.go`
+6. **Worker-Orchestrierung** fuer zentrale Jobs (`payment.succeeded`, `supplier.order.*`, `trend.candidate.launch.requested`, `channel.*`, Fulfillment):
    - `apps/api/internal/worker/processor.go`
-4. **Autonomes Dropshipping-Datenmodell** (`product_suppliers`, `supplier_orders`, Supplier-Readiness-Felder):
+7. **Stripe Instant Payout Trigger**: Auto-triggers on `payment.succeeded` (goroutine), needs Stripe Dashboard activation
+8. **Autonomes Dropshipping-Datenmodell** (`product_suppliers`, `supplier_orders`, Supplier-Readiness-Felder):
    - `infra/supabase/migrations/20260225000800_supplier_autopilot.sql`
-5. **Cross-Category Growth-Datenmodell** (`trend_*`, `channel_*`, `campaign_*`, `creative_*`, `affiliate_*`, `attribution_*`, `budget_*`):
+9. **Cross-Category Growth-Datenmodell** (`trend_*`, `channel_*`, `campaign_*`, `creative_*`, `affiliate_*`, `attribution_*`, `budget_*`):
    - `infra/supabase/migrations/20260225001000_growth_engine.sql`
-6. **Admin-Endpunkte fuer Trend/Growth/Channels/Attribution** sind live im API-Surface.
-7. **Neu in diesem Stand**: Revenue-Forecast ueber Admin API steuerbar:
-   - `GET|PUT /api/v1/admin/revenue/forecast-policy`
-   - `GET /api/v1/admin/revenue/forecast?scenario=conservative|base|scale`
-   - Implementierung:
-     - `apps/api/internal/admin/store_growth_revenue_forecast.go`
-     - `apps/api/internal/admin/handler_growth.go`
-     - `apps/api/internal/http/router_admin.go`
-8. **Neu in diesem Stand**: Growth-Ops Surface erweitert:
-   - `POST /api/v1/admin/trends/signals/ingest`
-   - `GET /api/v1/admin/channels/{channel}/health`
-   - `POST /api/v1/admin/channels/{channel}/events/ingest`
-   - `GET /api/v1/admin/kpi/scorecard`
-   - `GET|POST /api/v1/admin/creatives`
-   - `GET|POST /api/v1/admin/creators`
-   - `GET|POST /api/v1/admin/affiliate/offers`
+10. **Admin-Endpunkte** fuer Trend/Growth/Channels/Attribution sind live im API-Surface.
+11. **Revenue-Forecast** ueber Admin API steuerbar:
+    - `GET|PUT /api/v1/admin/revenue/forecast-policy`
+    - `GET /api/v1/admin/revenue/forecast?scenario=conservative|base|scale`
+12. **Growth-Ops Surface** erweitert:
+    - `POST /api/v1/admin/trends/signals/ingest`
+    - `GET /api/v1/admin/channels/{channel}/health`
+    - `POST /api/v1/admin/channels/{channel}/events/ingest`
+    - `GET /api/v1/admin/kpi/scorecard`
+    - `GET|POST /api/v1/admin/creatives`
+    - `GET|POST /api/v1/admin/creators`
+    - `GET|POST /api/v1/admin/affiliate/offers`
+
+## Was noch manuell erledigt werden muss
+
+1. **CJ Balance aufladen** ($20-50 via PayPal/Kreditkarte im CJ Dashboard) — aktuell $0, Orders werden erstellt+bestätigt aber nicht bezahlt
+2. **Stripe Bank Account** hinzufügen (Dashboard → Settings → Payouts) — aktuell kein Bankkonto konfiguriert
+3. **Stripe Instant Payouts** aktivieren (Dashboard → Settings → Payouts) — aktuell disabled, +1.5% Gebühr aber Auszahlung in Minuten
+4. **Resend Domain Verification** — delqhi.com bei Resend hinzufügen + SPF/DKIM/DMARC DNS Records via Cloudflare
 
 ## Was dieser Shop bietet (ohne Kategorie-Limit)
 

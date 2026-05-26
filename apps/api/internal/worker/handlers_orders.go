@@ -53,6 +53,8 @@ func (p *Processor) handlePaymentSucceeded(ctx context.Context, job Job) error {
 		return err
 	}
 
+	go p.maybeTriggerInstantPayout(context.Background())
+
 	return p.postAutomationEvent(ctx, job.JobType, payload)
 }
 

@@ -6,7 +6,7 @@ import (
 )
 
 func ProcessQueues(ctx context.Context, store *Store, handler Handler, workerName string, batchSize int) (int, error) {
-	queues := []string{"automation", "ai", "social"}
+	queues := []string{"default", "automation", "ai", "social"}
 	processed := 0
 
 	for _, queueName := range queues {
