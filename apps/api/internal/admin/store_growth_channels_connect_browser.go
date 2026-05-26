@@ -60,7 +60,7 @@ func (s *Store) RequestChannelConnectBrowserMetadata(ctx context.Context, channe
 		return nil, err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('channel.connect.browser_metadata.requested', 'channel', $1, $2::jsonb, 'pending')
 `, stateToken, string(body))
 	if err != nil {

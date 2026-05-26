@@ -25,7 +25,7 @@ func (s *Store) CreateSupplier(ctx context.Context, body map[string]any, actorID
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.suppliers (
+  insert into shop.suppliers (
     name, email, contact_email, phone, website, api_endpoint, api_key, status, rating,
     notes, contact_person, country, shipping_time_days, minimum_order, metadata,
     fulfillment_mode, auto_fulfill_enabled, sla_hours, sla_ack_hours, sla_fulfillment_hours, api_secret_ref,
@@ -166,7 +166,7 @@ from (
          onboarding_status, registration_url, portal_url, compliance_state, specialization_tags,
          payment_terms_days, early_payment_discount_pct, early_payment_discount_days,
          created_at, updated_at
-  from public.suppliers
+  from shop.suppliers
   where id::text = $1
   limit 1
 ) t
@@ -180,7 +180,7 @@ from (
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.suppliers
+  update shop.suppliers
   set %s
   where id::text = $%d
   returning id::text as id, name, email, contact_email, phone, website, api_endpoint, status, rating,
@@ -223,7 +223,7 @@ from (
          onboarding_status, registration_url, portal_url, compliance_state, specialization_tags,
          payment_terms_days, early_payment_discount_pct, early_payment_discount_days,
          created_at, updated_at
-  from public.suppliers
+  from shop.suppliers
   where id::text = $1
   limit 1
 ) t
@@ -233,14 +233,14 @@ from (
 	}
 
 	var productCount int
-	if err := tx.QueryRow(ctx, `select count(*) from public.products where supplier_id::text = $1`, id).Scan(&productCount); err != nil {
+	if err := tx.QueryRow(ctx, `select count(*) from shop.products where supplier_id::text = $1`, id).Scan(&productCount); err != nil {
 		return err
 	}
 	if productCount > 0 {
 		return errBlocked
 	}
 
-	cmd, err := tx.Exec(ctx, `delete from public.suppliers where id::text = $1`, id)
+	cmd, err := tx.Exec(ctx, `delete from shop.suppliers where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

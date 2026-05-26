@@ -11,7 +11,7 @@ func (s *Store) GetConfig(ctx context.Context) (map[string]any, error) {
 	const query = `
 select provider, model, personality, language, "systemPrompt", temperature, "maxTokens",
        "welcomeMessage", "fallbackMessage", "enabledFeatures", "workingHours"
-from public.ai_config
+from shop.ai_config
 where id = 'default'
 limit 1
 `

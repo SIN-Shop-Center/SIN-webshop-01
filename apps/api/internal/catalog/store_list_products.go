@@ -13,7 +13,7 @@ func (s *Store) ListProducts(ctx context.Context, filter ProductFilter) ([]Produ
 		`exists (
   with supplier_candidates as (
     select ps.supplier_id
-    from public.product_suppliers ps
+    from shop.product_suppliers ps
     where ps.product_id = p.id
       and ps.is_active = true
     union
@@ -21,7 +21,7 @@ func (s *Store) ListProducts(ctx context.Context, filter ProductFilter) ([]Produ
   )
   select 1
   from supplier_candidates sc
-  join public.suppliers s on s.id = sc.supplier_id
+  join shop.suppliers s on s.id = sc.supplier_id
   where s.auto_fulfill_enabled = true
     and s.status in ('approved', 'active')
     and s.onboarding_status = 'connected'
@@ -29,7 +29,7 @@ func (s *Store) ListProducts(ctx context.Context, filter ProductFilter) ([]Produ
     and (
       (s.fulfillment_mode = 'api'
         and coalesce(nullif(s.api_endpoint, ''), '') <> ''
-        and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
+        and coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
       or
       (s.fulfillment_mode = 'email' and coalesce(nullif(s.contact_email, ''), nullif(s.email, '')) <> '')
     )
@@ -80,8 +80,8 @@ select
   end as review_count,
   p.created_at,
   p.updated_at
-from public.products p
-left join public.categories c on c.id = p.category_id
+from shop.products p
+left join shop.categories c on c.id = p.category_id
 where %s
 order by p.created_at desc
 limit $%d offset $%d

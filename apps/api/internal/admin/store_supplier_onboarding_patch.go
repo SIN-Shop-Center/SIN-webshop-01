@@ -57,7 +57,7 @@ func (s *Store) PatchSupplierOnboardingRun(ctx context.Context, supplierID, runI
 
 	args = append(args, runID, supplierID)
 	updateQuery := fmt.Sprintf(`
-update public.supplier_onboarding_runs
+update shop.supplier_onboarding_runs
 set %s
 where id::text = $%d
   and supplier_id::text = $%d
@@ -81,7 +81,7 @@ where id::text = $%d
 		nextSupplierStatus := supplierStatusFromRun(runStatus)
 		if nextSupplierStatus != "" {
 			if _, err := tx.Exec(ctx, `
-update public.suppliers
+update shop.suppliers
 set onboarding_status = $2,
     last_onboarding_run_id = $3::uuid,
     updated_at = now()
@@ -98,7 +98,7 @@ where id = $1::uuid
 		actorParam = actorUUID
 	}
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   $2::uuid,

@@ -33,7 +33,7 @@ func insertOutboxEventTx(ctx context.Context, tx pgx.Tx, eventType, aggregateTyp
 		return err
 	}
 	_, err = tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ($1, $2, $3, $4::jsonb, 'pending')
 `, eventType, aggregateType, aggregateID, string(blob))
 	return err
@@ -41,7 +41,7 @@ values ($1, $2, $3, $4::jsonb, 'pending')
 
 func ensureAwaitingHumanTaskTx(ctx context.Context, tx pgx.Tx, supplierID, runID string) error {
 	_, err := tx.Exec(ctx, `
-insert into public.crm_tasks (
+insert into shop.crm_tasks (
   entity_type, entity_id, title, description, status, priority, source, metadata
 )
 select
@@ -55,7 +55,7 @@ select
   jsonb_build_object('run_id', $2)
 where not exists (
   select 1
-  from public.crm_tasks t
+  from shop.crm_tasks t
   where t.entity_type = 'supplier'
     and t.entity_id = $1
     and t.status in ('open', 'in_progress', 'blocked')

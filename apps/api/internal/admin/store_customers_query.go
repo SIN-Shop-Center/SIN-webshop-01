@@ -9,7 +9,7 @@ import (
 func (s *Store) ListCustomers(ctx context.Context, p CustomerListParams) ([]map[string]any, int, error) {
 	where, args := customerWhereClause(p.Search)
 
-	countQuery := "select count(*) from public.customers c where " + where
+	countQuery := "select count(*) from shop.customers c where " + where
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -35,8 +35,8 @@ from (
          c.metadata,
          c.created_at,
          c.updated_at,
-         (select count(*) from public.orders o where o.customer_id = c.id) as orders_count
-  from public.customers c
+         (select count(*) from shop.orders o where o.customer_id = c.id) as orders_count
+  from shop.customers c
   where %s
   order by %s %s
   limit $%d offset $%d
@@ -74,7 +74,7 @@ from (
          c.metadata,
          c.created_at,
          c.updated_at
-  from public.customers c
+  from shop.customers c
   where c.id::text = $1
   limit 1
 ) t
@@ -93,7 +93,7 @@ from (
          o.total,
          o.payment_status,
          o.created_at
-  from public.orders o
+  from shop.orders o
   where o.customer_id::text = $1
   order by o.created_at desc
 ) t
@@ -105,7 +105,7 @@ from (
 
 	const statsQuery = `
 select count(*), coalesce(sum(total), 0::numeric), max(created_at)
-from public.orders
+from shop.orders
 where customer_id::text = $1
 `
 	var totalOrders int

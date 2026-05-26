@@ -81,7 +81,7 @@ func (s *Store) RequestChannelCommunityReply(ctx context.Context, channel string
 		return nil, err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('channel.community.reply.requested', 'channel_reply', $1, $2::jsonb, 'pending')
 `, taskID, string(rawPayload))
 	if err != nil {
@@ -122,7 +122,7 @@ from (
          description,
          metadata,
          updated_at
-  from public.crm_tasks
+  from shop.crm_tasks
   where id::text = $1
     and entity_type = 'channel'
     and entity_id = $2
@@ -135,7 +135,7 @@ from (
 func (s *Store) getLatestChannelReplyDraft(ctx context.Context, channel, taskID string) (string, error) {
 	const query = `
 select note
-from public.crm_notes
+from shop.crm_notes
 where entity_type = 'channel'
   and entity_id = $1
   and coalesce(metadata->>'task_id', '') = $2

@@ -12,7 +12,7 @@ import (
 func (p *Processor) getInvoiceByOrderID(ctx context.Context, orderID string) (*invoiceRecord, error) {
 	const query = `
 select order_id::text, invoice_number, currency, subtotal_amount, shipping_amount, tax_amount, total_amount, pdf_path, pdf_sha256
-from public.invoices
+from shop.invoices
 where order_id::text = $1
 limit 1
 `
@@ -60,7 +60,7 @@ func (p *Processor) insertInvoice(ctx context.Context, order *orderAggregate, pd
 	}
 
 	const query = `
-insert into public.invoices (
+insert into shop.invoices (
   order_id, invoice_number, status, issue_date, performance_date,
   currency, subtotal_amount, shipping_amount, tax_amount, total_amount,
   customer_email, customer_name, customer_address, line_items, pdf_path, pdf_sha256
@@ -109,7 +109,7 @@ returning order_id::text, invoice_number, currency, subtotal_amount, shipping_am
 
 func nextInvoiceNumber(ctx context.Context, tx pgx.Tx, year int) (int, error) {
 	if _, err := tx.Exec(ctx, `
-insert into public.invoice_sequences (year, next_value)
+insert into shop.invoice_sequences (year, next_value)
 values ($1, 1)
 on conflict (year) do nothing
 `, year); err != nil {
@@ -118,7 +118,7 @@ on conflict (year) do nothing
 
 	var next int
 	err := tx.QueryRow(ctx, `
-update public.invoice_sequences
+update shop.invoice_sequences
 set next_value = next_value + 1, updated_at = now()
 where year = $1
 returning next_value - 1

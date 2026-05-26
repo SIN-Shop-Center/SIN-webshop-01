@@ -102,6 +102,46 @@ Use this pattern when the Master Google Doc is updated:
 
 - `NONE`: The current SSOT uses `simone-webshop-01 - SSOT-v2`, which is writable through the approved Docs API lane and already mirrors one child tab per canonical Markdown file.
 
+## Infrastructure (OCI VM 92.5.60.87)
+
+- **VM**: `92.5.60.87` (ARM64/aarch64, Ubuntu, hostname `sinsupabase`)
+- **SSH**: `ssh -i ~/.ssh/id_ed25519 ubuntu@92.5.60.87`
+- **Self-hosted Supabase**: Docker-based, PostgreSQL on port 5433 (internal `supabase-db:5433`)
+- **Webshop DB**: `shop` schema in `postgres` database, 82 tables, 49 products, 24 categories
+- **DB User**: `simone:simone123` (full access to `shop` schema)
+- **Go API**: Docker container `simone-api` on port 8080, health=ready, 49 active products
+- **Go Worker**: Docker container `simone-worker`, polling every 5s
+- **Cloudflare Tunnel**: `simone-api` tunnel → `api.delqhi.com` → `localhost:8080` (systemd service `cloudflared-simone-api`)
+- **Cloudflare Worker**: `simone-worldbest-shop` on `delqhi.com/*`, `INTERNAL_API_URL=https://api.delqhi.com`
+- **CJ Dropshipping**: Supplier ID `afe83509-b0d5-44fb-85b8-1bd5ce0df2ab`, API key `CJ5240573@api@d5d074918b1f434995c26af2fc932bb8`, openId `37995`
+- **n8n**: Port 5678, 12 workflows imported, login `zukunftsorientierte.energie@gmail.com` / `simone2026`
+- **Stripe**: Live mode, account `acct_1TEhmvAZZTxFQVSB` (DE), webhook `we_1Tb9KHAZZTxFQVSBxnWV6N1p`
+- **Go API env**: `/home/ubuntu/simone-api.env` on VM
+- **CJ Bundle Repo**: https://github.com/SIN-Shop-Center/SIN-CJDropshipping-Bundle (CLI + MCP + docs + scripts)
+
+### Schema Note
+
+Go API SQL uses explicit `shop.` schema prefix (was `public.` before migration). All Go source files under `apps/api/` were updated via bulk replace. Only `cmd/migrate/db_ops.go` retains `public.app_migrations`.
+
+### Skills
+
+- **cj-dropshipping**: `.opencode/skills/cj-dropshipping/SKILL.md` — CJ API 73-endpoint reference, CLI, MCP tools
+- **database-shop-schema**: `.opencode/skills/database-shop-schema/SKILL.md` — shop schema reference
+- **storefront-operations**: `.opencode/skills/storefront-operations/SKILL.md` — Storefront + API ops
+- **stripe-operations**: `.opencode/skills/stripe-operations/SKILL.md` — Stripe payment management
+- **infrastructure-ops**: `.opencode/skills/infrastructure-ops/SKILL.md` — VM/Docker/Tunnel/Supabase
+
+### CJ Bundle (Standalone Repo)
+
+Full CJ Dropshipping tooling lives in **SIN-Shop-Center/SIN-CJDropshipping-Bundle**:
+- `cli/cj-cli.py` — 73-endpoint CLI with auto token management
+- `mcp-server/cj-mcp-server.py` — 75-tool MCP server (`cj_*` prefix)
+- `scripts/` — Product import, stock sync, token refresh
+- `docs/` — API reference, order flow, webhook docs
+- `skills/` — All 5 skill files mirrored
+
+Local copies in `tools/cj-cli.py` and `tools/cj-mcp-server.py` are kept in sync.
+
 ## SIN A2A Runtime Rules
 
 - Secret operations must route through `SIN-Passwordmanager` (`SPM`) instead of ad-hoc local secret handling.

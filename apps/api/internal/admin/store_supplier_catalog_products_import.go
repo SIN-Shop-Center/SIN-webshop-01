@@ -30,7 +30,7 @@ from (
          lead_time_days,
          metadata,
          imported_product_id::text as imported_product_id
-  from public.supplier_catalog_products
+  from shop.supplier_catalog_products
   where id::text = $1
     and supplier_id::text = $2
   limit 1
@@ -97,7 +97,7 @@ from (
 	product, err := queryJSONObject(ctx, tx, `
 select row_to_json(t)::jsonb
 from (
-  insert into public.products (
+  insert into shop.products (
     supplier_id, category_id, sku, name, slug, description, price, original_price,
     images, variants, stock, is_active, metadata
   ) values (
@@ -126,7 +126,7 @@ from (
 	}
 
 	if _, err := tx.Exec(ctx, `
-insert into public.product_suppliers (
+insert into shop.product_suppliers (
   product_id, supplier_id, priority, is_primary, is_active, supplier_sku, cost_price, lead_time_days
 )
 values (
@@ -145,7 +145,7 @@ set priority = excluded.priority,
 	}
 
 	if _, err := tx.Exec(ctx, `
-update public.supplier_catalog_products
+update shop.supplier_catalog_products
 set status = 'imported',
     imported_product_id = $2::uuid,
     review_note = coalesce(nullif(review_note, ''), 'Imported into shop catalog'),
@@ -161,7 +161,7 @@ where id = $1::uuid
 		actorParam = actorUUID
 	}
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   'catalog.product.imported',

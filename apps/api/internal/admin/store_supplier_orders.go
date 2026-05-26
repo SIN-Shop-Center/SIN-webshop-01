@@ -12,7 +12,7 @@ select id::text, order_id::text, supplier_id::text, status, channel,
        external_order_id, attempt_count, last_error, placed_at,
        due_at, discount_until, discount_pct, paid_at, cost_amount, cost_currency,
        updated_at
-from public.supplier_orders
+from shop.supplier_orders
 where order_id::text = $1
 order by updated_at desc
 `
@@ -63,11 +63,11 @@ func (s *Store) TriggerSupplierDispatch(ctx context.Context, orderID, source str
 	}
 
 	const query = `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 select 'supplier.order.requested', 'order', $1, $2::jsonb, 'pending'
 where not exists (
   select 1
-  from public.event_outbox
+  from shop.event_outbox
   where event_type = 'supplier.order.requested'
     and aggregate_id = $1
     and created_at >= now() - interval '10 minutes'

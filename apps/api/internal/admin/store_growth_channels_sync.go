@@ -59,7 +59,7 @@ func (s *Store) TriggerChannelSync(ctx context.Context, channel, syncType string
 		payload[key] = value
 	}
 	const query = `
-insert into public.channel_sync_runs (channel, sync_type, status, requested_payload)
+insert into shop.channel_sync_runs (channel, sync_type, status, requested_payload)
 values ($1, $2, 'queued', $3::jsonb)
 returning id::text
 `
@@ -88,7 +88,7 @@ func (s *Store) enqueueChannelSyncEvent(ctx context.Context, syncRunID string, p
 		return err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ($1, 'channel_sync', $2, $3::jsonb, 'pending')
 `, eventType, syncRunID, string(body))
 	return err

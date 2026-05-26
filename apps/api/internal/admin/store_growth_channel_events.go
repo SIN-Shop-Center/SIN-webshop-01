@@ -49,7 +49,7 @@ func (s *Store) insertChannelEvent(ctx context.Context, channel string, item map
 	}
 
 	const rawInsert = `
-insert into public.channel_events_raw (channel, event_id, payload, status)
+insert into shop.channel_events_raw (channel, event_id, payload, status)
 values ($1, $2, $3::jsonb, 'ingested')
 on conflict (event_id) do nothing
 `
@@ -72,7 +72,7 @@ on conflict (event_id) do nothing
 func (s *Store) retryChannelEventProjection(ctx context.Context, channel, eventID string, item map[string]any) (bool, error) {
 	const statusQuery = `
 select status
-from public.channel_events_raw
+from shop.channel_events_raw
 where event_id = $1
 limit 1
 `
@@ -108,7 +108,7 @@ func (s *Store) insertAttributionTouchpoint(ctx context.Context, channel, eventI
 	}
 
 	const touchInsert = `
-insert into public.attribution_touchpoints (
+insert into shop.attribution_touchpoints (
   order_id, session_id, channel, campaign_id, touch_type, touched_at, dedupe_key, metadata
 )
 values (
@@ -211,7 +211,7 @@ func (s *Store) ensureChannelCommunityProjection(ctx context.Context, channel, e
 func (s *Store) ensureChannelCommunityTask(ctx context.Context, channel, conversationKey string, payload map[string]any) (map[string]any, error) {
 	const existingTaskQuery = `
 select id::text
-from public.crm_tasks
+from shop.crm_tasks
 where entity_type = 'channel'
   and entity_id = $1
   and source = 'community_worker'
@@ -309,7 +309,7 @@ func displayChannelEventType(eventType string) string {
 
 func (s *Store) markChannelEventProjectionState(ctx context.Context, eventID, status, lastError string) error {
 	const query = `
-update public.channel_events_raw
+update shop.channel_events_raw
 set status = $2,
     processed_at = now(),
     last_error = nullif($3, ''),

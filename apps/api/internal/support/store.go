@@ -17,7 +17,7 @@ func NewStore(pool *pgxpool.Pool) *Store {
 
 func (s *Store) FindCustomerByUser(ctx context.Context, userID string) (string, error) {
 	var customerID string
-	err := s.pool.QueryRow(ctx, `select id::text from public.customers where auth_user_id::text = $1 limit 1`, userID).Scan(&customerID)
+	err := s.pool.QueryRow(ctx, `select id::text from shop.customers where auth_user_id::text = $1 limit 1`, userID).Scan(&customerID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return "", nil

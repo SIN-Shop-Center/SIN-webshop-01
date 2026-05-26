@@ -17,7 +17,7 @@ func (s *Store) ListSupplierOnboardingRuns(ctx context.Context, supplierID strin
 	whereClause := strings.Join(where, " and ")
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.supplier_onboarding_runs where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.supplier_onboarding_runs where "+whereClause, args...).Scan(&total); err != nil {
 		return SupplierOnboardingRunsPage{}, err
 	}
 
@@ -41,10 +41,10 @@ from (
          r.updated_at,
          (
            select count(*)
-           from public.supplier_onboarding_steps st
+           from shop.supplier_onboarding_steps st
            where st.run_id = r.id
          ) as steps_count
-  from public.supplier_onboarding_runs r
+  from shop.supplier_onboarding_runs r
   where %s
   order by r.created_at desc
   limit $%d offset $%d
@@ -99,7 +99,7 @@ from (
                )
                order by st.step_order asc, st.created_at asc
              )
-             from public.supplier_onboarding_steps st
+             from shop.supplier_onboarding_steps st
              where st.run_id = r.id
            ),
            '[]'::jsonb
@@ -118,12 +118,12 @@ from (
                )
                order by a.created_at desc
              )
-             from public.supplier_activity_log a
+             from shop.supplier_activity_log a
              where a.run_id = r.id
            ),
            '[]'::jsonb
          ) as activity
-  from public.supplier_onboarding_runs r
+  from shop.supplier_onboarding_runs r
   where r.id::text = $1
     and r.supplier_id::text = $2
   limit 1

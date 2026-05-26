@@ -33,7 +33,7 @@ func (s *Store) UpdateConfig(ctx context.Context, patch map[string]any) (map[str
 	}
 
 	const query = `
-insert into public.ai_config (
+insert into shop.ai_config (
   id, provider, model, personality, language, "systemPrompt", temperature, "maxTokens",
   "welcomeMessage", "fallbackMessage", "enabledFeatures", "workingHours"
 ) values (

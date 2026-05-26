@@ -9,7 +9,7 @@ import (
 func (s *Store) ListProducts(ctx context.Context, p ProductListParams) ([]map[string]any, int, error) {
 	where, args := productWhereClause(p)
 
-	countQuery := "select count(*) from public.products p where " + where
+	countQuery := "select count(*) from shop.products p where " + where
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -45,8 +45,8 @@ from (
          p.created_at,
          p.updated_at,
          case when c.id is null then null else jsonb_build_object('id', c.id::text, 'name', c.name, 'slug', c.slug) end as category
-  from public.products p
-  left join public.categories c on c.id = p.category_id
+  from shop.products p
+  left join shop.categories c on c.id = p.category_id
   where %s
   order by %s %s
   limit $%d offset $%d
@@ -103,9 +103,9 @@ from (
          p.updated_at,
          case when c.id is null then null else jsonb_build_object('id', c.id::text, 'name', c.name, 'slug', c.slug) end as category,
          case when s.id is null then null else jsonb_build_object('id', s.id::text, 'name', s.name, 'email', s.email) end as supplier
-  from public.products p
-  left join public.categories c on c.id = p.category_id
-  left join public.suppliers s on s.id = p.supplier_id
+  from shop.products p
+  left join shop.categories c on c.id = p.category_id
+  left join shop.suppliers s on s.id = p.supplier_id
   where p.id::text = $1
   limit 1
 ) t

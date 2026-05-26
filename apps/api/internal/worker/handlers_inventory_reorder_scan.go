@@ -27,7 +27,7 @@ func (p *Processor) handleInventoryReorderScanRequested(ctx context.Context, job
 	if err := p.pool.QueryRow(ctx, `
 select exists(
   select 1
-  from public.support_tickets
+  from shop.support_tickets
   where status = 'open'
     and coalesce(metadata->>'type', '') = 'reorder_scan'
     and created_at >= now() - interval '6 hours'
@@ -50,9 +50,9 @@ select
   ps.reorder_min_stock,
   ps.reorder_target_stock,
   ps.lead_time_days
-from public.product_suppliers ps
-join public.products p on p.id = ps.product_id
-join public.suppliers s on s.id = ps.supplier_id
+from shop.product_suppliers ps
+join shop.products p on p.id = ps.product_id
+join shop.suppliers s on s.id = ps.supplier_id
 where ps.is_active = true
   and p.is_active = true
   and ps.reorder_min_stock is not null
@@ -127,7 +127,7 @@ limit $1
 	}
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.support_tickets (email, subject, message, status, priority, metadata)
+insert into shop.support_tickets (email, subject, message, status, priority, metadata)
 values ('ops@simone.local', 'Reorder candidates', 'Automatischer Hinweis: Produkte unter Reorder-Minimum', 'open', 'high', $1::jsonb)
 `, mustJSON(metadata))
 	return err

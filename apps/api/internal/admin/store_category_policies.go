@@ -8,7 +8,7 @@ import (
 func (s *Store) listCategoryPolicies(ctx context.Context) ([]CategoryPolicyRule, error) {
 	const query = `
 select category_key, country, channel, policy_state, reason, updated_at
-from public.category_policies
+from shop.category_policies
 order by category_key asc, country asc, channel asc
 `
 	rows, err := s.pool.Query(ctx, query)
@@ -50,7 +50,7 @@ func (s *Store) upsertCategoryPolicies(ctx context.Context, rules []CategoryPoli
 			channel = "all"
 		}
 		_, err := s.pool.Exec(ctx, `
-insert into public.category_policies (category_key, country, channel, policy_state, reason)
+insert into shop.category_policies (category_key, country, channel, policy_state, reason)
 values ($1, $2, $3, $4, $5)
 on conflict (category_key, country, channel) do update
 set policy_state = excluded.policy_state,

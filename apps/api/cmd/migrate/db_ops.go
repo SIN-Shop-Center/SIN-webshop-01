@@ -102,7 +102,7 @@ func verifySchema(ctx context.Context, conn *pgx.Conn) error {
 		return errors.New("verify_failed:no_public_tables")
 	}
 
-	for _, name := range []string{"public.orders", "public.products", "public.queue_jobs", "public.supplier_orders", "public.trend_candidates"} {
+	for _, name := range []string{"shop.orders", "shop.products", "shop.queue_jobs", "shop.supplier_orders", "shop.trend_candidates"} {
 		var regclass *string
 		if err := conn.QueryRow(ctx, "select to_regclass($1)", name).Scan(&regclass); err != nil {
 			return err

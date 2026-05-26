@@ -8,7 +8,7 @@ import (
 
 func (s *Store) ListPromotions(ctx context.Context, p PromotionListParams) ([]map[string]any, int, error) {
 	where, args := promotionWhereClause(p)
-	countQuery := "select count(*) from public.promotions p where " + where
+	countQuery := "select count(*) from shop.promotions p where " + where
 
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
@@ -53,7 +53,7 @@ from (
          p.segment_scope,
          p.created_at,
          p.updated_at
-  from public.promotions p
+  from shop.promotions p
   where %s
   order by %s %s
   limit $%d offset $%d
@@ -114,7 +114,7 @@ from (
          p.segment_scope,
          p.created_at,
          p.updated_at
-  from public.promotions p
+  from shop.promotions p
   where p.id::text = $1
   limit 1
 ) t

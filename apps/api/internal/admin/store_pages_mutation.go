@@ -16,7 +16,7 @@ func (s *Store) CreatePage(ctx context.Context, body map[string]any) (map[string
 	}
 
 	var exists bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.pages where slug = $1)`, slug).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.pages where slug = $1)`, slug).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if exists {
@@ -26,7 +26,7 @@ func (s *Store) CreatePage(ctx context.Context, body map[string]any) (map[string
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.pages (slug, title, content, meta_title, meta_description, page_type, is_published)
+  insert into shop.pages (slug, title, content, meta_title, meta_description, page_type, is_published)
   values ($1, $2, $3, $4, $5, $6, $7)
   returning id::text as id, slug, title, content, meta_title, meta_description, page_type, is_published, created_at, updated_at
 ) t
@@ -47,7 +47,7 @@ func (s *Store) UpdatePage(ctx context.Context, id string, body map[string]any) 
 	if slugRaw, ok := body["slug"]; ok {
 		slug := slugify(asString(slugRaw))
 		var exists bool
-		if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.pages where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
+		if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.pages where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
 			return nil, err
 		}
 		if exists {
@@ -84,7 +84,7 @@ func (s *Store) UpdatePage(ctx context.Context, id string, body map[string]any) 
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.pages
+  update shop.pages
   set %s
   where id::text = $%d
   returning id::text as id, slug, title, content, meta_title, meta_description, page_type, is_published, created_at, updated_at
@@ -95,7 +95,7 @@ from (
 }
 
 func (s *Store) DeletePage(ctx context.Context, id string) error {
-	cmd, err := s.pool.Exec(ctx, `delete from public.pages where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.pages where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

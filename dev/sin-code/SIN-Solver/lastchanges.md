@@ -42,7 +42,7 @@
 - Validation: All keys verified and working
 
 #### Phase 3: Agent Model Configuration ✅
-**Agent-to-Model Mappings** (`oh-my-opencode.json.template`):
+**Agent-to-Model Mappings** (`oh-my-openagent.json.template`):
 - **11 Primary Agents** → `github-copilot/claude-haiku-4-5`
   - sisyphus (orchestrator)
   - prometheus (planning)
@@ -109,7 +109,7 @@
   - All 4 providers present
   - Default model: google/antigravity-gemini-3-flash
   
-- `/Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template`
+- `/Users/jeremy/dev/sin-code/OpenCode/oh-my-openagent.json.template`
   - 12 agents mapped
   - GitHub Copilot primary (11 agents)
   - Google Gemini specialized (1 agent)
@@ -137,7 +137,7 @@
 ```
 e7ed8c9  docs: Add final validation report for OpenCode configuration (2026-01-27)
 98ff389  fix: Update agent models - GitHub Copilot Claude Haiku + Google Gemini Pro for frontend-ui-ux
-2b9e057  fix: Remove fallback models from oh-my-opencode.json.template
+2b9e057  fix: Remove fallback models from oh-my-openagent.json.template
 9a79a6f  fix: Restore Google Gemini models in templates for OpenCode CLI compatibility
 187e7eb  feat: Add XiaoMi, Streamlake, OpenCode ZEN API credentials
 d9072bf  feat(zimmer-18): Complete Survey Worker with FREE AI providers
@@ -185,7 +185,7 @@ curl https://api.opencode.ai/v1/chat/completions \
 
 # Validate templates
 jq . /Users/jeremy/dev/sin-code/OpenCode/opencode.json.template
-jq . /Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template
+jq . /Users/jeremy/dev/sin-code/OpenCode/oh-my-openagent.json.template
 ```
 
 ### For GitHub Copilot Setup

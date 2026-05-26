@@ -21,7 +21,7 @@ func (s *Store) ListOrders(ctx context.Context, status string, limit, offset int
 	args := []any{limit, offset}
 	query := `
 select id::text, status, email, currency, total_amount, total, payment_status, created_at, updated_at
-from public.orders
+from shop.orders
 `
 	if status != "" {
 		query += "where status = $3\n"
@@ -78,7 +78,7 @@ func (s *Store) PatchOrder(ctx context.Context, id string, in PatchOrderInput) (
 	args = append(args, id)
 
 	query := fmt.Sprintf(`
-update public.orders
+update shop.orders
 set %s
 where id::text = $%d
 returning id::text, status, email, currency, total_amount, total, payment_status, created_at, updated_at
@@ -108,7 +108,7 @@ returning id::text, status, email, currency, total_amount, total, payment_status
 func (s *Store) GetOrderByID(ctx context.Context, id string) (*OrderSummary, error) {
 	const query = `
 select id::text, status, email, currency, total_amount, total, payment_status, created_at, updated_at
-from public.orders
+from shop.orders
 where id::text = $1
 limit 1
 `

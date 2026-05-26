@@ -20,7 +20,7 @@ func (s *Store) LaunchTrendCandidate(ctx context.Context, candidateID string, ch
 	}
 
 	var decision string
-	err := s.pool.QueryRow(ctx, `select decision_state from public.trend_candidates where id::text = $1`, candidateID).Scan(&decision)
+	err := s.pool.QueryRow(ctx, `select decision_state from shop.trend_candidates where id::text = $1`, candidateID).Scan(&decision)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (s *Store) LaunchTrendCandidate(ctx context.Context, candidateID string, ch
 	}
 
 	_, _ = s.pool.Exec(ctx, `
-update public.trend_candidates
+update shop.trend_candidates
 set lifecycle_state = 'launched',
     updated_at = now()
 where id::text = $1

@@ -10,7 +10,7 @@ import (
 func (p *Processor) isSupplierFulfillmentEnabled(ctx context.Context) (bool, error) {
 	const query = `
 select coalesce((value->'automation_policy'->>'supplier_fulfillment_enabled')::boolean, true)
-from public.settings
+from shop.settings
 where key = 'shop_settings'
 limit 1
 `
@@ -29,7 +29,7 @@ func (p *Processor) isGrowthKillSwitchEnabled(ctx context.Context, domain string
 	}
 	const query = `
 select coalesce((value->'growth_kill_switch'->>$1)::boolean, false)
-from public.settings
+from shop.settings
 where key = 'shop_settings'
 limit 1
 `

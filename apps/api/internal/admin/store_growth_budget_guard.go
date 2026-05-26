@@ -16,7 +16,7 @@ type budgetPolicyRow struct {
 func (s *Store) getBudgetPolicyOptional(ctx context.Context, scope, channel string) (*budgetPolicyRow, error) {
 	const query = `
 select daily_cap, hard_stop
-from public.budget_policies
+from shop.budget_policies
 where scope = $1 and channel = $2
 limit 1
 `
@@ -60,8 +60,8 @@ func (s *Store) calculateChannelBudgetUsage(ctx context.Context, channel string)
 	var actualSpend float64
 	if err := s.pool.QueryRow(ctx, `
 select coalesce(sum(cs.spend_amount), 0)::float8
-from public.campaign_spend_daily cs
-join public.campaigns c on c.id = cs.campaign_id
+from shop.campaign_spend_daily cs
+join shop.campaigns c on c.id = cs.campaign_id
 where c.channel = $1
   and cs.spend_date = now()::date
 `, channel).Scan(&actualSpend); err != nil {
@@ -71,7 +71,7 @@ where c.channel = $1
 	var reservedSpend float64
 	if err := s.pool.QueryRow(ctx, `
 select coalesce(sum(c.budget_daily), 0)::float8
-from public.campaigns c
+from shop.campaigns c
 where c.channel = $1
   and c.status in ('active', 'launching')
 `, channel).Scan(&reservedSpend); err != nil {
@@ -112,7 +112,7 @@ func (s *Store) recordGrowthIncident(ctx context.Context, incidentType, severity
 		channel = "all"
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.budget_incidents (channel, incident_type, severity, status, summary, payload)
+insert into shop.budget_incidents (channel, incident_type, severity, status, summary, payload)
 values ($1, $2, $3, 'open', $4, $5::jsonb)
 `, channel, incidentType, severity, summary, string(body))
 	return err

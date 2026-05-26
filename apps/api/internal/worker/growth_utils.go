@@ -19,7 +19,7 @@ func (p *Processor) isChannelReady(ctx context.Context, channel string) (bool, e
 	const query = `
 select exists (
   select 1
-  from public.channel_accounts
+  from shop.channel_accounts
   where channel = $1
     and status = any($2::text[])
 )
@@ -53,7 +53,7 @@ func (p *Processor) effectiveDailyBudgetCap(ctx context.Context, channel string)
 func (p *Processor) loadBudgetPolicy(ctx context.Context, scope, channel string) (float64, bool, error) {
 	const query = `
 select daily_cap, hard_stop
-from public.budget_policies
+from shop.budget_policies
 where scope = $1 and channel = $2
 limit 1
 `
@@ -73,8 +73,8 @@ func (p *Processor) channelBudgetUsage(ctx context.Context, channel string) (flo
 	var actualSpend float64
 	if err := p.pool.QueryRow(ctx, `
 select coalesce(sum(cs.spend_amount), 0)::float8
-from public.campaign_spend_daily cs
-join public.campaigns c on c.id = cs.campaign_id
+from shop.campaign_spend_daily cs
+join shop.campaigns c on c.id = cs.campaign_id
 where c.channel = $1
   and cs.spend_date = now()::date
 `, channel).Scan(&actualSpend); err != nil {
@@ -84,7 +84,7 @@ where c.channel = $1
 	var reserved float64
 	if err := p.pool.QueryRow(ctx, `
 select coalesce(sum(c.budget_daily), 0)::float8
-from public.campaigns c
+from shop.campaigns c
 where c.channel = $1
   and c.status in ('active', 'launching')
 `, channel).Scan(&reserved); err != nil {
@@ -124,7 +124,7 @@ func (p *Processor) recordGrowthIncident(ctx context.Context, incidentType, seve
 		channel = "all"
 	}
 	_, err = p.pool.Exec(ctx, `
-insert into public.budget_incidents (channel, incident_type, severity, status, summary, payload)
+insert into shop.budget_incidents (channel, incident_type, severity, status, summary, payload)
 values ($1, $2, $3, 'open', $4, $5::jsonb)
 `, channel, incidentType, severity, summary, string(body))
 	return err

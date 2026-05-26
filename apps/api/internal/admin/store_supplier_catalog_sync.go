@@ -10,7 +10,7 @@ import (
 
 func (s *Store) TriggerSupplierCatalogSync(ctx context.Context, supplierID string, options map[string]any, actorID string) (map[string]any, error) {
 	var exists bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.suppliers where id::text = $1)`, supplierID).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.suppliers where id::text = $1)`, supplierID).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if !exists {
@@ -43,7 +43,7 @@ func (s *Store) TriggerSupplierCatalogSync(ctx context.Context, supplierID strin
 	}
 
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('supplier.catalog.sync.requested', 'supplier', $1, $2::jsonb, 'pending')
 `, supplierID, string(body))
 	if err != nil {
@@ -56,7 +56,7 @@ values ('supplier.catalog.sync.requested', 'supplier', $1, $2::jsonb, 'pending')
 		actorParam = actorUUID
 	}
 	_, _ = s.pool.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   'catalog.sync.requested',

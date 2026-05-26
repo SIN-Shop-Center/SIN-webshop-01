@@ -11,7 +11,7 @@ func (p *Processor) handleAIProviderTest(ctx context.Context, job Job) error {
 		return fmt.Errorf("%w: invalid ai provider payload", ErrPermanent)
 	}
 	_, err = p.pool.Exec(ctx, `
-insert into public.ai_chat_audit (session_id, request_message, response_message, provider, status, metadata, processed_at)
+insert into shop.ai_chat_audit (session_id, request_message, response_message, provider, status, metadata, processed_at)
 values ($1, 'provider_test', null, coalesce(nullif($2, ''), 'provider_test'), 'processed', $3::jsonb, now())
 `, sanitizeIdentifier(asString(payload["session_id"]), job.ID), asString(payload["provider"]), mustJSON(payload))
 	return err
@@ -30,7 +30,7 @@ func (p *Processor) handleAIChatRequested(ctx context.Context, job Job) error {
 	userID := normalizeUUID(asString(payload["user_id"]))
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.ai_chat_audit (
+insert into shop.ai_chat_audit (
   session_id, user_id, request_message, response_message, provider, status, metadata, processed_at
 )
 values (

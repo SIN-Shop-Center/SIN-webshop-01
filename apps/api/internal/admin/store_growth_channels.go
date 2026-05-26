@@ -11,7 +11,7 @@ import (
 func (s *Store) ListChannelAccounts(ctx context.Context) ([]ChannelAccountSummary, error) {
 	const query = `
 select id::text, channel, account_name, status, connection_mode, last_connected_at, last_health_at, updated_at
-from public.channel_accounts
+from shop.channel_accounts
 order by channel asc, updated_at desc
 `
 	rows, err := s.pool.Query(ctx, query)
@@ -41,7 +41,7 @@ func (s *Store) StartChannelConnect(ctx context.Context, channel string) (map[st
 	stateToken := uuid.NewString()
 	redirect := "/admin/channels?channel=" + channel + "&state=" + stateToken
 	_, err := s.pool.Exec(ctx, `
-insert into public.channel_accounts (channel, account_name, status, connection_mode)
+insert into shop.channel_accounts (channel, account_name, status, connection_mode)
 values ($1, 'default', 'disconnected', $2)
 on conflict (channel, account_name) do nothing
 `, channel, channelConnectMode(channel))
@@ -63,7 +63,7 @@ on conflict (channel, account_name) do nothing
 		return nil, err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.channel_connection_sessions (channel, state_token, status, redirect_url, callback_payload)
+insert into shop.channel_connection_sessions (channel, state_token, status, redirect_url, callback_payload)
 values ($1, $2, 'pending', $3, $4::jsonb)
 `, payload["channel"], stateToken, redirect, string(body))
 	if err != nil {

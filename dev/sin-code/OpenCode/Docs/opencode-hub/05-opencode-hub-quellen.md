@@ -34,7 +34,7 @@
 - Key Files:
   - `AGENTS.md` - Supreme Operational Mandates & architectural overview
   - `opencode.json` - Global configuration schema
-  - `oh-my-opencode.json` - Agent framework configuration
+  - `oh-my-openagent.json` - Agent framework configuration
 - Last Verified: 2026-01-26
 - Integration: Core orchestration for all operations
 

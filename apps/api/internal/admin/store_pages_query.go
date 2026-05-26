@@ -16,7 +16,7 @@ from (
          p.is_published,
          p.created_at,
          p.updated_at
-  from public.pages p
+  from shop.pages p
   order by p.title asc
 ) t
 `
@@ -38,7 +38,7 @@ from (
          p.is_published,
          p.created_at,
          p.updated_at
-  from public.pages p
+  from shop.pages p
   where p.id::text = $1 or p.slug = $1
   order by p.updated_at desc
   limit 1

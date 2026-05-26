@@ -261,7 +261,7 @@ Quota exceeded for model: gemini-3-flash (1000 RPM limit)
 # Step 1: Add secondary account for load distribution
 opencode auth login --account secondary
 
-# Step 2: Configure fallback in oh-my-opencode.json
+# Step 2: Configure fallback in oh-my-openagent.json
 {
   "agents": {
     "sisyphus": {

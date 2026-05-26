@@ -48,13 +48,13 @@ func (s *Store) EnsurePendingOrder(ctx context.Context, in CreateOrderInput) err
 	defer tx.Rollback(ctx)
 
 	res, err := tx.Exec(ctx, `
-insert into public.orders (
-  id, user_id, email, status, payment_status, payment_provider, currency,
+insert into shop.orders (
+  id, user_id, customer_id, email, status, payment_status, payment_provider, currency,
   subtotal_amount, shipping_amount, tax_amount, total_amount,
   shipping_method, shipping_address
 )
 values (
-  $1::uuid, nullif($2, '')::uuid, $3, 'payment_pending', 'pending', 'stripe', $4,
+  $1::uuid, nullif($2, '')::uuid, null, $3, 'payment_pending', 'pending', 'stripe', $4,
   $5, $6, 0, $7, $8, $9::jsonb
 )
 on conflict (id) do nothing
@@ -68,7 +68,7 @@ on conflict (id) do nothing
 
 	for _, item := range in.Items {
 		_, err := tx.Exec(ctx, `
-insert into public.order_items (order_id, product_id, sku, title, quantity, unit_price_amount)
+insert into shop.order_items (order_id, product_id, sku, title, quantity, unit_price_amount)
 values ($1::uuid, nullif($2, '')::uuid, $3, $4, $5, $6)
 `, in.OrderID, item.ProductID, item.SKU, item.Title, item.Quantity, item.UnitPriceAmount)
 		if err != nil {
@@ -93,7 +93,7 @@ values ($1::uuid, nullif($2, '')::uuid, $3, $4, $5, $6)
 	}
 
 	_, err = tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('order.created', 'order', $1, $2::jsonb, 'pending')
 `, in.OrderID, string(eventBody))
 	if err != nil {

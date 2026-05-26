@@ -17,11 +17,11 @@ func NewStore(pool *pgxpool.Pool) *Store {
 
 func (s *Store) UpsertItem(ctx context.Context, userID string, in AddItemInput) (*Item, error) {
 	const query = `
-insert into public.cart_items (user_id, sku, variant_name, quantity, unit_price_amount, image_url)
+insert into shop.cart_items (user_id, sku, variant_name, quantity, unit_price_amount, image_url)
 values ($1, $2, $3, $4, $5, $6)
 on conflict (user_id, sku)
 do update set
-  quantity = public.cart_items.quantity + excluded.quantity,
+  quantity = shop.cart_items.quantity + excluded.quantity,
   variant_name = excluded.variant_name,
   unit_price_amount = excluded.unit_price_amount,
   image_url = excluded.image_url,
@@ -49,7 +49,7 @@ returning id::text, user_id::text, sku, variant_name, quantity, unit_price_amoun
 
 func (s *Store) PatchItem(ctx context.Context, userID, sku string, quantity int) (*Item, error) {
 	const query = `
-update public.cart_items
+update shop.cart_items
 set quantity = $3, updated_at = now()
 where user_id = $1 and sku = $2
 returning id::text, user_id::text, sku, variant_name, quantity, unit_price_amount, image_url, created_at, updated_at
@@ -74,7 +74,7 @@ returning id::text, user_id::text, sku, variant_name, quantity, unit_price_amoun
 }
 
 func (s *Store) DeleteItem(ctx context.Context, userID, sku string) error {
-	const query = `delete from public.cart_items where user_id = $1 and sku = $2`
+	const query = `delete from shop.cart_items where user_id = $1 and sku = $2`
 	_, err := s.pool.Exec(ctx, query, userID, sku)
 	return err
 }

@@ -13,7 +13,7 @@ func (s *Store) UpdatePromotion(ctx context.Context, id string, body map[string]
 		code := strings.ToUpper(asString(codeRaw))
 		if code != "" {
 			var exists bool
-			if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.promotions where code = $1 and id::text <> $2)`, code, id).Scan(&exists); err != nil {
+			if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.promotions where code = $1 and id::text <> $2)`, code, id).Scan(&exists); err != nil {
 				return nil, err
 			}
 			if exists {
@@ -64,7 +64,7 @@ func (s *Store) UpdatePromotion(ctx context.Context, id string, body map[string]
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.promotions
+  update shop.promotions
   set %s
   where id::text = $%d
   returning id::text as id, name, description, type, code, discount_value, discount_percentage,
@@ -78,7 +78,7 @@ from (
 }
 
 func (s *Store) DeletePromotion(ctx context.Context, id string) error {
-	cmd, err := s.pool.Exec(ctx, `delete from public.promotions where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.promotions where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

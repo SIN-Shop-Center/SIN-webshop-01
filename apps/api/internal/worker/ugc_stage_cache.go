@@ -29,7 +29,7 @@ func (p *Processor) loadUGCStageCache(ctx context.Context, stage, cacheKey strin
 	var raw []byte
 	err := p.pool.QueryRow(ctx, `
 select payload
-from public.ugc_generation_stage_cache
+from shop.ugc_generation_stage_cache
 where stage = $1
   and cache_key = $2
   and (expires_at is null or expires_at > now())
@@ -58,7 +58,7 @@ func (p *Processor) storeUGCStageCache(ctx context.Context, stage, provider, cac
 	}
 	expiresAt := time.Now().UTC().Add(ttl)
 	_, err = p.pool.Exec(ctx, `
-insert into public.ugc_generation_stage_cache (stage, provider, cache_key, payload, expires_at)
+insert into shop.ugc_generation_stage_cache (stage, provider, cache_key, payload, expires_at)
 values ($1, $2, $3, $4::jsonb, $5)
 on conflict (cache_key) do update
 set provider = excluded.provider,

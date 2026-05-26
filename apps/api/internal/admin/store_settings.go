@@ -10,7 +10,7 @@ import (
 func (s *Store) GetSettings(ctx context.Context) (map[string]any, error) {
 	const query = `
 select value
-from public.settings
+from shop.settings
 where key = 'shop_settings'
 limit 1
 `
@@ -44,10 +44,10 @@ func (s *Store) UpdateSettings(ctx context.Context, patch map[string]any) (map[s
 	}
 
 	const query = `
-insert into public.settings (key, value)
+insert into shop.settings (key, value)
 values ('shop_settings', $1::jsonb)
 on conflict (key) do update
-set value = coalesce(public.settings.value, '{}'::jsonb) || excluded.value,
+set value = coalesce(shop.settings.value, '{}'::jsonb) || excluded.value,
     updated_at = now()
 returning value
 `

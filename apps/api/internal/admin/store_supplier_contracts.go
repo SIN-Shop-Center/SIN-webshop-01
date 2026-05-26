@@ -19,7 +19,7 @@ func (s *Store) ListSupplierContracts(ctx context.Context, supplierID string, pa
 	args := []any{supplierID}
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.supplier_contracts where "+where, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.supplier_contracts where "+where, args...).Scan(&total); err != nil {
 		return SupplierContractsPage{}, err
 	}
 
@@ -45,7 +45,7 @@ from (
          metadata,
          created_at,
          updated_at
-  from public.supplier_contracts
+  from shop.supplier_contracts
   where %s
   order by expires_at desc nulls last, created_at desc
   limit $%d offset $%d
@@ -87,7 +87,7 @@ func (s *Store) CreateSupplierContract(ctx context.Context, supplierID string, b
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.supplier_contracts (
+  insert into shop.supplier_contracts (
     supplier_id,
     contract_type,
     version,
@@ -154,7 +154,7 @@ from (
 
 	if asString(item["status"]) == "active" {
 		_, err := tx.Exec(ctx, `
-update public.supplier_contracts
+update shop.supplier_contracts
 set status = 'superseded', updated_at = now()
 where supplier_id::text = $1
   and contract_type = $2
@@ -198,7 +198,7 @@ from (
          metadata,
          created_at,
          updated_at
-  from public.supplier_contracts
+  from shop.supplier_contracts
   where supplier_id::text = $1
     and id::text = $2
 ) t

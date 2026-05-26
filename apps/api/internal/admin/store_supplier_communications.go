@@ -20,7 +20,7 @@ func (s *Store) ListSupplierCommunications(ctx context.Context, supplierID strin
 	args := []any{supplierID}
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.supplier_communications where "+where, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.supplier_communications where "+where, args...).Scan(&total); err != nil {
 		return SupplierCommunicationsPage{}, err
 	}
 
@@ -43,7 +43,7 @@ from (
          created_by::text as created_by,
          created_at,
          updated_at
-  from public.supplier_communications
+  from shop.supplier_communications
   where %s
   order by created_at desc
   limit $%d offset $%d
@@ -115,7 +115,7 @@ func (s *Store) CreateSupplierCommunication(ctx context.Context, supplierID stri
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.supplier_communications (
+  insert into shop.supplier_communications (
     supplier_id,
     channel,
     direction,
@@ -194,7 +194,7 @@ from (
 			"communication_type": "supplier_email",
 		})
 		_, err := tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('supplier.communication.email.send.requested', 'supplier', $1, $2::jsonb, 'pending')
 `, supplierID, string(evPayload))
 		if err != nil {

@@ -33,7 +33,7 @@ func (s *Store) EnqueueRun(ctx context.Context, target string, payload map[strin
 	}
 
 	const query = `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ($1, 'automation', gen_random_uuid()::text, $2::jsonb, 'pending')
 returning id::text
 `

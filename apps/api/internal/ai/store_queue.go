@@ -12,7 +12,7 @@ func (s *Store) EnqueueProviderTest(ctx context.Context, payload map[string]any)
 	}
 
 	const query = `
-insert into public.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
 values ('ai', 'ai.provider.test', gen_random_uuid()::text, $1::jsonb, 'pending')
 returning id::text
 `
@@ -31,7 +31,7 @@ func (s *Store) EnqueueChatRequested(ctx context.Context, sessionID string, payl
 	}
 
 	const query = `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('ai.chat.requested', 'chat', $1, $2::jsonb, 'pending')
 returning id::text
 `

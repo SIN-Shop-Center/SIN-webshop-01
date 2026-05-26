@@ -22,7 +22,7 @@ type AuditLogPage struct {
 
 func (s *Store) ListSupplierAuditLog(ctx context.Context, supplierID string, page, limit int) (AuditLogPage, error) {
 	var total int
-	if err := s.pool.QueryRow(ctx, `select count(*) from public.audit_log where supplier_id::text = $1`, supplierID).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, `select count(*) from shop.audit_log where supplier_id::text = $1`, supplierID).Scan(&total); err != nil {
 		return AuditLogPage{}, err
 	}
 
@@ -41,7 +41,7 @@ from (
          after,
          metadata,
          created_at
-  from public.audit_log
+  from shop.audit_log
   where supplier_id::text = $1
   order by created_at desc
   limit $2 offset $3
@@ -81,7 +81,7 @@ func (s *Store) insertAuditLog(
 	}
 
 	_, err = db.Exec(ctx, `
-insert into public.audit_log (
+insert into shop.audit_log (
   supplier_id,
   actor_id,
   actor_role,

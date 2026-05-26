@@ -228,7 +228,7 @@ select id::text,
        callback_payload::text,
        expires_at,
        completed_at
-from public.channel_connection_sessions
+from shop.channel_connection_sessions
 where channel = $1
   and state_token = $2
 limit 1
@@ -256,7 +256,7 @@ func (s *Store) mergeChannelConnectSessionPayload(ctx context.Context, sessionID
 	var raw string
 	if err := s.pool.QueryRow(ctx, `
 select callback_payload::text
-from public.channel_connection_sessions
+from shop.channel_connection_sessions
 where id::text = $1
 limit 1
 `, sessionID).Scan(&raw); err != nil {
@@ -275,7 +275,7 @@ limit 1
 		return err
 	}
 	_, err = s.pool.Exec(ctx, `
-update public.channel_connection_sessions
+update shop.channel_connection_sessions
 set callback_payload = $2::jsonb,
     updated_at = now()
 where id::text = $1

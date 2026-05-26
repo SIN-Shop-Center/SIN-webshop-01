@@ -22,7 +22,7 @@ func (s *Store) CreateProduct(ctx context.Context, body map[string]any) (map[str
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.products (
+  insert into shop.products (
     supplier_id, category_id, sku, name, slug, description, price, original_price,
     images, variants, stock, is_active, metadata
   ) values (
@@ -114,7 +114,7 @@ func (s *Store) UpdateProduct(ctx context.Context, id string, body map[string]an
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.products
+  update shop.products
   set %s
   where id::text = $%d
   returning id::text as id, supplier_id::text as supplier_id, category_id::text as category_id,

@@ -17,7 +17,7 @@ func (s *Store) emitShipmentUpdatedEvent(ctx context.Context, orderID, status st
 	}
 
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('shipment.updated', 'shipment', $1, $2::jsonb, 'pending')
 `, orderID, string(payload))
 	return err

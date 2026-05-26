@@ -34,7 +34,7 @@ from (
          t.metadata,
          t.created_at,
          t.updated_at
-  from public.support_tickets t
+  from shop.support_tickets t
   where %s
   order by t.created_at desc
   limit $%d offset $%d

@@ -23,7 +23,7 @@ type SaveCheckoutSessionInput struct {
 func (s *Store) GetCheckoutSessionByIdempotency(ctx context.Context, idempotencyKey string) (*CheckoutSessionRecord, error) {
 	const query = `
 select order_id::text, checkout_url, stripe_session_id, status, customer_email, currency, amount_total
-from public.checkout_sessions
+from shop.checkout_sessions
 where idempotency_key = $1
 `
 
@@ -48,7 +48,7 @@ where idempotency_key = $1
 
 func (s *Store) UpsertCheckoutSession(ctx context.Context, in SaveCheckoutSessionInput) (*CheckoutSessionRecord, error) {
 	const query = `
-insert into public.checkout_sessions (
+insert into shop.checkout_sessions (
   idempotency_key, order_id, stripe_session_id, checkout_url, status,
   customer_email, currency, amount_total, expires_at
 )
@@ -90,7 +90,7 @@ returning order_id::text, checkout_url, stripe_session_id, status, customer_emai
 	}
 
 	_, err = s.pool.Exec(ctx, `
-update public.orders
+update shop.orders
 set payment_provider = 'stripe',
     payment_reference = $1,
     updated_at = now()

@@ -13,7 +13,7 @@ func (p *Processor) loadChannelSyncRequest(ctx context.Context, runID string) (s
 select channel,
        requested_payload::text,
        coalesce(nullif(requested_payload->>'spend_cap_daily', '')::float8, 0)
-from public.channel_sync_runs
+from shop.channel_sync_runs
 where id::text = $1
 limit 1
 `, runID).Scan(&channel, &requestedRaw, &requestedBudget)
@@ -29,7 +29,7 @@ limit 1
 
 func (p *Processor) markChannelSyncRunning(ctx context.Context, runID string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'running',
     started_at = coalesce(started_at, now()),
     updated_at = now()
@@ -44,7 +44,7 @@ func (p *Processor) markChannelSyncSucceeded(ctx context.Context, runID string, 
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'succeeded',
     result_payload = $2::jsonb,
     error_message = null,
@@ -57,7 +57,7 @@ where id::text = $1
 
 func (p *Processor) markChannelSyncFailed(ctx context.Context, runID, reason string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'failed',
     error_message = $2,
     completed_at = now(),

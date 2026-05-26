@@ -24,7 +24,7 @@ select id::text,
        payload::text,
        attempt_count,
        max_attempts
-from public.dequeue_jobs($1, $2, $3)
+from shop.dequeue_jobs($1, $2, $3)
 `
 
 	rows, err := s.pool.Query(ctx, query, queueName, limit, workerName)
@@ -51,7 +51,7 @@ from public.dequeue_jobs($1, $2, $3)
 
 func (s *Store) MarkSucceeded(ctx context.Context, id string) error {
 	const query = `
-update public.queue_jobs
+update shop.queue_jobs
 set status = 'succeeded',
     locked_at = null,
     locked_by = null,
@@ -70,7 +70,7 @@ func (s *Store) MarkFailed(ctx context.Context, j Job, err error) error {
 			return dlqErr
 		}
 		_, updErr := s.pool.Exec(ctx, `
-update public.queue_jobs
+update shop.queue_jobs
 set status = 'dead_letter',
     locked_at = null,
     locked_by = null,
@@ -83,7 +83,7 @@ where id::text = $1
 
 	backoffSeconds := retryBackoffSeconds(j.Attempt)
 	_, updErr := s.pool.Exec(ctx, `
-update public.queue_jobs
+update shop.queue_jobs
 set status = 'pending',
     locked_at = null,
     locked_by = null,
@@ -97,7 +97,7 @@ where id::text = $1
 
 func (s *Store) moveToDLQ(ctx context.Context, j Job, reason string) error {
 	const query = `
-insert into public.queue_dead_letter (queue_job_id, queue_name, job_type, payload, reason)
+insert into shop.queue_dead_letter (queue_job_id, queue_name, job_type, payload, reason)
 values ($1::uuid, $2, $3, $4::jsonb, $5)
 `
 	_, err := s.pool.Exec(ctx, query, j.ID, j.QueueName, j.JobType, string(j.Payload), reason)

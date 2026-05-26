@@ -189,7 +189,7 @@ func resolveChannelCommunityReplyEndpoint(channel string, auth map[string]any) s
 
 func (p *Processor) setCRMTaskStatus(ctx context.Context, taskID, status string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.crm_tasks
+update shop.crm_tasks
 set status = $2,
     updated_at = now()
 where id::text = $1
@@ -199,7 +199,7 @@ where id::text = $1
 
 func (p *Processor) appendCRMActivity(ctx context.Context, entityType, entityID, activityType, severity, actorType, message string, metadata map[string]any) error {
 	_, err := p.pool.Exec(ctx, `
-insert into public.crm_activities (entity_type, entity_id, activity_type, severity, actor_type, message, metadata)
+insert into shop.crm_activities (entity_type, entity_id, activity_type, severity, actor_type, message, metadata)
 values ($1, $2, $3, $4, $5, $6, $7::jsonb)
 `, entityType, entityID, activityType, severity, actorType, message, mustJSON(metadata))
 	return err
@@ -207,7 +207,7 @@ values ($1, $2, $3, $4, $5, $6, $7::jsonb)
 
 func (p *Processor) appendCRMNote(ctx context.Context, entityType, entityID, note string, metadata map[string]any) error {
 	_, err := p.pool.Exec(ctx, `
-insert into public.crm_notes (entity_type, entity_id, note, visibility, metadata)
+insert into shop.crm_notes (entity_type, entity_id, note, visibility, metadata)
 values ($1, $2, $3, 'internal', $4::jsonb)
 `, entityType, entityID, note, mustJSON(metadata))
 	return err

@@ -14,7 +14,7 @@ select
   count(*) filter (where event_type = 'checkout_step_completed')::int as checkout_step_completed,
   count(*) filter (where event_type = 'purchase')::int as purchase,
   count(*) filter (where event_type = 'checkout_error')::int as checkout_error
-from public.analytics_events
+from shop.analytics_events
 where occurred_at >= $1 and occurred_at < $2
 `
 

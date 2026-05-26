@@ -4,13 +4,13 @@ import "context"
 
 func (p *Processor) acquireEmailSlot(ctx context.Context, orderID, recipient, emailType, subject string) (string, bool, error) {
 	const query = `
-insert into public.email_log (order_id, recipient, email_type, subject, status, provider_message_id, last_error)
+insert into shop.email_log (order_id, recipient, email_type, subject, status, provider_message_id, last_error)
 values ($1::uuid, $2, $3, $4, 'processing', null, null)
 on conflict (order_id, email_type)
 do update set
   recipient = excluded.recipient,
   subject = excluded.subject,
-  status = case when public.email_log.status = 'sent' then public.email_log.status else 'processing' end,
+  status = case when shop.email_log.status = 'sent' then shop.email_log.status else 'processing' end,
   last_error = null,
   updated_at = now()
 returning id::text, status
@@ -25,7 +25,7 @@ returning id::text, status
 
 func (p *Processor) markEmailSent(ctx context.Context, logID, messageID string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.email_log
+update shop.email_log
 set status = 'sent',
     provider_message_id = $2,
     gmail_message_id = $2,
@@ -38,7 +38,7 @@ where id::text = $1
 
 func (p *Processor) markEmailFailed(ctx context.Context, logID, reason string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.email_log
+update shop.email_log
 set status = 'failed',
     last_error = $2,
     updated_at = now()
@@ -49,7 +49,7 @@ where id::text = $1
 
 func (p *Processor) markInvoiceEmailed(ctx context.Context, orderID string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.invoices
+update shop.invoices
 set emailed_at = now(), updated_at = now()
 where order_id::text = $1
 `, orderID)

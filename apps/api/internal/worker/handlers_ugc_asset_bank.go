@@ -33,7 +33,7 @@ func (p *Processor) handleUGCAssetCleanupRequested(ctx context.Context, job Job)
 select coalesce(video_object_key, ''),
        coalesce(thumbnail_object_key, ''),
        coalesce(storage_provider, '')
-from public.ugc_asset_bank
+from shop.ugc_asset_bank
 where id::text = $1
 limit 1
 `, assetID).Scan(&videoKey, &thumbnailKey, &storageProvider)
@@ -54,7 +54,7 @@ limit 1
 	}
 
 	if _, err := p.pool.Exec(ctx, `
-update public.ugc_asset_bank
+update shop.ugc_asset_bank
 set status = 'deleted',
     deleted_at = coalesce(deleted_at, now()),
     updated_at = now()
@@ -63,7 +63,7 @@ where id::text = $1
 		return err
 	}
 	if _, err := p.pool.Exec(ctx, `
-update public.ugc_posting_queue
+update shop.ugc_posting_queue
 set status = 'deleted',
     updated_at = now()
 where asset_id::text = $1
@@ -80,7 +80,7 @@ select id::text,
        coalesce(video_object_key, ''),
        coalesce(thumbnail_object_key, ''),
        coalesce(storage_provider, '')
-from public.ugc_asset_bank
+from shop.ugc_asset_bank
 where run_id::text = $1
 `, runID)
 	if err != nil {
@@ -126,16 +126,16 @@ where run_id::text = $1
 	}
 
 	if _, err := p.pool.Exec(ctx, `
-delete from public.ugc_posting_queue
+delete from shop.ugc_posting_queue
 where asset_id in (
   select id
-  from public.ugc_asset_bank
+  from shop.ugc_asset_bank
   where run_id::text = $1
 )
 `, runID); err != nil {
 		return err
 	}
-	_, err = p.pool.Exec(ctx, `delete from public.ugc_asset_bank where run_id::text = $1`, runID)
+	_, err = p.pool.Exec(ctx, `delete from shop.ugc_asset_bank where run_id::text = $1`, runID)
 	return err
 }
 
@@ -199,7 +199,7 @@ func (p *Processor) syncUGCVariantToAssetBank(ctx context.Context, runID, varian
 
 	var assetID string
 	err = p.pool.QueryRow(ctx, `
-insert into public.ugc_asset_bank (
+insert into shop.ugc_asset_bank (
   run_id,
   variant_id,
   creative_asset_id,
@@ -256,7 +256,7 @@ returning id::text
 	}
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.ugc_posting_queue (
+insert into shop.ugc_posting_queue (
   asset_id,
   channel,
   status,

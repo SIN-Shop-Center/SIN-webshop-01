@@ -50,7 +50,7 @@ select
   p.minimum_order,
   p.start_date,
   p.end_date
-from public.promotions p
+from shop.promotions p
 where %s
 order by p.start_date desc, p.created_at desc
 limit $%d

@@ -81,7 +81,7 @@ from (
          created_by::text as created_by,
          created_at,
          updated_at
-  from public.crm_tasks
+  from shop.crm_tasks
   where entity_type = 'channel'
     and entity_id = $1
     and status = any($2::text[])
@@ -113,7 +113,7 @@ from (
          message,
          metadata,
          created_at
-  from public.crm_activities
+  from shop.crm_activities
   where entity_type = 'channel'
     and entity_id = $1
   order by created_at desc
@@ -136,7 +136,7 @@ from (
          metadata,
          created_at,
          updated_at
-  from public.crm_notes
+  from shop.crm_notes
   where entity_type = 'channel'
     and entity_id = $1
   order by created_at desc
@@ -158,7 +158,7 @@ from (
          processed_at,
          last_error,
          payload
-  from public.channel_events_raw
+  from shop.channel_events_raw
   where channel = $1
   order by received_at desc
   limit $2
@@ -186,7 +186,7 @@ select
   count(*) filter (where status = 'open')::int as open_count,
   count(*) filter (where status = 'in_progress')::int as in_progress_count,
   count(*) filter (where priority = 'urgent' and status = any($2::text[]))::int as urgent_count
-from public.crm_tasks
+from shop.crm_tasks
 where entity_type = 'channel'
   and entity_id = $1
 `
@@ -215,7 +215,7 @@ where entity_type = 'channel'
 select
   count(*)::int as events_24h,
   count(*) filter (where status = 'error')::int as projection_errors
-from public.channel_events_raw
+from shop.channel_events_raw
 where channel = $1
   and received_at >= now() - interval '24 hours'
 `
@@ -232,7 +232,7 @@ where channel = $1
 
 	const accountQuery = `
 select status, connection_mode, auth_snapshot::text
-from public.channel_accounts
+from shop.channel_accounts
 where channel = $1
 order by updated_at desc
 limit 1

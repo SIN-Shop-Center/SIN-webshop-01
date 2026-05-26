@@ -21,7 +21,7 @@ func (p *Processor) handleTrendCandidateLaunchRequested(ctx context.Context, job
 		return err
 	} else if blocked {
 		_, _ = p.pool.Exec(ctx, `
-update public.trend_launches
+update shop.trend_launches
 set status = 'paused',
     outcome = jsonb_build_object('reason', 'kill_switch_enabled', 'at', $2),
     updated_at = now()
@@ -35,7 +35,7 @@ where id::text = $1
 	var spendCap float64
 	err = p.pool.QueryRow(ctx, `
 select trend_candidate_id::text, channel, spend_cap_daily
-from public.trend_launches
+from shop.trend_launches
 where id::text = $1
 limit 1
 `, launchID).Scan(&candidateID, &channel, &spendCap)
@@ -53,7 +53,7 @@ limit 1
 			"channel":            channel,
 		})
 		_, _ = p.pool.Exec(ctx, `
-update public.trend_launches
+update shop.trend_launches
 set status = 'failed',
     outcome = jsonb_build_object('reason', 'channel_not_connected', 'channel', $2, 'at', $3),
     updated_at = now()
@@ -75,7 +75,7 @@ where id::text = $1
 			"requested_budget":   spendCap,
 		})
 		_, _ = p.pool.Exec(ctx, `
-update public.trend_launches
+update shop.trend_launches
 set status = 'failed',
     outcome = jsonb_build_object(
       'reason', 'budget_cap_exceeded',
@@ -99,7 +99,7 @@ where id::text = $1
 			"error":              truncateErr(err),
 		})
 		_, _ = p.pool.Exec(ctx, `
-update public.trend_launches
+update shop.trend_launches
 set status = 'failed',
     outcome = jsonb_build_object('reason', 'provider_publish_failed', 'channel', $2, 'error', $3, 'at', $4),
     updated_at = now()
@@ -113,7 +113,7 @@ where id::text = $1
 	}
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.campaigns (channel, trend_candidate_id, name, objective, status, budget_daily, external_campaign_id, payload, metadata, launched_at)
+insert into shop.campaigns (channel, trend_candidate_id, name, objective, status, budget_daily, external_campaign_id, payload, metadata, launched_at)
 values ($1, $2::uuid, $3, 'sales', 'active', $4, nullif($5, ''), $6::jsonb, '{}'::jsonb, now())
 on conflict do nothing
 `, channel, candidateID, "Trend-"+launchID, spendCap, externalCampaignID, string(providerBody))
@@ -132,7 +132,7 @@ on conflict do nothing
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-update public.trend_launches
+update shop.trend_launches
 set status = 'active',
     started_at = coalesce(started_at, now()),
     outcome = $2::jsonb,

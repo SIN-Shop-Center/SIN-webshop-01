@@ -121,8 +121,8 @@ select s.id::text,
        coalesce(s.portal_url, ''),
        coalesce(s.api_endpoint, ''),
        coalesce(s.metadata::text, '{}'::text),
-       coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), s.api_key, '')
-from public.suppliers s
+       coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), s.api_key, '')
+from shop.suppliers s
 where s.id::text = $1
 limit 1
 `
@@ -412,7 +412,7 @@ func (p *Processor) upsertSupplierCatalogProductsWorker(ctx context.Context, sup
 		}
 
 		if _, err := tx.Exec(ctx, `
-insert into public.supplier_catalog_products (
+insert into shop.supplier_catalog_products (
   supplier_id, external_product_id, supplier_sku, title, description, source_url, image_url,
   currency, price, compare_at_price, minimum_order_quantity, stock_hint, lead_time_days,
   status, review_note, ai_score, metadata, discovered_at, last_seen_at
@@ -423,7 +423,7 @@ values (
   $14, nullif($15, ''), $16, $17::jsonb, now(), now()
 )
 on conflict (supplier_id, external_product_id) do update
-set supplier_sku = coalesce(nullif(excluded.supplier_sku, ''), public.supplier_catalog_products.supplier_sku),
+set supplier_sku = coalesce(nullif(excluded.supplier_sku, ''), shop.supplier_catalog_products.supplier_sku),
     title = excluded.title,
     description = excluded.description,
     source_url = excluded.source_url,
@@ -434,10 +434,10 @@ set supplier_sku = coalesce(nullif(excluded.supplier_sku, ''), public.supplier_c
     minimum_order_quantity = excluded.minimum_order_quantity,
     stock_hint = excluded.stock_hint,
     lead_time_days = excluded.lead_time_days,
-    status = case when public.supplier_catalog_products.status = 'imported' then public.supplier_catalog_products.status else excluded.status end,
-    review_note = coalesce(nullif(excluded.review_note, ''), public.supplier_catalog_products.review_note),
+    status = case when shop.supplier_catalog_products.status = 'imported' then shop.supplier_catalog_products.status else excluded.status end,
+    review_note = coalesce(nullif(excluded.review_note, ''), shop.supplier_catalog_products.review_note),
     ai_score = excluded.ai_score,
-    metadata = coalesce(public.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
+    metadata = coalesce(shop.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
     last_seen_at = now(),
     updated_at = now()
 `, supplierID,
@@ -475,7 +475,7 @@ func (p *Processor) appendSupplierActivity(ctx context.Context, supplierID, acti
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, message, metadata)
 values ($1::uuid, $2, $3, 'worker', $4, $5::jsonb)
 `, supplierID, activityType, severity, message, string(blob))
 	return err

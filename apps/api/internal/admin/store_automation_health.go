@@ -46,7 +46,7 @@ func (s *Store) GetAutomationHealth(ctx context.Context) (AutomationHealth, erro
 func (s *Store) countSupplierOrders(ctx context.Context, statuses ...string) (int, error) {
 	const query = `
 select count(*)
-from public.supplier_orders
+from shop.supplier_orders
 where status = any($1::text[])
 `
 	var out int
@@ -57,7 +57,7 @@ where status = any($1::text[])
 func (s *Store) countCriticalDLQ(ctx context.Context) (int, error) {
 	const query = `
 select count(*)
-from public.queue_dead_letter
+from shop.queue_dead_letter
 where job_type = any($1::text[])
 `
 	critical := []string{"payment.succeeded", "supplier.order.requested", "shipment.updated"}
@@ -69,11 +69,11 @@ where job_type = any($1::text[])
 func (s *Store) paymentWithoutSupplierMinutes(ctx context.Context) (int, error) {
 	const query = `
 select coalesce(max(extract(epoch from (now() - o.updated_at)) / 60)::int, 0)
-from public.orders o
+from shop.orders o
 where o.payment_status = 'paid'
   and not exists (
     select 1
-    from public.supplier_orders so
+    from shop.supplier_orders so
     where so.order_id = o.id
       and so.status = 'placed'
   )

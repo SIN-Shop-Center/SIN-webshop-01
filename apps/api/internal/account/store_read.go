@@ -10,8 +10,8 @@ func (s *Store) GetByUserID(ctx context.Context, userID string) (*Profile, error
 	const profileQuery = `
 select p.id::text, p.email, p.first_name, p.last_name, coalesce(c.name, ''), c.phone, p.role, p.created_at, p.updated_at,
        coalesce(c.metadata, '{}'::jsonb)::text
-from public.profiles p
-left join public.customers c on c.auth_user_id = p.id
+from shop.profiles p
+left join shop.customers c on c.auth_user_id = p.id
 where p.id = $1
 limit 1
 `
@@ -57,7 +57,7 @@ limit 1
 func (s *Store) listAddresses(ctx context.Context, userID string) ([]Address, error) {
 	const query = `
 select id::text, name, first_name, last_name, street1, street2, city, zip, country, phone, is_default
-from public.addresses
+from shop.addresses
 where user_id = $1
 order by is_default desc, created_at asc
 `

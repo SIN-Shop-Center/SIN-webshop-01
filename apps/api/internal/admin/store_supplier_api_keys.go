@@ -22,7 +22,7 @@ type SupplierAPIKeysPage struct {
 
 func (s *Store) ListSupplierAPIKeys(ctx context.Context, supplierID string, page, limit int) (SupplierAPIKeysPage, error) {
 	var total int
-	if err := s.pool.QueryRow(ctx, `select count(*) from public.supplier_api_keys where supplier_id::text = $1`, supplierID).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, `select count(*) from shop.supplier_api_keys where supplier_id::text = $1`, supplierID).Scan(&total); err != nil {
 		return SupplierAPIKeysPage{}, err
 	}
 
@@ -39,7 +39,7 @@ from (
          last_used_at,
          revoked_at,
          coalesce(revoked_by::text, '') as revoked_by
-  from public.supplier_api_keys
+  from shop.supplier_api_keys
   where supplier_id::text = $1
   order by created_at desc
   limit $2 offset $3
@@ -94,7 +94,7 @@ func (s *Store) CreateSupplierAPIKey(ctx context.Context, supplierID string, bod
 		const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.supplier_api_keys (
+  insert into shop.supplier_api_keys (
     supplier_id,
     key_prefix,
     key_hash,
@@ -169,7 +169,7 @@ from (
          last_used_at,
          revoked_at,
          revoked_by::text as revoked_by
-  from public.supplier_api_keys
+  from shop.supplier_api_keys
   where supplier_id::text = $1
     and id::text = $2
   limit 1
@@ -182,7 +182,7 @@ from (
 	after, err := queryJSONObject(ctx, tx, `
 select row_to_json(t)::jsonb
 from (
-  update public.supplier_api_keys
+  update shop.supplier_api_keys
   set revoked_at = now(),
       revoked_by = $3::uuid
   where supplier_id::text = $1

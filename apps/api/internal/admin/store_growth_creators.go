@@ -11,7 +11,7 @@ func (s *Store) ListCreators(ctx context.Context, limit, offset int) ([]map[stri
 select row_to_json(t)
 from (
   select id::text, handle, platform, status, region, score, metadata, created_at, updated_at
-  from public.creators
+  from shop.creators
   order by updated_at desc
   limit $1 offset $2
 ) t
@@ -41,7 +41,7 @@ func (s *Store) CreateCreator(ctx context.Context, in map[string]any) (map[strin
 
 	const query = `
 with created as (
-  insert into public.creators (handle, platform, status, region, score, metadata)
+  insert into shop.creators (handle, platform, status, region, score, metadata)
   values ($1, $2, $3, $4, $5, $6::jsonb)
   returning id::text, handle, platform, status, region, score, metadata, created_at, updated_at
 )
