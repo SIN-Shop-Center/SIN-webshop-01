@@ -1,6 +1,6 @@
 # Go-Live Today Checklist (Essential Only)
 
-Stand: **26.02.2026**
+Stand: **26.05.2026**
 
 ## 1) Environment (must-have)
 
@@ -13,7 +13,13 @@ Stand: **26.02.2026**
 2. Checkout:
    - `STRIPE_SECRET_KEY`
    - `STRIPE_WEBHOOK_SECRET`
-3. Mail:
+3. CJ Dropshipping:
+   - `CJ_API_KEY`
+   - `CJ_OPEN_ID`
+4. Email:
+   - `RESEND_API_KEY` (primary email provider)
+   - `RESEND_FROM_DOMAIN` (optional, defaults to onboarding@resend.dev)
+5. Mail (fallback):
    - `GOOGLE_SERVICE_ACCOUNT_JSON_B64` (or `GOOGLE_SERVICE_ACCOUNT_FILE`)
    - `GMAIL_DELEGATED_USER`
    - `GMAIL_SENDER_FROM`
@@ -21,11 +27,18 @@ Stand: **26.02.2026**
    - `BILLING_ADDRESS`
    - `BILLING_TAX_ID`
    - `BILLING_VAT_ID`
-4. Web:
+6. Web:
    - `INTERNAL_API_URL` (or `NEXT_PUBLIC_API_URL`)
-5. Smoke:
+7. Smoke:
    - `API_BASE_URL`
    - `ADMIN_BEARER_TOKEN`
+
+## 1b) Manual Setup (Dashboard)
+
+1. **Stripe Bank Account**: Add in Dashboard → Settings → Payouts
+2. **Stripe Instant Payouts**: Enable in Dashboard (+1.5% fee, payouts in minutes)
+3. **CJ Balance**: Fund with $20-50 via PayPal/credit card in CJ Dashboard
+4. **Resend Domain**: Add delqhi.com to Resend + SPF/DKIM/DMARC DNS records
 
 ## 2) DB migration (must run before deploy)
 

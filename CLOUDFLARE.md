@@ -1,6 +1,6 @@
 # Cloudflare Deployment Record
 
-Stand: **27.02.2026**
+Stand: **26.05.2026**
 
 ## Canonical Production Target
 
@@ -23,8 +23,13 @@ pnpm deploy:cloudflare
 - `/products` -> full product catalog with search and category filters
 - `/products/:slug` -> product detail page with gallery and add-to-cart
 - `/cart` -> interactive cart with quantity controls
-- `/checkout` -> checkout form + order summary
+- `/checkout` -> checkout form + order summary (Stripe: Card, SEPA, Klarna)
 - `/order-success` -> purchase confirmation summary
+- `/impressum` -> Impressum (legal)
+- `/agb` -> AGB / Terms (legal, dropshipping)
+- `/datenschutz` -> Datenschutz / Privacy (legal)
+- `/widerrufsrecht` -> Widerrufsrecht / Right of withdrawal (legal)
+- `/versand` -> Versand / Shipping policy (legal)
 - `/health` -> runtime status JSON
 - `/api/products` -> product payload JSON
 

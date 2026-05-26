@@ -7,6 +7,9 @@ Manage Stripe payments for the Delqhi webshop (delqhi.com).
 - **Account ID**: `acct_1TEhmvAZZTxFQVSB`
 - **Country**: DE (Germany)
 - **Mode**: Live
+- **Payment Methods**: Card, SEPA Direct Debit, Klarna
+- **Payout Schedule**: Manual (delay_days=3)
+- **Instant Payouts**: NOT YET ENABLED (needs Dashboard activation + bank account)
 
 ## Keys (LIVE)
 
@@ -69,10 +72,17 @@ curl -s -X POST https://api.stripe.com/v1/refunds \
 
 ## Order Flow
 
-1. Customer checkout → Stripe Checkout Session created
+1. Customer checkout → Stripe Checkout Session created (Card/SEPA/Klarna)
 2. Customer pays → Stripe fires `checkout.session.completed` webhook
 3. Go API verifies webhook signature → updates `shop.orders` status to `paid`
-4. Go Worker picks up `paid` orders → creates CJ order
+4. Go Worker picks up `paid` orders → creates CJ order (3-step: create→confirm→payBalance)
+5. Stripe Instant Payout auto-triggered (goroutine) — needs activation
+
+## Payment Intent
+
+- **Descriptor**: `DELQHI SHOP`
+- **Description**: `Delqhi Bestellung <orderID[:8]>`
+- **SEPA Mandate Prefix**: `DLQ`
 
 ## Important Notes
 
@@ -80,3 +90,5 @@ curl -s -X POST https://api.stripe.com/v1/refunds \
 - Stripe Checkout uses `mode: "payment"` (one-time, not subscription)
 - Webhook secret is used to verify signature: `whsec_THCR4ppa1RMhadpdJR9ziLLjuL7VEqgr`
 - Live mode is active — test with small amounts first
+- No bank account configured yet — payouts impossible until added
+- Instant Payouts require: (1) bank account, (2) Dashboard activation (+1.5% fee)

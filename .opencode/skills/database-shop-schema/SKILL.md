@@ -30,18 +30,26 @@ Oder via Docker-Netzwerk: `postgresql://simone:simone123@supabase-db:5433/postgr
 
 ### orders
 - `id` (uuid, PK), `customer_id` (FK→customers)
-- `status` (pending|confirmed|paid|supplier_ordered|shipped|delivered|cancelled)
-- `subtotal`, `shipping_cost`, `total`, `currency`
-- `shipping_address` (jsonb), `metadata` (jsonb)
+- `status` (created→paid→processing→supplier_ordered→shipped→delivered|cancelled)
+- `subtotal_amount`, `shipping_amount`, `tax_amount`, `total_amount`
+- `shipping_address` (jsonb), `tracking_number`, `tracking_url`
+- `email`, `payment_status`, `payment_provider`, `payment_reference`
 
 ### order_items
 - `id` (uuid, PK), `order_id` (FK→orders), `product_id` (FK→products)
-- `quantity`, `unit_price`, `total_price`
+- `sku`, `title`, `variant`, `variant_name`, `price`, `quantity`
 
 ### supplier_orders
 - `id` (uuid, PK), `order_id` (FK→orders)
-- `supplier_id` (FK→suppliers), `status`, `channel` (api|email)
-- `external_order_id`, `tracking_number`, `metadata`
+- `supplier_id` (FK→suppliers), `status` (dispatching|placed|shipped|delivered)
+- `channel` (api|email), `external_order_id`, `tracking_number`
+- `response_payload` (jsonb) — CJ dispatch result (cj_order_id, pay_status, balance, etc.)
+
+### queue_jobs
+- `id` (uuid, PK), `queue_name` (default|automation|ai|social)
+- `job_type` (payment.succeeded, supplier.order.requested, shipment.updated, etc.)
+- `payload` (jsonb), `status` (pending|processing|succeeded|dead_letter)
+- `attempt_count`, `max_attempts`, `last_error`
 
 ### checkout_sessions
 - `id` (uuid, PK), `order_id` (FK→orders)
