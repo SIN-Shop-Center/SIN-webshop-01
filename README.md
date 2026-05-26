@@ -241,4 +241,104 @@ Sofort-Checkliste (heute live): `docs/go-live-today-checklist.md`
 
 ---
 
+## Neue-Mac Onboarding (100% Setup aus Repos + Infisical)
+
+### 1. Repos klonen
+
+```bash
+git clone git@github.com:SIN-Shop-Center/SIN-webshop-01.git
+git clone git@github.com:SIN-Shop-Center/SIN-CJDropshipping-Bundle.git
+```
+
+### 2. Infisical Secrets pullen (ersetzt SOPS/age-key)
+
+Alle Secrets und ENVs liegen in Infisical (EU Cloud):
+
+| Projekt | Pfad | Inhalt |
+|---------|------|--------|
+| SIN-Webshop-01 | `/SIN-Webshop-01` | Stripe keys, DB credentials, CJ API key, Cloudflare keys, n8n encryption key, Supabase JWT, etc. |
+
+```bash
+brew install infisical
+infisical login --domain https://eu.infisical.com
+# Browser-Login mit GitHub/Email
+
+# Secrets in .env exportieren
+cd SIN-webshop-01
+infisical export --domain https://eu.infisical.com \
+  --project-id fa7758b4-f84c-4297-966e-710056d531ef \
+  --path /SIN-Webshop-01 \
+  --env dev \
+  -f .env
+```
+
+Infisical Org: `https://eu.infisical.com/organizations/a83c52af-795b-437f-8f17-f1b68d3ab65c`
+Infisical Project: `secret-management` / `fa7758b4-f84c-4297-966e-710056d531ef`
+
+### 3. SSH Key fuer VM
+
+Der SSH Key fuer die OCI VM (`92.5.60.87`) muss manuell kopiert werden:
+
+```bash
+# Auf dem alten Mac:
+scp ~/.ssh/id_ed25519 neuer-mac:~/.ssh/id_ed25519
+
+# Verifizieren:
+ssh -i ~/.ssh/id_ed25519 ubuntu@92.5.60.87 "echo OK"
+```
+
+### 4. CJ API Token (auto-generiert)
+
+```bash
+cd SIN-CJDropshipping-Bundle
+python3 cli/cj-cli.py auth get-token
+# Erstellt automatisch ~/.cj-tokens.json
+```
+
+### 5. Node/Go Dependencies
+
+```bash
+cd SIN-webshop-01
+pnpm install          # Frontend + Worker deps
+cd apps/api
+go mod tidy           # Go API deps
+```
+
+### 6. MCP Server (optional, fuer opencode)
+
+```bash
+pip install --system --break-system-packages mcp
+# Dann in opencode config:
+# "mcpServers": { "cj-dropshipping": { "command": "python3", "args": ["SIN-CJDropshipping-Bundle/mcp-server/cj-mcp-server.py"] } }
+```
+
+### Was NICHT aus den Repos kommt (manuell)
+
+| Item | Loesung |
+|------|---------|
+| SSH Key `~/.ssh/id_ed25519` | Manuell kopieren |
+| Infisical Login | `infisical login` (Browser-Auth) |
+| CJ Token `~/.cj-tokens.json` | Auto-generiert bei erstem API Call |
+
+### Was NUR auf der VM lebt (brauchst du nicht lokal)
+
+| Item | Ort |
+|------|-----|
+| Docker Container (supabase-db, simone-api, simone-worker) | VM `92.5.60.87` |
+| Cloudflare Tunnel Credentials | `/home/ubuntu/.cloudflared/` auf VM |
+| PostgreSQL Daten (49 Produkte, 82 Tabellen) | `shop` Schema auf VM |
+| Go API Env File | `/home/ubuntu/simone-api.env` auf VM |
+| n8n Workflows + Data | Port 5678 auf VM |
+| Supabase Studio | Port 3004 auf VM |
+
+### Verwandte Repos in SIN-Shop-Center
+
+| Repo | Zweck |
+|------|-------|
+| [SIN-webshop-01](https://github.com/SIN-Shop-Center/SIN-webshop-01) | Haupt-Webshop (Go API, Next.js Frontend, Cloudflare Worker, DB Migrations) |
+| [SIN-CJDropshipping-Bundle](https://github.com/SIN-Shop-Center/SIN-CJDropshipping-Bundle) | CJ API CLI (73 Endpunkte), MCP Server (75 Tools), Docs, Scripts |
+| [SIN-Supabase-OCI-Bundle](https://github.com/SIN-Shop-Center/SIN-Supabase-OCI-Bundle) | Supabase Docker Stack fuer OCI VM, DB Provisionierung fuer alle Shops |
+
+---
+
 Wenn eine Aussage in diesem README nicht ueber Code, Metrik oder Quelle belegbar ist, gilt sie nicht als Tatsache.
