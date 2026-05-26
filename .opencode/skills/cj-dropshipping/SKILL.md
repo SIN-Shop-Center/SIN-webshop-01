@@ -180,13 +180,28 @@ All 50+ endpoints exposed as `cj_*` tools. Configure in opencode:
 - **Logistics for DE**: `logisticName` from freight calculation — e.g., "PostNL", "CJPacket"
 - **Currency**: EUR (2.5x markup on USD sell price, fx rate 0.92)
 
-## Order Flow (Customer → CJ)
+## Order Flow (Customer → CJ) — 3-Step Auto-Pay
 
 1. Customer pays via Stripe → webhook updates `shop.orders` status to `paid`
-2. Go Worker picks up `paid` orders → calls CJ `createOrderV2` with `payType=2` (balance)
-3. CJ creates order → returns `orderId` → stored in `shop.supplier_orders`
-4. CJ fulfills → logistics webhook updates tracking number
-5. Track via `cj_tracking_info_v2` or `cj_order_detail`
+2. Go Worker picks up `paid` orders → calls CJ `createOrderV3` with `payType=2`
+3. **Step 1**: CJ creates order → returns `orderId` → stored in `shop.supplier_orders`
+4. **Step 2**: Worker calls `confirmOrder(orderId)` → order status UNPAID
+5. **Step 3**: Worker calls `payBalance(orderId)` → **requires CJ Balance > $0**
+   - If balance sufficient → order PAID → CJ ships automatically
+   - If balance insufficient → order stays UNPAID → `supplier_dispatch_incomplete`
+6. CJ fulfills → logistics webhook updates tracking number
+7. Track via `cj_tracking_info_v2` or `cj_order_detail`
+
+### CJ Balance Status
+- **Current balance**: $0.00
+- Orders are created+confirmed but remain UNPAID until balance is funded
+- Fund CJ Balance manually via PayPal/credit card in CJ Dashboard, or via Stripe Instant Payouts
+
+### Stripe Instant Payout Integration
+- After `payment.succeeded`, Worker auto-triggers Stripe Instant Payout (goroutine)
+- Instant Payout sends available Stripe balance to bank account (minutes, +1.5% fee)
+- **Prerequisites**: (1) Bank account in Stripe Dashboard, (2) Instant Payouts enabled
+- Currently **not yet enabled** — needs manual activation in Stripe Dashboard
 
 ## Rate Limits
 

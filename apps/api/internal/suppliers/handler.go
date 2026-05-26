@@ -3,6 +3,7 @@ package suppliers
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
@@ -36,9 +37,7 @@ func (h *Handler) Webhook(c *gin.Context) {
 	)
 	apiKey := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
-	isCJVerification := strings.Contains(string(rawBody), `"messageId"`) &&
-		strings.Contains(string(rawBody), `"messageType"`) &&
-		strings.Contains(string(rawBody), `"openId"`)
+	cjEvent := parseCJWebhookPayload(rawBody)
 
 	validAuth := false
 	if signature != "" && verifySignature(h.options.WebhookSecret, rawBody, signature) {
@@ -53,7 +52,7 @@ func (h *Handler) Webhook(c *gin.Context) {
 				}
 			}
 		}
-	} else if isCJVerification {
+	} else if cjEvent != nil && cjEvent.isOpenIDValid() {
 		validAuth = true
 	}
 
@@ -62,8 +61,34 @@ func (h *Handler) Webhook(c *gin.Context) {
 		return
 	}
 
-	if isCJVerification {
+	if cjEvent != nil && cjEvent.isVerification() {
 		c.JSON(http.StatusOK, gin.H{"status": "verified"})
+		return
+	}
+
+	if cjEvent != nil && cjEvent.isOrderEvent() {
+		payload, resolveErr := h.store.ResolveCJEvent(c.Request.Context(), cjEvent)
+		if resolveErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "cj_webhook_resolution_failed"})
+			return
+		}
+		if payload == nil {
+			c.JSON(http.StatusOK, gin.H{"status": "ignored", "reason": "order_not_found"})
+			return
+		}
+		if strings.TrimSpace(payload.EventID) == "" {
+			payload.EventID = fallbackEventID(c.Param("supplier"), rawBody)
+		}
+		duplicate, err := h.store.ProcessWebhook(c.Request.Context(), c.Param("supplier"), *payload)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "supplier_webhook_processing_failed"})
+			return
+		}
+		if duplicate {
+			c.JSON(http.StatusOK, gin.H{"status": "duplicate"})
+			return
+		}
+		c.JSON(http.StatusAccepted, gin.H{"status": "accepted"})
 		return
 	}
 
@@ -86,6 +111,69 @@ func (h *Handler) Webhook(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"status": "accepted"})
+}
+
+type cjWebhookEvent struct {
+	MessageID   string `json:"messageId"`
+	MessageType string `json:"messageType"`
+	OpenID      string `json:"openId"`
+	Data        struct {
+		OrderID       string `json:"orderId"`
+		OrderNumber   string `json:"orderNumber"`
+		OrderStatus   string `json:"orderStatus"`
+		TrackNumber   string `json:"trackNumber"`
+		LogisticName  string `json:"logisticName"`
+		TrackingURL   string `json:"trackingUrl"`
+	} `json:"data"`
+}
+
+func parseCJWebhookPayload(raw []byte) *cjWebhookEvent {
+	input := map[string]any{}
+	if err := json.Unmarshal(raw, &input); err != nil {
+		return nil
+	}
+	if _, ok := input["messageId"]; !ok {
+		return nil
+	}
+	if _, ok := input["messageType"]; !ok {
+		return nil
+	}
+	var evt cjWebhookEvent
+	if err := json.Unmarshal(raw, &evt); err != nil {
+		return nil
+	}
+	return &evt
+}
+
+func (e *cjWebhookEvent) isVerification() bool {
+	mt := strings.ToLower(strings.TrimSpace(e.MessageType))
+	return mt == "" || mt == "verification" || mt == "verify" || mt == "ping"
+}
+
+func (e *cjWebhookEvent) isOrderEvent() bool {
+	mt := strings.ToLower(strings.TrimSpace(e.MessageType))
+	return strings.Contains(mt, "order") || strings.Contains(mt, "track") || strings.Contains(mt, "logistic") || strings.Contains(mt, "ship")
+}
+
+func (e *cjWebhookEvent) isOpenIDValid() bool {
+	return strings.TrimSpace(e.OpenID) != ""
+}
+
+func (e *cjWebhookEvent) toStatus() string {
+	switch strings.ToLower(strings.TrimSpace(e.Data.OrderStatus)) {
+	case "placed", "pending":
+		return "placed"
+	case "processing", "confirmed":
+		return "processing"
+	case "shipped", "in_transit", "in transit":
+		return "shipped"
+	case "delivered":
+		return "delivered"
+	case "cancelled", "failed":
+		return "failed"
+	default:
+		return strings.ToLower(strings.TrimSpace(e.Data.OrderStatus))
+	}
 }
 
 func fallbackEventID(supplier string, body []byte) string {

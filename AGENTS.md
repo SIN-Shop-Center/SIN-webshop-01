@@ -114,6 +114,12 @@ Use this pattern when the Master Google Doc is updated:
 - **Cloudflare Tunnel**: `simone-api` tunnel → `api.delqhi.com` → `localhost:8080` (systemd service `cloudflared-simone-api`)
 - **Cloudflare Worker**: `simone-worldbest-shop` on `delqhi.com/*`, `INTERNAL_API_URL=https://api.delqhi.com`
 - **CJ Dropshipping**: Supplier ID `afe83509-b0d5-44fb-85b8-1bd5ce0df2ab`, API key `CJ5240573@api@d5d074918b1f434995c26af2fc932bb8`, openId `37995`
+- **CJ Payment Flow**: `payType=2` (3-step: createOrder→confirmOrder→payBalance), requires CJ Balance > $0 for auto-pay
+- **CJ Balance**: Currently $0 — orders created+confirmed but UNPAID until balance funded
+- **Stripe Instant Payouts**: NOT YET ENABLED on account `acct_1TEhmvAZZTxFQVSB` — needs manual activation in Stripe Dashboard
+- **Stripe Bank Account**: No external bank account configured yet — required for payouts
+- **Resend Email**: Primary email provider (API key `re_YAnqVXrV...`, send-only scope), Gmail API as fallback
+- **Resend From**: `Delqhi Shop <onboarding@resend.dev>` until delqhi.com domain verified, then `shop@delqhi.com`
 - **n8n**: Port 5678, 12 workflows imported, login `zukunftsorientierte.energie@gmail.com` / `simone2026`
 - **Stripe**: Live mode, account `acct_1TEhmvAZZTxFQVSB` (DE), webhook `we_1Tb9KHAZZTxFQVSBxnWV6N1p`
 - **Go API env**: `/home/ubuntu/simone-api.env` on VM
@@ -122,7 +128,7 @@ Use this pattern when the Master Google Doc is updated:
 
 ### Infisical (Primary Secrets Manager)
 
-25 secrets populated (2026-05-26), replaces SOPS for onboarding:
+26 secrets populated (2026-05-26, includes RESEND_API_KEY), replaces SOPS for onboarding:
 - **Console**: https://eu.infisical.com/organizations/a83c52af-795b-437f-8f17-f1b68d3ab65c
 - **Project**: `secret-management` / `fa7758b4-f84c-4297-966e-710056d531ef`
 - **Path**: `/SIN-Webshop-01`, **Env**: `dev`
@@ -134,7 +140,7 @@ Use this pattern when the Master Google Doc is updated:
 | CJ | `CJ_API_KEY`, `CJ_OPEN_ID` |
 | Cloudflare | `CLOUDFLARE_GLOBAL_API_KEY`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_TUNNEL_ID` |
 | Infra | `OCI_VM_IP`, `N8N_ENCRYPTION_KEY` |
-| App | `JWT_REQUIRED`, `APP_ENV`, `CJ_MARKUP`, `CURRENCY`, `FX_RATE` |
+| App | `JWT_REQUIRED`, `APP_ENV`, `CJ_MARKUP`, `CURRENCY`, `FX_RATE`, `RESEND_API_KEY` |
 
 ```bash
 # Pull all secrets

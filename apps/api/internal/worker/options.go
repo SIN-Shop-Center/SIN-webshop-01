@@ -27,6 +27,9 @@ type Options struct {
 	CJAPIKey string
 	CJOpenID  string
 
+	ResendAPIKey     string
+	ResendFromDomain string
+
 	NVIDIAAPIKey                string
 	NVIDIAReasonURL             string
 	NVIDIAPredictURL            string

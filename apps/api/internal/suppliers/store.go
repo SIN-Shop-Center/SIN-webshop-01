@@ -124,3 +124,40 @@ func eventTypeForStatus(status string) string {
 		return "shipment.updated"
 	}
 }
+
+func (s *Store) ResolveCJEvent(ctx context.Context, evt *cjWebhookEvent) (*WebhookPayload, error) {
+	cjOrderID := strings.TrimSpace(evt.Data.OrderID)
+	if cjOrderID == "" {
+		return nil, nil
+	}
+
+	var orderID string
+	err := s.pool.QueryRow(ctx, `
+select order_id::text
+from shop.supplier_orders
+where external_order_id = $1
+  and supplier_id::text = 'afe83509-b0d5-44fb-85b8-1bd5ce0df2ab'
+limit 1
+`, cjOrderID).Scan(&orderID)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &WebhookPayload{
+		EventID:         strings.TrimSpace(evt.MessageID),
+		OrderID:         orderID,
+		Status:          evt.toStatus(),
+		TrackingNumber:  strings.TrimSpace(evt.Data.TrackNumber),
+		TrackingURL:     strings.TrimSpace(evt.Data.TrackingURL),
+		ExternalOrderID: cjOrderID,
+		Raw: map[string]any{
+			"messageType":  evt.MessageType,
+			"cj_order_id":  cjOrderID,
+			"order_status": evt.Data.OrderStatus,
+			"logistic_name": evt.Data.LogisticName,
+		},
+	}, nil
+}

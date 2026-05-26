@@ -27,7 +27,7 @@ func buildStripeCancelURL(siteURL, orderID string) string {
 }
 
 func buildStripePaymentMethodTypes() []string {
-	return []string{"card", "link"}
+	return []string{"card", "link", "sepa_debit", "klarna"}
 }
 
 func (s *StripeClient) CreateHostedCheckout(input StripeSessionInput) (StripeSessionOutput, error) {
@@ -46,12 +46,27 @@ func (s *StripeClient) CreateHostedCheckout(input StripeSessionInput) (StripeSes
 		SuccessURL:    stripe.String(successURL),
 		CancelURL:     stripe.String(cancelURL),
 		CustomerEmail: stripe.String(input.Email),
+		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
+			StatementDescriptor: stripe.String("DELQHI SHOP"),
+			Description:         stripe.String(fmt.Sprintf("Delqhi Bestellung %s", input.OrderID[:8])),
+			Metadata: map[string]string{
+				"order_id": input.OrderID,
+			},
+		},
 		Metadata: map[string]string{
 			"order_id": input.OrderID,
 		},
 	}
 	params.SetIdempotencyKey(input.IdempotencyKey)
 	params.PaymentMethodTypes = stripe.StringSlice(buildStripePaymentMethodTypes())
+	params.PaymentMethodOptions = &stripe.CheckoutSessionPaymentMethodOptionsParams{
+		Klarna: &stripe.CheckoutSessionPaymentMethodOptionsKlarnaParams{},
+		SEPADebit: &stripe.CheckoutSessionPaymentMethodOptionsSEPADebitParams{
+			MandateOptions: &stripe.CheckoutSessionPaymentMethodOptionsSEPADebitMandateOptionsParams{
+				ReferencePrefix: stripe.String("DLQ"),
+			},
+		},
+	}
 
 	for _, item := range input.Items {
 		params.LineItems = append(params.LineItems, &stripe.CheckoutSessionLineItemParams{
