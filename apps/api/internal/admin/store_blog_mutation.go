@@ -17,7 +17,7 @@ func (s *Store) CreateBlogPost(ctx context.Context, body map[string]any) (map[st
 	slug := slugify(defaultString(body["slug"], title))
 
 	var exists bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.blog_posts where slug = $1)`, slug).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.blog_posts where slug = $1)`, slug).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if exists {
@@ -33,7 +33,7 @@ func (s *Store) CreateBlogPost(ctx context.Context, body map[string]any) (map[st
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.blog_posts (
+  insert into shop.blog_posts (
     slug, title, excerpt, content, featured_image, category, tags, author,
     status, published_at, scheduled_at, meta_title, meta_description, views
   ) values (
@@ -67,7 +67,7 @@ func (s *Store) UpdateBlogPost(ctx context.Context, id string, body map[string]a
 	if slugRaw, ok := body["slug"]; ok {
 		slug := slugify(asString(slugRaw))
 		var exists bool
-		if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.blog_posts where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
+		if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.blog_posts where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
 			return nil, err
 		}
 		if exists {
@@ -110,7 +110,7 @@ func (s *Store) UpdateBlogPost(ctx context.Context, id string, body map[string]a
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.blog_posts
+  update shop.blog_posts
   set %s
   where id::text = $%d
   returning id::text as id, slug, title, excerpt, content, featured_image, category,
@@ -123,7 +123,7 @@ from (
 }
 
 func (s *Store) DeleteBlogPost(ctx context.Context, id string) error {
-	cmd, err := s.pool.Exec(ctx, `delete from public.blog_posts where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.blog_posts where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

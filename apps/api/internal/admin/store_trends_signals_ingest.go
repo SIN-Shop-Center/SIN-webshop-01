@@ -47,7 +47,7 @@ func (s *Store) upsertTrendSignal(ctx context.Context, item map[string]any) (boo
 	}
 
 	const updateQuery = `
-update public.trend_signals
+update shop.trend_signals
 set search_velocity = $6,
     social_velocity = $7,
     sales_velocity = $8,
@@ -81,7 +81,7 @@ where coalesce(product_id::text, '') = $1
 	}
 
 	const insertQuery = `
-insert into public.trend_signals (
+insert into shop.trend_signals (
   product_id, source, country, signal_date, search_velocity, social_velocity, sales_velocity, competition_score, margin_fit_score, metadata
 )
 values (nullif($1, '')::uuid, $2, $3, $4::date, $5, $6, $7, $8, $9, $10::jsonb)

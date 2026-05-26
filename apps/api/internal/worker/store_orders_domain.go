@@ -20,7 +20,7 @@ select id::text,
        coalesce(total_amount, round(coalesce(total, 0) * 100)::int, 0),
        coalesce(shipping_address, '{}'::jsonb)::text,
        created_at
-from public.orders
+from shop.orders
 where id::text = $1
 limit 1
 `
@@ -53,7 +53,7 @@ select coalesce(sku, ''),
        coalesce(title, ''),
        quantity,
        coalesce(unit_price_amount, round(coalesce(price, 0) * 100)::int, 0)
-from public.order_items
+from shop.order_items
 where order_id::text = $1
 order by created_at asc
 `

@@ -49,7 +49,7 @@ func (p *Processor) transitionOrderStatus(ctx context.Context, orderID, nextStat
 	}
 
 	result, err := p.pool.Exec(ctx, `
-update public.orders
+update shop.orders
 set status = $2,
     updated_at = now()
 where id::text = $1
@@ -65,7 +65,7 @@ func (p *Processor) readOrderStatus(ctx context.Context, orderID string) (string
 	var status string
 	err := p.pool.QueryRow(ctx, `
 select status
-from public.orders
+from shop.orders
 where id::text = $1
 limit 1
 `, orderID).Scan(&status)

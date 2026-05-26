@@ -12,7 +12,7 @@ select channel,
             then (sum(revenue_amount) / sum(cost_amount))::float8
             else 0
        end as mer
-from public.attributed_orders
+from shop.attributed_orders
 group by channel
 order by revenue_amount desc
 `

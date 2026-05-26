@@ -8,7 +8,7 @@ import (
 func (s *Store) CountByEventType(ctx context.Context, since, until time.Time) ([]EventCount, error) {
 	const query = `
 select event_type, count(*)::int as count
-from public.analytics_events
+from shop.analytics_events
 where occurred_at >= $1 and occurred_at < $2
 group by event_type
 `
@@ -35,7 +35,7 @@ group by event_type
 func (s *Store) CountBySegment(ctx context.Context, since, until time.Time) ([]SegmentCount, error) {
 	const query = `
 select coalesce(nullif(segment, ''), 'unknown') as segment, event_type, count(*)::int as count
-from public.analytics_events
+from shop.analytics_events
 where occurred_at >= $1 and occurred_at < $2
 group by coalesce(nullif(segment, ''), 'unknown'), event_type
 `

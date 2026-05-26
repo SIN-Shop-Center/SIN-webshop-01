@@ -61,7 +61,7 @@ func (s *Store) PatchCRMTask(ctx context.Context, id string, body map[string]any
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.crm_tasks
+  update shop.crm_tasks
   set %s
   where id::text = $%d
   returning id::text as id,

@@ -20,7 +20,7 @@ func (s *Store) ListCRMNotes(ctx context.Context, page, limit int, entityType, e
 	whereClause := strings.Join(where, " and ")
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.crm_notes where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.crm_notes where "+whereClause, args...).Scan(&total); err != nil {
 		return CRMPage{}, err
 	}
 
@@ -37,7 +37,7 @@ from (
          metadata,
          created_at,
          updated_at
-  from public.crm_notes
+  from shop.crm_notes
   where %s
   order by created_at desc
   limit $%d offset $%d
@@ -72,7 +72,7 @@ func (s *Store) CreateCRMNote(ctx context.Context, body map[string]any, actorID 
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.crm_notes (
+  insert into shop.crm_notes (
     entity_type, entity_id, note, visibility, author_id, metadata
   ) values (
     $1, $2, $3, $4, $5::uuid, coalesce($6::jsonb, '{}'::jsonb)

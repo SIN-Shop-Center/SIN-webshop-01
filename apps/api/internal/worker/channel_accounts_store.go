@@ -12,7 +12,7 @@ import (
 func (p *Processor) loadConnectedChannelAccount(ctx context.Context, channel string) (*channelAccountRuntime, error) {
 	const query = `
 select connection_mode, auth_snapshot::text
-from public.channel_accounts
+from shop.channel_accounts
 where channel = $1
   and status = any($2::text[])
 order by updated_at desc

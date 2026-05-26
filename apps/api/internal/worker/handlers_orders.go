@@ -13,7 +13,7 @@ func (p *Processor) handleOrderCreated(ctx context.Context, job Job) error {
 	}
 
 	_, err = p.pool.Exec(ctx, `
-update public.orders
+update shop.orders
 set status = case when status = 'created' then 'payment_pending' else status end,
     updated_at = now()
 where id::text = $1
@@ -70,10 +70,10 @@ func (p *Processor) emitSupplierOrderRequested(ctx context.Context, orderID stri
 	}
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 select 'supplier.order.requested', 'order', $1, $2::jsonb, 'pending'
 where not exists (
-  select 1 from public.event_outbox where event_type = 'supplier.order.requested' and aggregate_id = $1
+  select 1 from shop.event_outbox where event_type = 'supplier.order.requested' and aggregate_id = $1
 )
 `, orderID, string(body))
 	return err

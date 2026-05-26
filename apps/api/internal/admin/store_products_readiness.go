@@ -15,18 +15,18 @@ func isProductAutopilotReady(ctx context.Context, q productReadyQuerier, product
 select exists (
   with supplier_candidates as (
     select ps.supplier_id
-    from public.product_suppliers ps
+    from shop.product_suppliers ps
     where ps.product_id = $1::uuid
       and ps.is_active = true
     union
     select p.supplier_id
-    from public.products p
+    from shop.products p
     where p.id = $1::uuid
       and p.supplier_id is not null
   )
   select 1
   from supplier_candidates sc
-  join public.suppliers s on s.id = sc.supplier_id
+  join shop.suppliers s on s.id = sc.supplier_id
   where s.auto_fulfill_enabled = true
     and s.status in ('approved', 'active')
     and s.onboarding_status = 'connected'

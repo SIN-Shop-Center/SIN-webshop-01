@@ -62,7 +62,7 @@ select id::text,
        connection_mode,
        auth_snapshot::text,
        health_snapshot::text
-from public.channel_accounts
+from shop.channel_accounts
 where channel = $1
 order by updated_at desc
 limit 1
@@ -100,7 +100,7 @@ func (s *Store) updateChannelAccountSnapshots(ctx context.Context, accountID, ac
 		return err
 	}
 	_, err = s.pool.Exec(ctx, `
-update public.channel_accounts
+update shop.channel_accounts
 set account_external_id = nullif($2, ''),
     status = case when status = 'disconnected' then 'connected' else status end,
     auth_snapshot = $3::jsonb,

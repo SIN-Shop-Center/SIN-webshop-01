@@ -28,7 +28,7 @@ func (p *Processor) handleChannelSyncRequested(ctx context.Context, job Job, syn
 		return err
 	} else if blocked {
 		_, _ = p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'failed',
     error_message = 'kill_switch_enabled',
     completed_at = now(),
@@ -53,7 +53,7 @@ where id::text = $1
 			"sync_type":   syncType,
 		})
 		_, _ = p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'failed',
     error_message = 'channel_not_connected',
     completed_at = now(),
@@ -76,7 +76,7 @@ where id::text = $1
 				"requested_budget": requestedBudget,
 			})
 			_, _ = p.pool.Exec(ctx, `
-update public.channel_sync_runs
+update shop.channel_sync_runs
 set status = 'failed',
     error_message = format('budget_cap_exceeded (cap=%s projected=%s)', $2, $3),
     completed_at = now(),

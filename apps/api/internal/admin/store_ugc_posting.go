@@ -27,7 +27,7 @@ func (s *Store) ListUGCPostingQueue(ctx context.Context, params UGCPostingQueueL
 	}
 
 	clause := strings.Join(where, " and ")
-	countQuery := "select count(*) from public.ugc_posting_queue q join public.ugc_asset_bank a on a.id = q.asset_id where " + clause
+	countQuery := "select count(*) from shop.ugc_posting_queue q join shop.ugc_asset_bank a on a.id = q.asset_id where " + clause
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -69,11 +69,11 @@ from (
          p.name as product_name,
          v.variant_label,
          v.variant_role
-  from public.ugc_posting_queue q
-  join public.ugc_asset_bank a on a.id = q.asset_id
-  left join public.ugc_generation_runs r on r.id = a.run_id
-  left join public.products p on p.id = r.product_id
-  left join public.ugc_generation_variants v on v.id = a.variant_id
+  from shop.ugc_posting_queue q
+  join shop.ugc_asset_bank a on a.id = q.asset_id
+  left join shop.ugc_generation_runs r on r.id = a.run_id
+  left join shop.products p on p.id = r.product_id
+  left join shop.ugc_generation_variants v on v.id = a.variant_id
   where %s
   order by q.scheduled_for asc, q.created_at asc
   limit $%d offset $%d
@@ -109,8 +109,8 @@ func (s *Store) ClaimUGCPostingQueueItem(ctx context.Context, channel, claimedBy
 	err = tx.QueryRow(ctx, `
 with candidate as (
   select q.id
-  from public.ugc_posting_queue q
-  join public.ugc_asset_bank a on a.id = q.asset_id
+  from shop.ugc_posting_queue q
+  join shop.ugc_asset_bank a on a.id = q.asset_id
   where q.channel = $1
     and q.scheduled_for <= now()
     and a.deleted_at is null
@@ -125,7 +125,7 @@ with candidate as (
   limit 1
   for update skip locked
 )
-update public.ugc_posting_queue q
+update shop.ugc_posting_queue q
 set status = 'claimed',
     claim_token = $3,
     claimed_by = $4,
@@ -180,7 +180,7 @@ func (s *Store) MarkUGCPostingQueuePosted(ctx context.Context, id, claimToken, a
 	defer tx.Rollback(ctx)
 
 	const updateQueue = `
-update public.ugc_posting_queue
+update shop.ugc_posting_queue
 set status = 'posted',
     posted_at = coalesce(posted_at, now()),
     manifest = coalesce(manifest, '{}'::jsonb) || $2::jsonb,
@@ -199,7 +199,7 @@ returning asset_id::text, delete_after_posted
 	}
 
 	if _, err := tx.Exec(ctx, `
-update public.ugc_asset_bank
+update shop.ugc_asset_bank
 set status = 'posted',
     posted_at = coalesce(posted_at, now()),
     metadata = coalesce(metadata, '{}'::jsonb) || $2::jsonb,
@@ -263,11 +263,11 @@ from (
          p.name as product_name,
          v.variant_label,
          v.variant_role
-  from public.ugc_posting_queue q
-  join public.ugc_asset_bank a on a.id = q.asset_id
-  left join public.ugc_generation_runs r on r.id = a.run_id
-  left join public.products p on p.id = r.product_id
-  left join public.ugc_generation_variants v on v.id = a.variant_id
+  from shop.ugc_posting_queue q
+  join shop.ugc_asset_bank a on a.id = q.asset_id
+  left join shop.ugc_generation_runs r on r.id = a.run_id
+  left join shop.products p on p.id = r.product_id
+  left join shop.ugc_generation_variants v on v.id = a.variant_id
   where q.id::text = $1
   limit 1
 ) t
@@ -286,7 +286,7 @@ func (s *Store) enqueueUGCAssetCleanupTx(ctx context.Context, tx pgx.Tx, assetID
 		return err
 	}
 	_, err = tx.Exec(ctx, `
-insert into public.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
 values ('automation', 'creative.ugc.asset.cleanup.requested', $1, $2::jsonb, 'pending')
 on conflict (queue_name, dedupe_key) do nothing
 `, "ugc-asset-cleanup:"+assetID, string(payload))

@@ -69,7 +69,7 @@ func (s *Store) ApplySupplierOnboardingCallback(ctx context.Context, body map[st
 	}
 
 	if _, err := tx.Exec(ctx, `
-update public.supplier_onboarding_runs
+update shop.supplier_onboarding_runs
 set status = $2,
     started_at = case when $2 in ('running', 'awaiting_human') then coalesce(started_at, now()) else started_at end,
     finished_at = case when $2 in ('succeeded', 'failed', 'cancelled') then coalesce(finished_at, now()) else finished_at end,
@@ -84,7 +84,7 @@ where id::text = $1
 	nextSupplierStatus := supplierStatusFromRun(runStatus)
 	if nextSupplierStatus != "" {
 		if _, err := tx.Exec(ctx, `
-update public.suppliers
+update shop.suppliers
 set onboarding_status = $2,
     last_onboarding_run_id = $3::uuid,
     updated_at = now()
@@ -96,7 +96,7 @@ where id = $1::uuid
 
 	activitySeverity := callbackActivitySeverity(runStatus)
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, message, metadata)
 values (
   $1::uuid,
   $2::uuid,

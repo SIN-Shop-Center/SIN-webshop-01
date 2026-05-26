@@ -29,7 +29,7 @@ func (s *Store) ListCRMTasks(ctx context.Context, page, limit int, entityType, e
 
 	whereClause := strings.Join(where, " and ")
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.crm_tasks where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.crm_tasks where "+whereClause, args...).Scan(&total); err != nil {
 		return CRMPage{}, err
 	}
 
@@ -51,7 +51,7 @@ from (
          created_by::text as created_by,
          created_at,
          updated_at
-  from public.crm_tasks
+  from shop.crm_tasks
   where %s
   order by updated_at desc, created_at desc
   limit $%d offset $%d
@@ -92,7 +92,7 @@ func (s *Store) CreateCRMTask(ctx context.Context, body map[string]any, actorID 
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.crm_tasks (
+  insert into shop.crm_tasks (
     entity_type, entity_id, title, description, status, priority, owner_id, due_at, source, metadata, created_by
   ) values (
     $1, $2, $3, nullif($4, ''), $5, $6, $7::uuid, nullif($8, '')::timestamptz, $9, coalesce($10::jsonb, '{}'::jsonb), $11::uuid

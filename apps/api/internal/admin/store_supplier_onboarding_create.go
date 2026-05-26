@@ -31,7 +31,7 @@ func (s *Store) CreateSupplierOnboardingRun(ctx context.Context, supplierID stri
 	var existingRunID string
 	err = tx.QueryRow(ctx, `
 select id::text
-from public.supplier_onboarding_runs
+from shop.supplier_onboarding_runs
 where supplier_id = $1::uuid
   and status in ('queued', 'running', 'awaiting_human')
 order by created_at desc
@@ -64,7 +64,7 @@ for update
 
 	var runID string
 	if err := tx.QueryRow(ctx, `
-insert into public.supplier_onboarding_runs (
+insert into shop.supplier_onboarding_runs (
   supplier_id, status, execution_mode, skill_id, dry_run, requested_by, request_payload
 )
 values (
@@ -76,7 +76,7 @@ returning id::text
 	}
 
 	if _, err := tx.Exec(ctx, `
-update public.suppliers
+update shop.suppliers
 set last_onboarding_run_id = $2::uuid,
     onboarding_status = coalesce(nullif(onboarding_status, ''), 'new'),
     updated_at = now()
@@ -86,7 +86,7 @@ where id = $1::uuid
 	}
 
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   $2::uuid,

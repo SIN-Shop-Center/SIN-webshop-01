@@ -11,7 +11,7 @@ import (
 func (s *Store) GetBudgetPolicy(ctx context.Context, scope, channel string) (BudgetPolicy, error) {
 	const query = `
 select scope, channel, daily_cap, weekly_cap, monthly_cap, target_mer, target_roas, hard_stop, updated_at
-from public.budget_policies
+from shop.budget_policies
 where scope = $1 and channel = $2
 limit 1
 `
@@ -29,7 +29,7 @@ limit 1
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		_, insErr := s.pool.Exec(ctx, `
-insert into public.budget_policies (scope, channel, daily_cap, weekly_cap, monthly_cap, target_mer, target_roas, hard_stop)
+insert into shop.budget_policies (scope, channel, daily_cap, weekly_cap, monthly_cap, target_mer, target_roas, hard_stop)
 values ($1, $2, 2500, 17500, 75000, 2.5, 3.0, true)
 on conflict (scope, channel) do nothing
 `, scope, channel)
@@ -67,7 +67,7 @@ func (s *Store) UpdateBudgetPolicy(ctx context.Context, scope, channel string, p
 	}
 
 	const query = `
-update public.budget_policies
+update shop.budget_policies
 set daily_cap = $3,
     weekly_cap = $4,
     monthly_cap = $5,

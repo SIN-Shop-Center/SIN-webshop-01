@@ -12,7 +12,7 @@ import (
 
 func (s *Store) upsertTrendLaunch(ctx context.Context, candidateID, channel string, spendCapDaily float64) (*TrendLaunchSummary, bool, error) {
 	const insertQuery = `
-insert into public.trend_launches (trend_candidate_id, channel, status, spend_cap_daily, metadata)
+insert into shop.trend_launches (trend_candidate_id, channel, status, spend_cap_daily, metadata)
 values ($1::uuid, $2, 'queued', $3, '{}'::jsonb)
 on conflict (trend_candidate_id, channel) do nothing
 returning id::text, trend_candidate_id::text, channel, status, spend_cap_daily, started_at, stopped_at, updated_at
@@ -40,7 +40,7 @@ returning id::text, trend_candidate_id::text, channel, status, spend_cap_daily, 
 func (s *Store) loadExistingTrendLaunch(ctx context.Context, candidateID, channel string) (*TrendLaunchSummary, bool, error) {
 	const existingQuery = `
 select id::text, trend_candidate_id::text, channel, status, spend_cap_daily, started_at, stopped_at, updated_at
-from public.trend_launches
+from shop.trend_launches
 where trend_candidate_id::text = $1 and channel = $2
 `
 	var row TrendLaunchSummary
@@ -72,7 +72,7 @@ func (s *Store) enqueueTrendLaunchEvent(ctx context.Context, launch *TrendLaunch
 		return err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('trend.candidate.launch.requested', 'trend_launch', $1, $2::jsonb, 'pending')
 `, launch.ID, string(body))
 	return err

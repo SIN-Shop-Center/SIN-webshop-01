@@ -12,7 +12,7 @@ select coalesce(oi.product_id::text, ''),
        coalesce(oi.title, ''),
        oi.quantity,
        coalesce(oi.unit_price_amount, round(coalesce(oi.price, 0) * 100)::int, 0)
-from public.order_items oi
+from shop.order_items oi
 where oi.order_id::text = $1
 order by oi.created_at asc
 `
@@ -72,7 +72,7 @@ func (p *Processor) resolveProductIDsBySKU(ctx context.Context, items []supplier
 
 	rows, err := p.pool.Query(ctx, `
 select sku, id::text
-from public.products
+from shop.products
 where sku = any($1::text[])
 `, skus)
 	if err != nil {
@@ -96,12 +96,12 @@ func (p *Processor) loadSupplierCandidates(ctx context.Context, productID string
 	const query = `
 with source_suppliers as (
   select ps.supplier_id, ps.priority, ps.is_primary
-  from public.product_suppliers ps
+  from shop.product_suppliers ps
   where ps.product_id = $1::uuid
     and ps.is_active = true
   union all
   select p.supplier_id, 1000 as priority, true as is_primary
-  from public.products p
+  from shop.products p
   where p.id = $1::uuid
     and p.supplier_id is not null
 )
@@ -112,13 +112,13 @@ select distinct on (s.id)
   coalesce(s.fulfillment_mode, 'email'),
   coalesce(nullif(s.contact_email, ''), nullif(s.email, ''), ''),
   coalesce(s.api_endpoint, ''),
-  coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), s.api_key, ''),
+  coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), s.api_key, ''),
   coalesce(s.sla_hours, 48),
   coalesce(ss.priority, 1000),
   coalesce(ss.is_primary, false),
   coalesce(s.rating::float8, 0)
 from source_suppliers ss
-join public.suppliers s on s.id = ss.supplier_id
+join shop.suppliers s on s.id = ss.supplier_id
 where s.auto_fulfill_enabled = true
   and s.status = any($2::text[])
   and s.onboarding_status = 'connected'
@@ -126,7 +126,7 @@ where s.auto_fulfill_enabled = true
   and (
     (coalesce(s.fulfillment_mode, 'email') = 'api'
       and coalesce(nullif(s.api_endpoint, ''), '') <> ''
-      and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
+      and coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> '')
     or
     (coalesce(s.fulfillment_mode, 'email') = 'email'
       and coalesce(nullif(s.contact_email, ''), nullif(s.email, '')) <> '')

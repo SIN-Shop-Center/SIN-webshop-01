@@ -75,7 +75,7 @@ Use singular key `"plugin"` (NOT `"plugins"`). Never configure `antigravity` und
 }
 ```
 
-### Schritt 3: Agent Integration (oh-my-opencode.json)
+### Schritt 3: Agent Integration (oh-my-openagent.json)
 Prevent conflicts: set `google_auth` to `false` when using Antigravity.
 
 ```json
@@ -442,7 +442,7 @@ Before declaring system production-ready:
 - [ ] `plugin` key is singular (not `plugins`)
 - [ ] No `antigravity` configuration under `mcp: {}`
 - [ ] OAuth tokens securely stored with 600 permissions
-- [ ] Agent fallback chain configured in `oh-my-opencode.json`
+- [ ] Agent fallback chain configured in `oh-my-openagent.json`
 - [ ] Rate limit monitoring enabled
 - [ ] Multi-account setup complete (≥2 accounts)
 - [ ] Health checks passing for all MCP servers

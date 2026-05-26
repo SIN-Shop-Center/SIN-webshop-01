@@ -12,7 +12,7 @@ select
   exists (
     with supplier_candidates as (
       select ps.supplier_id
-      from public.product_suppliers ps
+      from shop.product_suppliers ps
       where ps.product_id = p.id
         and ps.is_active = true
       union
@@ -20,7 +20,7 @@ select
     )
     select 1
     from supplier_candidates sc
-    join public.suppliers s on s.id = sc.supplier_id
+    join shop.suppliers s on s.id = sc.supplier_id
     where s.auto_fulfill_enabled = true
       and s.status in ('approved', 'active')
       and s.onboarding_status = 'connected'
@@ -29,7 +29,7 @@ select
         (
           s.fulfillment_mode = 'api'
           and coalesce(nullif(s.api_endpoint, ''), '') <> ''
-          and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> ''
+          and coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> ''
         )
         or
         (
@@ -38,7 +38,7 @@ select
         )
       )
   ) as ready_for_checkout
-from public.products p
+from shop.products p
 where p.is_active = true
   and (p.id::text = any($1::text[]) or p.sku = any($1::text[]))
 `

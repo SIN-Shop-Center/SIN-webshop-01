@@ -17,7 +17,7 @@ select id::text,
        coalesce(registration_url, ''),
        coalesce(portal_url, ''),
        coalesce(website, '')
-from public.suppliers
+from shop.suppliers
 where id::text = $1
 limit 1
 `
@@ -50,7 +50,7 @@ func pickRegistrationURL(target *supplierRegistrationTarget) string {
 
 func (p *Processor) markOnboardingRunRunning(ctx context.Context, runID string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.supplier_onboarding_runs
+update shop.supplier_onboarding_runs
 set status = 'running',
     started_at = coalesce(started_at, now()),
     updated_at = now()
@@ -66,7 +66,7 @@ func (p *Processor) markOnboardingRunFinished(ctx context.Context, runID, suppli
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-update public.supplier_onboarding_runs
+update shop.supplier_onboarding_runs
 set status = $2,
     result_payload = coalesce(result_payload, '{}'::jsonb) || $3::jsonb,
     finished_at = now(),
@@ -88,7 +88,7 @@ where id::text = $1
 		onboardingStatus = "awaiting_access"
 	}
 	_, err = p.pool.Exec(ctx, `
-update public.suppliers
+update shop.suppliers
 set onboarding_status = $2,
     last_onboarding_run_id = $3::uuid,
     updated_at = now()
@@ -103,7 +103,7 @@ func (p *Processor) upsertOnboardingStep(ctx context.Context, runID, supplierID 
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-insert into public.supplier_onboarding_steps (
+insert into shop.supplier_onboarding_steps (
   run_id, supplier_id, step_order, step_type, status, attempt_count, output_payload, artifact_urls, error_message, started_at, finished_at
 )
 values (
@@ -125,10 +125,10 @@ set step_type = excluded.step_type,
     output_payload = excluded.output_payload,
     artifact_urls = excluded.artifact_urls,
     error_message = excluded.error_message,
-    started_at = coalesce(public.supplier_onboarding_steps.started_at, excluded.started_at),
+    started_at = coalesce(shop.supplier_onboarding_steps.started_at, excluded.started_at),
     finished_at = case
       when excluded.status in ('succeeded', 'failed', 'cancelled') then now()
-      else public.supplier_onboarding_steps.finished_at
+      else shop.supplier_onboarding_steps.finished_at
     end,
     updated_at = now()
 `, runID, supplierID, stepOrder, stepType, status, string(blob), artifactURLs, errorMessage)
@@ -141,7 +141,7 @@ func (p *Processor) appendOnboardingActivity(ctx context.Context, supplierID, ru
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, run_id, activity_type, severity, actor_type, message, metadata)
 values ($1::uuid, $2::uuid, $3, $4, 'worker', $5, $6::jsonb)
 `, supplierID, runID, activityType, severity, message, string(blob))
 	return err

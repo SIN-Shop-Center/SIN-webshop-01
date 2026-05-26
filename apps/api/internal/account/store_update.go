@@ -15,7 +15,7 @@ func (s *Store) PatchByUserID(ctx context.Context, userID string, in UpdateInput
 	defer tx.Rollback(ctx)
 
 	const updateProfileQuery = `
-update public.profiles
+update shop.profiles
 set
   first_name = coalesce($2, first_name),
   last_name = coalesce($3, last_name),
@@ -42,7 +42,7 @@ where id = $1
 	}
 
 	const updateCustomerQuery = `
-update public.customers
+update shop.customers
 set
   name = coalesce($2, name),
   phone = coalesce($3, phone),
@@ -68,14 +68,14 @@ where auth_user_id = $1
 }
 
 func (s *Store) insertCustomerFallback(ctx context.Context, tx pgx.Tx, userID string, in UpdateInput, metadataRaw string) error {
-	const emailQuery = `select email from public.profiles where id = $1 limit 1`
+	const emailQuery = `select email from shop.profiles where id = $1 limit 1`
 	var email string
 	if err := tx.QueryRow(ctx, emailQuery, userID).Scan(&email); err != nil {
 		return err
 	}
 
 	const insertQuery = `
-insert into public.customers (auth_user_id, email, name, phone, metadata)
+insert into shop.customers (auth_user_id, email, name, phone, metadata)
 values ($1, $2, $3, $4, $5::jsonb)
 `
 	_, err := tx.Exec(ctx, insertQuery, userID, email, in.Name, in.Phone, metadataRaw)

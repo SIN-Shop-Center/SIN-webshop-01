@@ -21,7 +21,7 @@ func NewStore(pool *pgxpool.Pool) *Store {
 
 func (s *Store) CreateSession(ctx context.Context, tokenHash string) (*SessionRecord, error) {
 	const query = `
-insert into public.store_sessions (session_token_hash)
+insert into shop.store_sessions (session_token_hash)
 values ($1)
 returning id::text, coalesce(email, '')
 `
@@ -35,7 +35,7 @@ returning id::text, coalesce(email, '')
 func (s *Store) GetSessionByTokenHash(ctx context.Context, tokenHash string) (*SessionRecord, error) {
 	const query = `
 select id::text, coalesce(email, '')
-from public.store_sessions
+from shop.store_sessions
 where session_token_hash = $1
 `
 	var out SessionRecord
@@ -51,7 +51,7 @@ where session_token_hash = $1
 
 func (s *Store) TouchSession(ctx context.Context, sessionID, email string) error {
 	const query = `
-update public.store_sessions
+update shop.store_sessions
 set last_seen_at = now(),
     email = case
       when nullif($2, '') is null then email
@@ -66,13 +66,13 @@ where id = $1::uuid
 
 func (s *Store) UpsertCartItem(ctx context.Context, sessionID, sku string, quantity int) error {
 	const query = `
-insert into public.store_cart_items (session_id, product_id, sku, quantity)
+insert into shop.store_cart_items (session_id, product_id, sku, quantity)
 select
   $1::uuid,
   p.id,
   coalesce(nullif(p.sku, ''), $2),
   $3
-from public.products p
+from shop.products p
 where p.is_active = true
   and coalesce(nullif(p.sku, ''), '') = $2
 on conflict (session_id, sku)
@@ -92,13 +92,13 @@ do update set
 }
 
 func (s *Store) DeleteCartItem(ctx context.Context, sessionID, sku string) error {
-	const query = `delete from public.store_cart_items where session_id = $1::uuid and sku = $2`
+	const query = `delete from shop.store_cart_items where session_id = $1::uuid and sku = $2`
 	_, err := s.pool.Exec(ctx, query, sessionID, strings.TrimSpace(sku))
 	return err
 }
 
 func (s *Store) ClearCart(ctx context.Context, sessionID string) error {
-	_, err := s.pool.Exec(ctx, `delete from public.store_cart_items where session_id = $1::uuid`, sessionID)
+	_, err := s.pool.Exec(ctx, `delete from shop.store_cart_items where session_id = $1::uuid`, sessionID)
 	return err
 }
 
@@ -118,9 +118,9 @@ select
   round(p.price * 100)::int as unit_price_amount,
   least(greatest(sci.quantity, 1), greatest(p.stock, 1)) * round(p.price * 100)::int as line_total_amount,
   greatest(p.stock, 0) as stock
-from public.store_cart_items sci
-join public.products p on p.id = sci.product_id
-left join public.categories c on c.id = p.category_id
+from shop.store_cart_items sci
+join shop.products p on p.id = sci.product_id
+left join shop.categories c on c.id = p.category_id
 where sci.session_id = $1::uuid
   and p.is_active = true
 order by sci.updated_at desc, sci.created_at desc
@@ -164,7 +164,7 @@ order by sci.updated_at desc, sci.created_at desc
 
 func (s *Store) AttachOrderToSession(ctx context.Context, orderID, sessionID, paymentMethod string) error {
 	const query = `
-update public.orders
+update shop.orders
 set storefront_session_id = $2::uuid,
     payment_method = nullif($3, ''),
     updated_at = now()
@@ -189,8 +189,8 @@ select
   coalesce(o.total_amount, round(coalesce(o.total, 0) * 100)::int),
   o.shipping_method,
   coalesce(o.shipping_address, '{}'::jsonb)
-from public.checkout_sessions cs
-join public.orders o on o.id = cs.order_id
+from shop.checkout_sessions cs
+join shop.orders o on o.id = cs.order_id
 where o.id = $1::uuid
   and cs.stripe_session_id = $2
 limit 1
@@ -232,9 +232,9 @@ select
   coalesce(nullif(oi.image_url, ''), nullif(p.images->>0, ''), ''),
   greatest(oi.quantity, 1),
   coalesce(oi.unit_price_amount, round(coalesce(oi.price, 0) * 100)::int)
-from public.order_items oi
-left join public.products p on p.id = oi.product_id
-left join public.categories c on c.id = p.category_id
+from shop.order_items oi
+left join shop.products p on p.id = oi.product_id
+left join shop.categories c on c.id = p.category_id
 where oi.order_id = $1::uuid
 order by oi.created_at asc
 `
@@ -273,12 +273,12 @@ func (s *Store) CreateAccessRequest(ctx context.Context, in AccessRequestInput) 
 	const query = `
 with linked_customer as (
   select id, auth_user_id
-  from public.customers
+  from shop.customers
   where lower(email) = lower($1)
   order by updated_at desc nulls last, created_at desc
   limit 1
 )
-insert into public.store_access_requests (email, requested_role, note, customer_id, auth_user_id)
+insert into shop.store_access_requests (email, requested_role, note, customer_id, auth_user_id)
 select
   $1,
   $2,

@@ -30,7 +30,7 @@ func (s *Store) ListSupplierProductMappings(ctx context.Context, supplierID stri
 	whereClause := strings.Join(where, " and ")
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.product_suppliers ps join public.products p on p.id = ps.product_id where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.product_suppliers ps join shop.products p on p.id = ps.product_id where "+whereClause, args...).Scan(&total); err != nil {
 		return SupplierProductMappingsPage{}, err
 	}
 
@@ -55,8 +55,8 @@ from (
          ps.reorder_target_stock,
          ps.created_at,
          ps.updated_at
-  from public.product_suppliers ps
-  join public.products p on p.id = ps.product_id
+  from shop.product_suppliers ps
+  join shop.products p on p.id = ps.product_id
   where %s
   order by ps.is_primary desc, ps.priority asc, ps.updated_at desc, ps.created_at desc
   limit $%d offset $%d

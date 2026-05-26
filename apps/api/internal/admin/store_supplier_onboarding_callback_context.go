@@ -14,8 +14,8 @@ func loadOnboardingCallbackRunContextTx(ctx context.Context, tx pgx.Tx, runID st
 select r.supplier_id::text,
        r.status,
        coalesce(s.metadata, '{}'::jsonb)::text
-from public.supplier_onboarding_runs r
-join public.suppliers s on s.id = r.supplier_id
+from shop.supplier_onboarding_runs r
+join shop.suppliers s on s.id = r.supplier_id
 where r.id::text = $1
 limit 1
 for update

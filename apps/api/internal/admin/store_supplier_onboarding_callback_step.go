@@ -24,7 +24,7 @@ func (s *Store) applySupplierOnboardingStepCallbackTx(
 		return nil
 	}
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_onboarding_steps (
+insert into shop.supplier_onboarding_steps (
   run_id, supplier_id, step_order, step_type, status, attempt_count, output_payload, artifact_urls, redacted_log, error_message, started_at, finished_at
 )
 values (
@@ -44,15 +44,15 @@ values (
 on conflict (run_id, step_order) do update
 set step_type = excluded.step_type,
     status = excluded.status,
-    attempt_count = greatest(public.supplier_onboarding_steps.attempt_count, excluded.attempt_count),
+    attempt_count = greatest(shop.supplier_onboarding_steps.attempt_count, excluded.attempt_count),
     output_payload = excluded.output_payload,
     artifact_urls = excluded.artifact_urls,
     redacted_log = excluded.redacted_log,
     error_message = excluded.error_message,
-    started_at = coalesce(public.supplier_onboarding_steps.started_at, excluded.started_at),
+    started_at = coalesce(shop.supplier_onboarding_steps.started_at, excluded.started_at),
     finished_at = case
       when excluded.status in ('succeeded', 'failed', 'cancelled') then now()
-      else public.supplier_onboarding_steps.finished_at
+      else shop.supplier_onboarding_steps.finished_at
     end,
     updated_at = now()
 `, runID, supplierID, stepOrder, stepType, stepStatus, attemptCount, outputJSON, artifactURLs, redactedLog, errorMessage); err != nil {

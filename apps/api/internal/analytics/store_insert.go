@@ -19,7 +19,7 @@ func (s *Store) InsertEvent(ctx context.Context, in EventInput, requestID, userA
 	}
 
 	const query = `
-insert into public.analytics_events (
+insert into shop.analytics_events (
   event_type,
   occurred_at,
   segment,

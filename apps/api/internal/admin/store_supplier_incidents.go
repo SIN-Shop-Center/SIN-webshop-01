@@ -15,7 +15,7 @@ type SupplierIncidentsPage struct {
 
 func (s *Store) ListSupplierIncidents(ctx context.Context, supplierID string, page, limit int) (SupplierIncidentsPage, error) {
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.supplier_incidents where supplier_id::text = $1", supplierID).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.supplier_incidents where supplier_id::text = $1", supplierID).Scan(&total); err != nil {
 		return SupplierIncidentsPage{}, err
 	}
 
@@ -39,7 +39,7 @@ from (
          resolved_by::text as resolved_by,
          created_at,
          updated_at
-  from public.supplier_incidents
+  from shop.supplier_incidents
   where supplier_id::text = $1
   order by created_at desc
   limit $2 offset $3
@@ -63,7 +63,7 @@ func (s *Store) CreateSupplierIncident(ctx context.Context, supplierID string, b
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.supplier_incidents (
+  insert into shop.supplier_incidents (
     supplier_id,
     order_id,
     incident_type,
@@ -117,7 +117,7 @@ func (s *Store) UpdateSupplierIncident(ctx context.Context, supplierID, incident
 	}
 	defer tx.Rollback(ctx)
 
-	before, err := queryJSONObject(ctx, tx, "select row_to_json(t)::jsonb from (select * from public.supplier_incidents where id::text = $1) t", incidentID)
+	before, err := queryJSONObject(ctx, tx, "select row_to_json(t)::jsonb from (select * from shop.supplier_incidents where id::text = $1) t", incidentID)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (s *Store) UpdateSupplierIncident(ctx context.Context, supplierID, incident
 	}
 
 	setParts = append(setParts, "updated_at = now()")
-	query := fmt.Sprintf("update public.supplier_incidents set %s where id::text = $1 returning id::text as id", strings.Join(setParts, ", "))
+	query := fmt.Sprintf("update shop.supplier_incidents set %s where id::text = $1 returning id::text as id", strings.Join(setParts, ", "))
 	
 	var outID string
 	if err := tx.QueryRow(ctx, query, args...).Scan(&outID); err != nil {
@@ -161,7 +161,7 @@ func (s *Store) UpdateSupplierIncident(ctx context.Context, supplierID, incident
 select row_to_json(t)::jsonb
 from (
   select id::text as id, status, severity, title, description, root_cause, corrective_action, preventive_action, updated_at
-  from public.supplier_incidents
+  from shop.supplier_incidents
   where id::text = $1
 ) t
 `, outID)

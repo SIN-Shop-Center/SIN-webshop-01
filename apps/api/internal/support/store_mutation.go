@@ -10,7 +10,7 @@ func (s *Store) CreateTicket(ctx context.Context, customerID, email, subject, me
 	const query = `
 select row_to_json(x)::jsonb
 from (
-  insert into public.support_tickets (customer_id, email, subject, message, metadata)
+  insert into shop.support_tickets (customer_id, email, subject, message, metadata)
   values (nullif($1, '')::uuid, nullif($2, ''), $3, $4, coalesce($5::jsonb, '{}'::jsonb))
   returning id::text as id, customer_id::text as customer_id, email, subject, message, status, priority, created_at, updated_at
 ) x
@@ -55,7 +55,7 @@ func (s *Store) UpdateTicket(ctx context.Context, id string, patch map[string]an
 	query := fmt.Sprintf(`
 select row_to_json(x)::jsonb
 from (
-  update public.support_tickets
+  update shop.support_tickets
   set %s
   where id::text = $%d
   returning id::text as id, customer_id::text as customer_id, email, subject, message, status, priority, created_at, updated_at

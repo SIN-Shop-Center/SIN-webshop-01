@@ -43,7 +43,7 @@ func (s *Store) ProcessWebhook(ctx context.Context, supplierSlug string, payload
 
 	var inboxID string
 	err = tx.QueryRow(ctx, `
-insert into public.event_inbox (external_event_id, event_type, payload, status)
+insert into shop.event_inbox (external_event_id, event_type, payload, status)
 values ($1, $2, $3::jsonb, 'processing')
 on conflict (external_event_id) do nothing
 returning id::text
@@ -56,7 +56,7 @@ returning id::text
 	}
 
 	_, err = tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ($1, 'order', $2, $3::jsonb, 'pending')
 `, eventType, payload.OrderID, string(eventPayload))
 	if err != nil {
@@ -64,7 +64,7 @@ values ($1, 'order', $2, $3::jsonb, 'pending')
 	}
 
 	_, err = tx.Exec(ctx, `
-update public.event_inbox
+update shop.event_inbox
 set status = 'processed',
     processed_at = now(),
     error_message = null,
@@ -96,7 +96,7 @@ func (s *Store) ValidateAPIKey(ctx context.Context, apiKey string) (string, []st
 	var scopes []string
 	err := s.pool.QueryRow(ctx, `
 select supplier_id::text, scopes
-from public.supplier_api_keys
+from shop.supplier_api_keys
 where key_prefix = $1
   and key_hash = $2
   and revoked_at is null
@@ -109,7 +109,7 @@ limit 1
 		return "", nil, err
 	}
 
-	_, _ = s.pool.Exec(ctx, `update public.supplier_api_keys set last_used_at = now() where key_prefix = $1 and key_hash = $2`, prefix, hashHex)
+	_, _ = s.pool.Exec(ctx, `update shop.supplier_api_keys set last_used_at = now() where key_prefix = $1 and key_hash = $2`, prefix, hashHex)
 
 	return supplierID, scopes, nil
 }

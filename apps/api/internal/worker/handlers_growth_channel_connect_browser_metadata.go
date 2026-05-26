@@ -103,7 +103,7 @@ select id::text,
        status,
        coalesce(redirect_url, ''),
        callback_payload::text
-from public.channel_connection_sessions
+from shop.channel_connection_sessions
 where channel = $1
   and state_token = $2
 limit 1

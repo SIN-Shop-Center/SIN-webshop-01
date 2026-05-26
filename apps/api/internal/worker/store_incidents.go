@@ -25,7 +25,7 @@ func (s *Store) recordDLQIncident(ctx context.Context, j Job, reason string) err
 		return err
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.budget_incidents (channel, incident_type, severity, status, summary, payload)
+insert into shop.budget_incidents (channel, incident_type, severity, status, summary, payload)
 values ('all', 'dlq_job', $1, 'open', $2, $3::jsonb)
 `, severity, summary, string(payload))
 	return err

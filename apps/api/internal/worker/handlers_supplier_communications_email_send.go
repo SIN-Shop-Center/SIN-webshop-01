@@ -37,7 +37,7 @@ select supplier_id::text,
        coalesce(recipient, ''),
        coalesce(status, ''),
        coalesce(external_id, '')
-from public.supplier_communications
+from shop.supplier_communications
 where id::text = $1
 limit 1
 `, communicationID).Scan(&supplierID, &channel, &direction, &subject, &body, &recipient, &status, &externalID); err != nil {
@@ -61,7 +61,7 @@ limit 1
 	}
 
 	_, err = p.pool.Exec(ctx, `
-update public.supplier_communications
+update shop.supplier_communications
 set status = 'processing',
     updated_at = now()
 where id::text = $1
@@ -101,7 +101,7 @@ where id::text = $1
 
 func (p *Processor) markSupplierCommunicationSent(ctx context.Context, communicationID, externalID string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.supplier_communications
+update shop.supplier_communications
 set status = 'sent',
     external_id = $2,
     metadata = jsonb_set(coalesce(metadata, '{}'::jsonb), '{provider}', to_jsonb('gmail'::text), true),
@@ -113,7 +113,7 @@ where id::text = $1
 
 func (p *Processor) markSupplierCommunicationFailed(ctx context.Context, communicationID, reason string) error {
 	_, err := p.pool.Exec(ctx, `
-update public.supplier_communications
+update shop.supplier_communications
 set status = 'failed',
     metadata = jsonb_set(coalesce(metadata, '{}'::jsonb), '{last_error}', to_jsonb($2::text), true),
     updated_at = now()

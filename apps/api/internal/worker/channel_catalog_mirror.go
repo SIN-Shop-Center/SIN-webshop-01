@@ -67,9 +67,9 @@ from (
          p.metadata,
          case when c.id is null then null else jsonb_build_object('id', c.id::text, 'name', c.name, 'slug', c.slug) end as category,
          case when s.id is null then null else jsonb_build_object('id', s.id::text, 'name', s.name, 'email', s.email) end as supplier
-  from public.products p
-  left join public.categories c on c.id = p.category_id
-  left join public.suppliers s on s.id = p.supplier_id
+  from shop.products p
+  left join shop.categories c on c.id = p.category_id
+  left join shop.suppliers s on s.id = p.supplier_id
   where %s
   order by p.updated_at desc, p.created_at desc
   limit $1

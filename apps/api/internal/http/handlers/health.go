@@ -32,7 +32,7 @@ func loadCommerceReadiness(ctx context.Context, q healthReadinessQuerier) (comme
 	const query = `
 with ready_suppliers as (
   select distinct s.id
-  from public.suppliers s
+  from shop.suppliers s
   where s.auto_fulfill_enabled = true
     and s.status in ('approved', 'active')
     and s.onboarding_status = 'connected'
@@ -41,7 +41,7 @@ with ready_suppliers as (
       (
         coalesce(s.fulfillment_mode, 'email') = 'api'
         and coalesce(nullif(s.api_endpoint, ''), '') <> ''
-        and coalesce(nullif(public.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> ''
+        and coalesce(nullif(shop.resolve_supplier_secret_ref(s.api_secret_ref), ''), nullif(s.api_key, ''), '') <> ''
       )
       or
       (
@@ -52,12 +52,12 @@ with ready_suppliers as (
 ),
 ready_products as (
   select distinct p.id
-  from public.products p
+  from shop.products p
   where p.is_active = true
     and exists (
       with supplier_candidates as (
         select ps.supplier_id
-        from public.product_suppliers ps
+        from shop.product_suppliers ps
         where ps.product_id = p.id
           and ps.is_active = true
         union
@@ -70,7 +70,7 @@ ready_products as (
 ),
 active_products as (
   select count(*)::int as total
-  from public.products p
+  from shop.products p
   where p.is_active = true
 )
 select

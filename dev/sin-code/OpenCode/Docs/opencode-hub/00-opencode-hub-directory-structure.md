@@ -23,13 +23,13 @@ This document provides the **complete physical directory taxonomy** for the Open
 ```
 ~/.config/opencode/
 ├── opencode.json                 # 🔑 CORE: Provider & Plugin definitions
-├── oh-my-opencode.json           # 🤖 AGENTS: Model assignments & priorities
+├── oh-my-openagent.json           # 🤖 AGENTS: Model assignments & priorities
 ├── mcp.json                       # 📡 MCP: Server definitions & health config
 ├── antigravity-accounts.json      # 🔐 SECURE: OAuth tokens & credentials
 ├── config-schema.json             # 📋 VALIDATION: JSON Schema for opencode.json
 ├── .backup/
 │   ├── opencode.json.2026-01-26   # Timestamped backup after each change
-│   ├── oh-my-opencode.json.*      # Historical versions for RCA
+│   ├── oh-my-openagent.json.*      # Historical versions for RCA
 │   └── antigravity-accounts.json.* # Credential rotation audit trail
 ├── logs/
 │   ├── auth.log                   # OAuth flow & token refresh events
@@ -59,7 +59,7 @@ chmod 755 ~/.config/opencode/logs
 **Access Pattern:**
 ```
 Application → ~/.config/opencode/opencode.json (load providers)
-          → ~/.config/opencode/oh-my-opencode.json (load agents)
+          → ~/.config/opencode/oh-my-openagent.json (load agents)
           → ~/.config/opencode/antigravity-accounts.json (OAuth tokens)
           → ~/.config/opencode/cache/ (check caching layer)
 ```
@@ -283,7 +283,7 @@ START: User executes `opencode run --model google/gemini-3-pro "prompt"`
   ↓
 [4] Merge hierarchy: CLI > Project > Global > Defaults
   ↓
-[5] Load agent config: ~/.config/opencode/oh-my-opencode.json → {agents: {...}}
+[5] Load agent config: ~/.config/opencode/oh-my-openagent.json → {agents: {...}}
   ↓
 [6] Route to model: google/gemini-3-pro → Antigravity provider
   ↓
@@ -322,7 +322,7 @@ TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
 # Backup critical files
 cp ~/.config/opencode/opencode.json "$BACKUP_DIR/opencode.json.$TIMESTAMP"
-cp ~/.config/opencode/oh-my-opencode.json "$BACKUP_DIR/oh-my-opencode.json.$TIMESTAMP"
+cp ~/.config/opencode/oh-my-openagent.json "$BACKUP_DIR/oh-my-openagent.json.$TIMESTAMP"
 cp ~/.config/opencode/antigravity-accounts.json "$BACKUP_DIR/antigravity-accounts.json.$TIMESTAMP"
 
 # Keep only last 30 days
@@ -347,7 +347,7 @@ cp ~/.config/opencode/.backup/opencode.json.2026-01-26_02-00-00 ~/.config/openco
 ```
 ~/.config/opencode/
 ├── opencode.json              chmod 640  (owner read/write, group read)
-├── oh-my-opencode.json        chmod 640
+├── oh-my-openagent.json        chmod 640
 ├── antigravity-accounts.json  chmod 600  (owner read/write ONLY - SECRET!)
 ├── mcp.json                   chmod 644  (world-readable - no secrets)
 └── logs/                      chmod 700  (owner execute to enter)

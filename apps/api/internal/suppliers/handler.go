@@ -36,6 +36,10 @@ func (h *Handler) Webhook(c *gin.Context) {
 	)
 	apiKey := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 
+	isCJVerification := strings.Contains(string(rawBody), `"messageId"`) &&
+		strings.Contains(string(rawBody), `"messageType"`) &&
+		strings.Contains(string(rawBody), `"openId"`)
+
 	validAuth := false
 	if signature != "" && verifySignature(h.options.WebhookSecret, rawBody, signature) {
 		validAuth = true
@@ -49,10 +53,17 @@ func (h *Handler) Webhook(c *gin.Context) {
 				}
 			}
 		}
+	} else if isCJVerification {
+		validAuth = true
 	}
 
 	if !validAuth {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	if isCJVerification {
+		c.JSON(http.StatusOK, gin.H{"status": "verified"})
 		return
 	}
 

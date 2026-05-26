@@ -53,7 +53,7 @@ func (s *Store) UpsertSupplierCatalogProducts(ctx context.Context, supplierID st
 		switch {
 		case id != "":
 			tag, err := tx.Exec(ctx, `
-update public.supplier_catalog_products
+update shop.supplier_catalog_products
 set external_product_id = $3,
     supplier_sku = $4,
     title = $5,
@@ -84,7 +84,7 @@ where id = $1::uuid
 			affected++
 		case externalProductID != nil:
 			if _, err := tx.Exec(ctx, `
-insert into public.supplier_catalog_products (
+insert into shop.supplier_catalog_products (
   supplier_id, external_product_id, supplier_sku, title, description, source_url, image_url,
   currency, price, compare_at_price, minimum_order_quantity, stock_hint, lead_time_days,
   status, review_note, ai_score, metadata, discovered_at, last_seen_at
@@ -109,7 +109,7 @@ set supplier_sku = excluded.supplier_sku,
     status = excluded.status,
     review_note = excluded.review_note,
     ai_score = excluded.ai_score,
-    metadata = coalesce(public.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
+    metadata = coalesce(shop.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
     last_seen_at = now(),
     updated_at = now()
 `, supplierID, externalProductID, supplierSKU, title, description, sourceURL, imageURL, currency, price, compareAtPrice, moq, stockHint, leadTimeDays, status, reviewNote, aiScore, string(metadataJSON)); err != nil {
@@ -118,7 +118,7 @@ set supplier_sku = excluded.supplier_sku,
 			affected++
 		case supplierSKU != nil:
 			if _, err := tx.Exec(ctx, `
-insert into public.supplier_catalog_products (
+insert into shop.supplier_catalog_products (
   supplier_id, external_product_id, supplier_sku, title, description, source_url, image_url,
   currency, price, compare_at_price, minimum_order_quantity, stock_hint, lead_time_days,
   status, review_note, ai_score, metadata, discovered_at, last_seen_at
@@ -142,7 +142,7 @@ set title = excluded.title,
     status = excluded.status,
     review_note = excluded.review_note,
     ai_score = excluded.ai_score,
-    metadata = coalesce(public.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
+    metadata = coalesce(shop.supplier_catalog_products.metadata, '{}'::jsonb) || excluded.metadata,
     last_seen_at = now(),
     updated_at = now()
 `, supplierID, supplierSKU, title, description, sourceURL, imageURL, currency, price, compareAtPrice, moq, stockHint, leadTimeDays, status, reviewNote, aiScore, string(metadataJSON)); err != nil {
@@ -151,7 +151,7 @@ set title = excluded.title,
 			affected++
 		default:
 			if _, err := tx.Exec(ctx, `
-insert into public.supplier_catalog_products (
+insert into shop.supplier_catalog_products (
   supplier_id, title, description, source_url, image_url, currency, price, compare_at_price,
   minimum_order_quantity, stock_hint, lead_time_days, status, review_note, ai_score, metadata, discovered_at, last_seen_at
 )
@@ -172,7 +172,7 @@ values (
 		actorParam = actorUUID
 	}
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   'catalog.products.ingested',

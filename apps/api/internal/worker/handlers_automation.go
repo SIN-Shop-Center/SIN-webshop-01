@@ -37,7 +37,7 @@ func (p *Processor) handleTrendRun(ctx context.Context, job Job, payload map[str
 	score := asFloat(payload["score"])
 
 	_, err := p.pool.Exec(ctx, `
-insert into public.trends (id, source, title, summary, score, metadata, report_date)
+insert into shop.trends (id, source, title, summary, score, metadata, report_date)
 values ($1::uuid, 'automation.trend', $2, $3, $4, $5::jsonb, $6)
 on conflict (id) do update
 set summary = excluded.summary,
@@ -53,7 +53,7 @@ func (p *Processor) handleSupplierRun(ctx context.Context, job Job, payload map[
 	summary := defaultText(asString(payload["summary"]), "Automated supplier run")
 
 	_, err := p.pool.Exec(ctx, `
-insert into public.trends (id, source, title, summary, score, metadata, report_date)
+insert into shop.trends (id, source, title, summary, score, metadata, report_date)
 values ($1::uuid, 'automation.supplier', $2, $3, null, $4::jsonb, $5)
 on conflict (id) do update
 set summary = excluded.summary,
@@ -68,7 +68,7 @@ func (p *Processor) handleSocialRun(ctx context.Context, job Job, payload map[st
 	content := defaultText(asString(payload["content"]), "Automated social draft")
 
 	_, err := p.pool.Exec(ctx, `
-insert into public.social_posts (id, channel, status, content, media_urls, metadata)
+insert into shop.social_posts (id, channel, status, content, media_urls, metadata)
 values ($1::uuid, $2, 'draft', $3, '{}'::text[], $4::jsonb)
 on conflict (id) do update
 set channel = excluded.channel,

@@ -28,7 +28,7 @@ func (s *Store) TriggerInventoryReorderScan(ctx context.Context, body map[string
 	}
 
 	_, err = s.pool.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('inventory.reorder.scan.requested', 'inventory', 'reorder-scan', $1::jsonb, 'pending')
 `, string(blob))
 	if err != nil {

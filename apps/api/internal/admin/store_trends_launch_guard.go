@@ -17,9 +17,9 @@ func (s *Store) loadTrendLaunchGuardContext(ctx context.Context, candidateID str
 	const query = `
 select coalesce(lower(c.slug), lower(c.name), 'uncategorized'),
        coalesce(tc.country_scope, '{DE}'::text[])
-from public.trend_candidates tc
-left join public.products p on p.id = tc.product_id
-left join public.categories c on c.id = p.category_id
+from shop.trend_candidates tc
+left join shop.products p on p.id = tc.product_id
+left join shop.categories c on c.id = p.category_id
 where tc.id::text = $1
 limit 1
 `
@@ -64,7 +64,7 @@ func (s *Store) isChannelReady(ctx context.Context, channel string) (bool, error
 	const query = `
 select exists (
   select 1
-  from public.channel_accounts
+  from shop.channel_accounts
   where channel = $1
     and status = any($2::text[])
 )
@@ -99,7 +99,7 @@ func resolveTrendDecision(defaultDecision string, countryDefaults, channelDefaul
 func (s *Store) resolveCategoryPolicy(ctx context.Context, categoryKey, country, channel string) (string, error) {
 	const query = `
 select policy_state
-from public.category_policies
+from shop.category_policies
 where category_key = $1
   and country = $2
   and channel = any($3::text[])
@@ -121,7 +121,7 @@ limit 1
 func (s *Store) hasComplianceBlock(ctx context.Context, country, channel string) (bool, string, error) {
 	const query = `
 select rule_key
-from public.compliance_rules
+from shop.compliance_rules
 where state = 'active'
   and country = any($1::text[])
   and channel = any($2::text[])

@@ -7,7 +7,7 @@ import (
 
 func (s *Store) ListSuppliers(ctx context.Context, p SupplierListParams) ([]map[string]any, int, error) {
 	where, args := supplierWhereClause(p)
-	countQuery := "select count(*) from public.suppliers s where " + where
+	countQuery := "select count(*) from shop.suppliers s where " + where
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -61,8 +61,8 @@ from (
          s.metadata,
          s.created_at,
          s.updated_at,
-         (select count(*) from public.products p where p.supplier_id = s.id) as products_count
-  from public.suppliers s
+         (select count(*) from shop.products p where p.supplier_id = s.id) as products_count
+  from shop.suppliers s
   where %s
   order by %s %s
   limit $%d offset $%d
@@ -120,7 +120,7 @@ from (
                       metadata,
                       last_rotated_at,
                       (coalesce(nullif(secret_ref, ''), '') <> '') as has_secret
-               from public.supplier_credentials_refs
+               from shop.supplier_credentials_refs
                where supplier_id = s.id
                order by updated_at desc
                limit 1
@@ -140,7 +140,7 @@ from (
                       started_at,
                       finished_at,
                       updated_at
-               from public.supplier_onboarding_runs
+               from shop.supplier_onboarding_runs
                where supplier_id = s.id
                order by created_at desc
                limit 1
@@ -151,12 +151,12 @@ from (
          coalesce(
            (
              select jsonb_agg(jsonb_build_object('id', p.id::text, 'name', p.name, 'price', p.price, 'stock', p.stock, 'is_active', p.is_active))
-             from public.products p
+             from shop.products p
              where p.supplier_id = s.id
            ),
            '[]'::jsonb
          ) as products
-  from public.suppliers s
+  from shop.suppliers s
   where s.id::text = $1
   limit 1
 ) t

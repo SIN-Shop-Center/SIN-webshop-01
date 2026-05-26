@@ -16,7 +16,7 @@ func (s *Store) CreateCustomer(ctx context.Context, body map[string]any) (map[st
 	}
 
 	var exists bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.customers where email = $1)`, email).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.customers where email = $1)`, email).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if exists {
@@ -26,7 +26,7 @@ func (s *Store) CreateCustomer(ctx context.Context, body map[string]any) (map[st
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.customers (email, name, phone, address)
+  insert into shop.customers (email, name, phone, address)
   values ($1, $2, $3, $4)
   returning id::text as id, email, name, phone, address, metadata, created_at, updated_at
 ) t
@@ -37,7 +37,7 @@ from (
 func (s *Store) UpdateCustomer(ctx context.Context, id string, body map[string]any) (map[string]any, error) {
 	if email := asString(body["email"]); email != "" {
 		var exists bool
-		if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.customers where email = $1 and id::text <> $2)`, email, id).Scan(&exists); err != nil {
+		if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.customers where email = $1 and id::text <> $2)`, email, id).Scan(&exists); err != nil {
 			return nil, err
 		}
 		if exists {
@@ -75,7 +75,7 @@ func (s *Store) UpdateCustomer(ctx context.Context, id string, body map[string]a
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.customers
+  update shop.customers
   set %s
   where id::text = $%d
   returning id::text as id, email, name, phone, address, metadata, created_at, updated_at
@@ -87,14 +87,14 @@ from (
 
 func (s *Store) DeleteCustomer(ctx context.Context, id string) error {
 	var orderCount int
-	if err := s.pool.QueryRow(ctx, `select count(*) from public.orders where customer_id::text = $1`, id).Scan(&orderCount); err != nil {
+	if err := s.pool.QueryRow(ctx, `select count(*) from shop.orders where customer_id::text = $1`, id).Scan(&orderCount); err != nil {
 		return err
 	}
 	if orderCount > 0 {
 		return errBlocked
 	}
 
-	cmd, err := s.pool.Exec(ctx, `delete from public.customers where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.customers where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

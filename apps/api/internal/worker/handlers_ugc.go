@@ -47,7 +47,7 @@ func (p *Processor) handleUGCAutopilotScanRequested(ctx context.Context, _ Job) 
 	var personAssetID string
 	err = p.pool.QueryRow(ctx, `
 select id::text
-from public.ugc_person_assets
+from shop.ugc_person_assets
 where coalesce(is_default, false) = true
 order by updated_at desc
 limit 1
@@ -65,19 +65,19 @@ limit 1
 	}
 	rows, err := p.pool.Query(ctx, `
 select p.id::text
-from public.products p
+from shop.products p
 where p.is_active = true
   and coalesce(jsonb_array_length(p.images), 0) > 0
   and (
     select count(*)
-    from public.ugc_generation_runs r_daily
+    from shop.ugc_generation_runs r_daily
     where r_daily.product_id = p.id
       and r_daily.person_asset_id = $1::uuid
       and r_daily.created_at >= now() - interval '1 day'
   ) < $2
   and not exists (
     select 1
-    from public.ugc_generation_runs r_active
+    from shop.ugc_generation_runs r_active
     where r_active.product_id = p.id
       and r_active.person_asset_id = $1::uuid
       and r_active.status in ('queued', 'planning', 'generating', 'voicing', 'qa_review')
@@ -186,9 +186,9 @@ from (
            'source_data_url', pa.source_data_url,
            'metadata', pa.metadata
          ) as person_asset
-  from public.ugc_generation_runs r
-  join public.products p on p.id = r.product_id
-  join public.ugc_person_assets pa on pa.id = r.person_asset_id
+  from shop.ugc_generation_runs r
+  join shop.products p on p.id = r.product_id
+  join shop.ugc_person_assets pa on pa.id = r.person_asset_id
   where r.id::text = $1
   limit 1
 ) t
@@ -214,7 +214,7 @@ func (p *Processor) setUGCRunState(ctx context.Context, runID, status, message, 
 		return err
 	}
 	_, err = p.pool.Exec(ctx, `
-update public.ugc_generation_runs
+update shop.ugc_generation_runs
 set status = $2,
     status_message = nullif($3, ''),
     last_error = nullif($4, ''),
@@ -1145,7 +1145,7 @@ func (p *Processor) replaceUGCVariants(ctx context.Context, runID string, run ma
 	if err := p.purgeUGCAssetBankForRun(ctx, runID); err != nil {
 		return err
 	}
-	if _, err := p.pool.Exec(ctx, `delete from public.ugc_generation_variants where run_id::text = $1`, runID); err != nil {
+	if _, err := p.pool.Exec(ctx, `delete from shop.ugc_generation_variants where run_id::text = $1`, runID); err != nil {
 		return err
 	}
 
@@ -1160,7 +1160,7 @@ func (p *Processor) replaceUGCVariants(ctx context.Context, runID string, run ma
 		}
 		var variantID string
 		err = p.pool.QueryRow(ctx, `
-insert into public.ugc_generation_variants (
+insert into shop.ugc_generation_variants (
   run_id,
   creative_asset_id,
   variant_role,
@@ -1223,7 +1223,7 @@ func (p *Processor) createUGCCreativeAsset(ctx context.Context, runID string, ru
 
 	var creativeAssetID string
 	err = p.pool.QueryRow(ctx, `
-insert into public.creative_assets (
+insert into shop.creative_assets (
   channel,
   asset_type,
   title,

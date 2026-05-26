@@ -74,7 +74,7 @@ func (p *Processor) handleSupplierRegistrationRequested(ctx context.Context, job
 			return err
 		}
 		if _, err := p.pool.Exec(ctx, `
-update public.supplier_onboarding_runs
+update shop.supplier_onboarding_runs
 set execution_mode = 'browser',
     updated_at = now()
 where id::text = $1

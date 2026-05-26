@@ -10,7 +10,7 @@ func (s *Store) ListCreatives(ctx context.Context, limit, offset int) ([]map[str
 select row_to_json(t)
 from (
   select id::text, channel, asset_type, title, hook, status, storage_url, tags, metadata, created_at, updated_at
-  from public.creative_assets
+  from shop.creative_assets
   order by updated_at desc
   limit $1 offset $2
 ) t
@@ -43,7 +43,7 @@ func (s *Store) CreateCreative(ctx context.Context, in map[string]any) (map[stri
 
 	const query = `
 with created as (
-  insert into public.creative_assets (channel, asset_type, title, hook, status, storage_url, tags, metadata)
+  insert into shop.creative_assets (channel, asset_type, title, hook, status, storage_url, tags, metadata)
   values ($1, $2, $3, nullif($4, ''), $5, nullif($6, ''), $7, $8::jsonb)
   returning id::text, channel, asset_type, title, hook, status, storage_url, tags, metadata, created_at, updated_at
 )

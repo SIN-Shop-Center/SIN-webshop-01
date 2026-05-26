@@ -16,7 +16,7 @@ func (s *Store) ProcessStripeEvent(ctx context.Context, in StripeEventEnvelope) 
 
 	var inboxID string
 	err = tx.QueryRow(ctx, `
-insert into public.event_inbox (external_event_id, event_type, payload, status)
+insert into shop.event_inbox (external_event_id, event_type, payload, status)
 values ($1, $2, $3::jsonb, 'processing')
 on conflict (external_event_id) do nothing
 returning id::text
@@ -39,7 +39,7 @@ returning id::text
 	}
 
 	_, err = tx.Exec(ctx, `
-update public.event_inbox
+update shop.event_inbox
 set status = 'processed', processed_at = now(), updated_at = now(), error_message = null
 where id::text = $1
 `, inboxID)
@@ -57,7 +57,7 @@ func (s *Store) resolveOrderIDForEvent(ctx context.Context, tx pgx.Tx, orderID, 
 	var resolved string
 	err := tx.QueryRow(ctx, `
 select order_id::text
-from public.checkout_sessions
+from shop.checkout_sessions
 where stripe_session_id = $1
 `, sessionID).Scan(&resolved)
 	if err == pgx.ErrNoRows {
@@ -72,7 +72,7 @@ func (s *Store) applyOrderTransition(ctx context.Context, tx pgx.Tx, orderID str
 		return nil
 	}
 	res, err := tx.Exec(ctx, `
-update public.orders
+update shop.orders
 set payment_status = $1,
     status = $2,
     payment_provider = 'stripe',
@@ -86,7 +86,7 @@ where id::text = $4
 	}
 	if in.SessionID != "" && res.RowsAffected() > 0 {
 		_, err = tx.Exec(ctx, `
-update public.checkout_sessions
+update shop.checkout_sessions
 set status = $1, updated_at = now()
 where stripe_session_id = $2
 `, transition, in.SessionID)
@@ -105,7 +105,7 @@ where stripe_session_id = $2
 			return err
 		}
 		_, err = tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('payment.succeeded', 'payment', $1, $2::jsonb, 'pending')
 `, orderID, string(body))
 		if err != nil {

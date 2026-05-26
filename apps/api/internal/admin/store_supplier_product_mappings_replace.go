@@ -34,8 +34,8 @@ from (
          ps.lead_time_days,
          ps.reorder_min_stock,
          ps.reorder_target_stock
-  from public.product_suppliers ps
-  join public.products p on p.id = ps.product_id
+  from shop.product_suppliers ps
+  join shop.products p on p.id = ps.product_id
   where ps.supplier_id = $1::uuid
   order by ps.is_primary desc, ps.priority asc, ps.updated_at desc, ps.created_at desc
 ) t
@@ -45,7 +45,7 @@ from (
 		return SupplierProductMappingsPage{}, err
 	}
 
-	if _, err := tx.Exec(ctx, `delete from public.product_suppliers where supplier_id = $1::uuid`, supplierID); err != nil {
+	if _, err := tx.Exec(ctx, `delete from shop.product_suppliers where supplier_id = $1::uuid`, supplierID); err != nil {
 		return SupplierProductMappingsPage{}, err
 	}
 
@@ -93,7 +93,7 @@ from (
 
 		if isPrimary {
 			if _, err := tx.Exec(ctx, `
-update public.product_suppliers
+update shop.product_suppliers
 set is_primary = false,
     updated_at = now()
 where product_id = $1::uuid
@@ -105,7 +105,7 @@ where product_id = $1::uuid
 		}
 
 		if _, err := tx.Exec(ctx, `
- insert into public.product_suppliers (
+ insert into shop.product_suppliers (
   product_id,
   supplier_id,
   priority,
@@ -156,7 +156,7 @@ set priority = excluded.priority,
 		actorParam = actorUUID
 	}
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   'product.mappings.updated',

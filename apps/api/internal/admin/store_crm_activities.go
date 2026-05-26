@@ -20,7 +20,7 @@ func (s *Store) ListCRMActivities(ctx context.Context, page, limit int, entityTy
 	whereClause := strings.Join(where, " and ")
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.crm_activities where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.crm_activities where "+whereClause, args...).Scan(&total); err != nil {
 		return CRMPage{}, err
 	}
 
@@ -38,7 +38,7 @@ from (
          message,
          metadata,
          created_at
-  from public.crm_activities
+  from shop.crm_activities
   where %s
   order by created_at desc
   limit $%d offset $%d
@@ -74,7 +74,7 @@ func (s *Store) CreateCRMActivity(ctx context.Context, body map[string]any, acto
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.crm_activities (
+  insert into shop.crm_activities (
     entity_type, entity_id, activity_type, severity, actor_type, actor_id, message, metadata
   ) values (
     $1, $2, $3, $4, $5, $6::uuid, $7, coalesce($8::jsonb, '{}'::jsonb)

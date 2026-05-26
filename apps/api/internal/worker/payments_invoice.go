@@ -45,7 +45,7 @@ func (p *Processor) ensureInvoice(ctx context.Context, order *orderAggregate) (*
 	}
 
 	_, err = p.pool.Exec(ctx, `
-update public.invoices
+update shop.invoices
 set pdf_path = $2, pdf_sha256 = $3, updated_at = now()
 where order_id::text = $1
 `, order.ID, realPath, realSHA)

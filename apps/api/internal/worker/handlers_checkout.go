@@ -68,7 +68,7 @@ func (p *Processor) handleCheckoutSession(ctx context.Context, job Job) error {
 	defer tx.Rollback(ctx)
 
 	var exists bool
-	if err := tx.QueryRow(ctx, `select exists(select 1 from public.orders where id = $1::uuid)`, orderID).Scan(&exists); err != nil {
+	if err := tx.QueryRow(ctx, `select exists(select 1 from shop.orders where id = $1::uuid)`, orderID).Scan(&exists); err != nil {
 		return err
 	}
 	if exists {
@@ -76,7 +76,7 @@ func (p *Processor) handleCheckoutSession(ctx context.Context, job Job) error {
 	}
 
 	_, err = tx.Exec(ctx, `
-insert into public.orders (
+insert into shop.orders (
   id, user_id, email, status, payment_status, currency,
   subtotal_amount, shipping_amount, tax_amount, total_amount,
   shipping_method
@@ -101,7 +101,7 @@ values (
 
 	for _, item := range items {
 		_, err := tx.Exec(ctx, `
-insert into public.order_items (order_id, sku, title, quantity, unit_price_amount)
+insert into shop.order_items (order_id, sku, title, quantity, unit_price_amount)
 values ($1::uuid, $2, nullif($3, ''), $4, $5)
 `, orderID, item["sku"], item["title"], item["quantity"], item["unit_price_amount"])
 		if err != nil {
@@ -118,7 +118,7 @@ values ($1::uuid, $2, nullif($3, ''), $4, $5)
 		return err
 	}
 	_, err = tx.Exec(ctx, `
-insert into public.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
+insert into shop.event_outbox (event_type, aggregate_type, aggregate_id, payload, status)
 values ('order.created', 'order', $1, $2::jsonb, 'pending')
 `, orderID, string(eventPayload))
 	if err != nil {

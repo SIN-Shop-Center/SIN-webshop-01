@@ -22,8 +22,8 @@ from (
          c.last_rotated_at,
          (coalesce(nullif(c.secret_ref, ''), '') <> '') as has_secret,
          s.updated_at as supplier_updated_at
-  from public.suppliers s
-  left join public.supplier_credentials_refs c
+  from shop.suppliers s
+  left join shop.supplier_credentials_refs c
     on c.supplier_id = s.id
    and c.provider = $2
   where s.id::text = $1
@@ -74,8 +74,8 @@ from (
          c.last_rotated_at,
          (coalesce(nullif(c.secret_ref, ''), '') <> '') as has_secret,
          s.updated_at as supplier_updated_at
-  from public.suppliers s
-  left join public.supplier_credentials_refs c
+  from shop.suppliers s
+  left join shop.supplier_credentials_refs c
     on c.supplier_id = s.id
    and c.provider = $2
   where s.id::text = $1
@@ -89,7 +89,7 @@ from (
 
 	if secret != "" {
 		if _, err := tx.Exec(ctx, `
-select public.set_supplier_secret_ref(
+select shop.set_supplier_secret_ref(
   $1::uuid,
   $2,
   $3,
@@ -102,7 +102,7 @@ select public.set_supplier_secret_ref(
 		}
 	} else {
 		if _, err := tx.Exec(ctx, `
-insert into public.supplier_credentials_refs (
+insert into shop.supplier_credentials_refs (
   supplier_id, provider, secret_ref, username, metadata, created_by
 )
 values (
@@ -110,7 +110,7 @@ values (
 )
 on conflict (supplier_id, provider) do update
 set username = excluded.username,
-    metadata = coalesce(public.supplier_credentials_refs.metadata, '{}'::jsonb) || excluded.metadata,
+    metadata = coalesce(shop.supplier_credentials_refs.metadata, '{}'::jsonb) || excluded.metadata,
     updated_at = now()
 `, supplierID, resolvedProvider, username, string(metadataJSON), actorParam); err != nil {
 			return nil, err
@@ -118,7 +118,7 @@ set username = excluded.username,
 	}
 
 	if _, err := tx.Exec(ctx, `
-insert into public.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
+insert into shop.supplier_activity_log (supplier_id, activity_type, severity, actor_type, actor_id, message, metadata)
 values (
   $1::uuid,
   'credentials.updated',

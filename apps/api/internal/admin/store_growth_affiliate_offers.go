@@ -11,7 +11,7 @@ func (s *Store) ListAffiliateOffers(ctx context.Context, limit, offset int) ([]m
 select row_to_json(t)
 from (
   select id::text, creator_id::text, code, commission_pct, status, valid_from, valid_to, metadata, created_at, updated_at
-  from public.affiliate_offers
+  from shop.affiliate_offers
   order by created_at desc
   limit $1 offset $2
 ) t
@@ -37,7 +37,7 @@ func (s *Store) CreateAffiliateOffer(ctx context.Context, in map[string]any) (ma
 
 	const query = `
 with created as (
-  insert into public.affiliate_offers (creator_id, code, commission_pct, status, valid_from, valid_to, metadata)
+  insert into shop.affiliate_offers (creator_id, code, commission_pct, status, valid_from, valid_to, metadata)
   values (nullif($1, '')::uuid, $2, $3, $4, coalesce(nullif($5, '')::timestamptz, now()), nullif($6, '')::timestamptz, $7::jsonb)
   returning id::text, creator_id::text, code, commission_pct, status, valid_from, valid_to, metadata, created_at, updated_at
 )

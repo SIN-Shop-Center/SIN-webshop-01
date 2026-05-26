@@ -16,7 +16,7 @@ func (s *Store) CreatePromotion(ctx context.Context, body map[string]any) (map[s
 	code := strings.ToUpper(asString(body["code"]))
 	if code != "" {
 		var exists bool
-		if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.promotions where code = $1)`, code).Scan(&exists); err != nil {
+		if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.promotions where code = $1)`, code).Scan(&exists); err != nil {
 			return nil, err
 		}
 		if exists {
@@ -27,7 +27,7 @@ func (s *Store) CreatePromotion(ctx context.Context, body map[string]any) (map[s
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.promotions (
+  insert into shop.promotions (
     name, description, type, code, discount_value, discount_percentage,
     minimum_order, maximum_discount, usage_limit, usage_count, per_customer_limit,
     start_date, end_date, is_active, applies_to, category_ids, product_ids,

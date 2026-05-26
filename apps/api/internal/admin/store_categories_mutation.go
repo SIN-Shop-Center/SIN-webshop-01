@@ -16,7 +16,7 @@ func (s *Store) CreateCategory(ctx context.Context, body map[string]any) (map[st
 	}
 
 	var exists bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.categories where slug = $1)`, slug).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.categories where slug = $1)`, slug).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if exists {
@@ -26,7 +26,7 @@ func (s *Store) CreateCategory(ctx context.Context, body map[string]any) (map[st
 	const query = `
 select row_to_json(t)::jsonb
 from (
-  insert into public.categories (name, slug, description, image, parent_id)
+  insert into shop.categories (name, slug, description, image, parent_id)
   values ($1, $2, $3, $4, nullif($5, '')::uuid)
   returning id::text as id, name, slug, description, image,
             parent_id::text as parent_id, is_active, created_at, updated_at
@@ -46,7 +46,7 @@ func (s *Store) UpdateCategory(ctx context.Context, id string, body map[string]a
 	if slugRaw, ok := body["slug"]; ok {
 		slug := slugify(asString(slugRaw))
 		var exists bool
-		if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.categories where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
+		if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.categories where slug = $1 and id::text <> $2)`, slug, id).Scan(&exists); err != nil {
 			return nil, err
 		}
 		if exists {
@@ -84,7 +84,7 @@ func (s *Store) UpdateCategory(ctx context.Context, id string, body map[string]a
 	query := fmt.Sprintf(`
 select row_to_json(t)::jsonb
 from (
-  update public.categories
+  update shop.categories
   set %s
   where id::text = $%d
   returning id::text as id, name, slug, description, image,
@@ -97,14 +97,14 @@ from (
 
 func (s *Store) DeleteCategory(ctx context.Context, id string) error {
 	var productCount int
-	if err := s.pool.QueryRow(ctx, `select count(*) from public.products where category_id::text = $1`, id).Scan(&productCount); err != nil {
+	if err := s.pool.QueryRow(ctx, `select count(*) from shop.products where category_id::text = $1`, id).Scan(&productCount); err != nil {
 		return err
 	}
 	if productCount > 0 {
 		return errBlocked
 	}
 
-	cmd, err := s.pool.Exec(ctx, `delete from public.categories where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.categories where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

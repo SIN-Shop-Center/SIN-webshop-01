@@ -12,9 +12,9 @@ func (p *Processor) handleFulfillmentStarted(ctx context.Context, job Job) error
 	}
 
 	_, err = p.pool.Exec(ctx, `
-insert into public.shipments (order_id, carrier, status)
+insert into shop.shipments (order_id, carrier, status)
 select $1::uuid, 'dhl', 'label_created'
-where not exists (select 1 from public.shipments where order_id::text = $1)
+where not exists (select 1 from shop.shipments where order_id::text = $1)
 `, orderID)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (p *Processor) handleShipmentUpdated(ctx context.Context, job Job) error {
 	}
 
 	_, err = p.pool.Exec(ctx, `
-update public.orders
+update shop.orders
 set tracking_number = nullif($2, ''),
     tracking_url = nullif($3, ''),
     updated_at = now()
@@ -93,7 +93,7 @@ func (p *Processor) readOrderEmailAndStatus(ctx context.Context, orderID string)
 	var status string
 	err := p.pool.QueryRow(ctx, `
 select email, status
-from public.orders
+from shop.orders
 where id::text = $1
 limit 1
 `, orderID).Scan(&email, &status)

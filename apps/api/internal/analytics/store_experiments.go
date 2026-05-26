@@ -75,7 +75,7 @@ type experimentCount struct {
 func (s *Store) experimentExposures(ctx context.Context, since, until time.Time) ([]experimentCount, error) {
 	const query = `
 select payload->>'experiment_id' as experiment_id, payload->>'variant' as variant, count(*)::int as count
-from public.analytics_events
+from shop.analytics_events
 where occurred_at >= $1 and occurred_at < $2
   and event_type = 'trust_panel_opened'
   and payload->>'module' = 'ab_experiment'
@@ -89,7 +89,7 @@ group by payload->>'experiment_id', payload->>'variant'
 func (s *Store) eventByExperiment(ctx context.Context, since, until time.Time, eventType string) ([]experimentCount, error) {
 	const query = `
 select exp.key as experiment_id, exp.value as variant, count(*)::int as count
-from public.analytics_events e
+from shop.analytics_events e
 cross join lateral jsonb_each_text(coalesce(e.payload->'_experiments', '{}'::jsonb)) exp
 where e.occurred_at >= $1 and e.occurred_at < $2 and e.event_type = $3
 group by exp.key, exp.value

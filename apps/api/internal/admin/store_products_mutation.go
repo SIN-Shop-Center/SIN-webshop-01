@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Store) DeleteProduct(ctx context.Context, id string) error {
-	cmd, err := s.pool.Exec(ctx, `delete from public.products where id::text = $1`, id)
+	cmd, err := s.pool.Exec(ctx, `delete from shop.products where id::text = $1`, id)
 	if err != nil {
 		return err
 	}

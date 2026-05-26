@@ -19,7 +19,7 @@ func (s *Store) ListOrdersByUser(ctx context.Context, userID string, limit, offs
 	const query = `
 select id::text, status, currency, total_amount, total, payment_status,
        tracking_number, tracking_url, created_at, updated_at
-from public.orders
+from shop.orders
 where user_id = $1
 order by created_at desc
 limit $2 offset $3
@@ -57,7 +57,7 @@ func (s *Store) GetOrderByUser(ctx context.Context, userID, orderID string) (*Or
 	const orderQuery = `
 select id::text, status, currency, total_amount, total, payment_status,
        tracking_number, tracking_url, created_at, updated_at
-from public.orders
+from shop.orders
 where id::text = $1 and user_id = $2
 limit 1
 `
@@ -81,7 +81,7 @@ limit 1
 
 	const itemQuery = `
 select id::text, product_id::text, sku, title, variant, quantity, price, unit_price_amount
-from public.order_items
+from shop.order_items
 where order_id::text = $1
 order by created_at asc
 `

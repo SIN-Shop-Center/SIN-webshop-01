@@ -8,7 +8,7 @@ import (
 
 func (s *Store) ListBlogPosts(ctx context.Context, p BlogListParams) ([]map[string]any, int, error) {
 	where, args := blogWhereClause(p)
-	countQuery := "select count(*) from public.blog_posts b where " + where
+	countQuery := "select count(*) from shop.blog_posts b where " + where
 
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
@@ -45,7 +45,7 @@ from (
          b.views,
          b.created_at,
          b.updated_at
-  from public.blog_posts b
+  from shop.blog_posts b
   where %s
   order by %s %s
   limit $%d offset $%d
@@ -100,7 +100,7 @@ from (
          b.views,
          b.created_at,
          b.updated_at
-  from public.blog_posts b
+  from shop.blog_posts b
   where b.id::text = $1 or b.slug = $1
   order by b.updated_at desc
   limit 1

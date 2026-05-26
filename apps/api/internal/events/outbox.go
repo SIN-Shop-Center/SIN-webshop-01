@@ -9,7 +9,7 @@ import (
 
 const fetchPendingOutboxSQL = `
 select id, event_type, payload
-from public.event_outbox
+from shop.event_outbox
 where status = 'pending'
   and available_at <= now()
 order by created_at asc
@@ -85,13 +85,13 @@ func ProcessOutbox(ctx context.Context, pool *pgxpool.Pool) (int, error) {
 		queueName := queueForEvent(ev.EventType)
 
 		_, queueErr := tx.Exec(ctx, `
-insert into public.queue_jobs (queue_name, job_type, dedupe_key, payload, status, available_at)
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status, available_at)
 values ($1, $2, $3, $4::jsonb, 'pending', now())
 on conflict (queue_name, dedupe_key) do nothing
 `, queueName, ev.EventType, ev.ID, string(ev.Payload))
 		if queueErr != nil {
 			_, _ = tx.Exec(ctx, `
-update public.event_outbox
+update shop.event_outbox
 set status = 'failed',
     attempt_count = attempt_count + 1,
     last_error = $2,
@@ -102,7 +102,7 @@ where id = $1
 		}
 
 		_, markErr := tx.Exec(ctx, `
-update public.event_outbox
+update shop.event_outbox
 set status = 'published',
     published_at = now(),
     attempt_count = attempt_count + 1,

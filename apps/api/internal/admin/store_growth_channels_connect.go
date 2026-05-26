@@ -47,7 +47,7 @@ func (s *Store) CompleteChannelConnect(ctx context.Context, channel, stateToken,
 	var sessionID string
 	err = tx.QueryRow(ctx, `
 select id::text
-from public.channel_connection_sessions
+from shop.channel_connection_sessions
 where channel = $1
   and state_token = $2
   and status = 'pending'
@@ -99,7 +99,7 @@ func (s *Store) upsertChannelAccount(ctx context.Context, tx pgx.Tx, channel, ac
 	var accountID string
 	connectionMode := channelConnectMode(channel)
 	err := tx.QueryRow(ctx, `
-insert into public.channel_accounts (
+insert into shop.channel_accounts (
   channel, account_name, account_external_id, status, connection_mode, auth_snapshot, health_snapshot, last_connected_at, last_health_at
 )
 values ($1, $2, nullif($3, ''), 'connected', $4, $5::jsonb, $6::jsonb, now(), now())
@@ -132,7 +132,7 @@ returning id::text, id::text, channel, account_name, status, connection_mode, la
 
 func (s *Store) markChannelConnectSessionComplete(ctx context.Context, tx pgx.Tx, sessionID, accountID, callbackPayload string) error {
 	_, err := tx.Exec(ctx, `
-update public.channel_connection_sessions
+update shop.channel_connection_sessions
 set status = 'completed',
     account_id = $2::uuid,
     callback_payload = $3::jsonb,

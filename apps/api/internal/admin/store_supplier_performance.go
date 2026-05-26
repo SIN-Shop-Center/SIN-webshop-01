@@ -29,8 +29,8 @@ from (
       'avg_place_latency_seconds', coalesce(lat.avg_seconds, 0),
       'p95_place_latency_seconds', coalesce(lat.p95_seconds, 0)
     ) as metrics
-  from public.suppliers s
-  left join public.supplier_orders so
+  from shop.suppliers s
+  left join shop.supplier_orders so
     on so.supplier_id = s.id
    and so.created_at >= now() - ($2 || ' days')::interval
   left join lateral (
@@ -38,7 +38,7 @@ from (
       avg(extract(epoch from (so2.placed_at - so2.created_at))) as avg_seconds,
       percentile_cont(0.95) within group (order by extract(epoch from (so2.placed_at - so2.created_at))) as p95_seconds,
       avg(case when so2.placed_at <= so2.created_at + (s.sla_hours || ' hours')::interval then 1 else 0 end) as on_time_rate
-    from public.supplier_orders so2
+    from shop.supplier_orders so2
     where so2.supplier_id = s.id
       and so2.status = 'placed'
       and so2.placed_at is not null

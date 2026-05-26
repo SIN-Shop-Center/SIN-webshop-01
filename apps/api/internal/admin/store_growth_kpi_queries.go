@@ -6,13 +6,13 @@ func (s *Store) paymentToSupplierRate(ctx context.Context) (float64, error) {
 	const query = `
 with paid_orders as (
   select id
-  from public.orders
+  from shop.orders
   where payment_status = 'paid'
     and created_at >= now() - interval '14 days'
 ),
 supplier_ok as (
   select distinct so.order_id
-  from public.supplier_orders so
+  from shop.supplier_orders so
   join paid_orders p on p.id = so.order_id
   where so.status = 'placed'
 )
@@ -35,13 +35,13 @@ func (s *Store) paymentToConfirmationMailRate(ctx context.Context) (float64, err
 	const query = `
 with paid_orders as (
   select id
-  from public.orders
+  from shop.orders
   where payment_status = 'paid'
     and created_at >= now() - interval '14 days'
 ),
 mail_ok as (
   select distinct e.order_id
-  from public.email_log e
+  from shop.email_log e
   join paid_orders p on p.id = e.order_id
   where e.email_type = 'order_confirmation'
     and e.status = 'sent'
@@ -64,7 +64,7 @@ select
 func (s *Store) criticalDLQ24h(ctx context.Context) (float64, error) {
 	const query = `
 select count(*)::float8
-from public.queue_dead_letter
+from shop.queue_dead_letter
 where created_at >= now() - interval '24 hours'
   and job_type = any($1::text[])
 `
@@ -85,13 +85,13 @@ func (s *Store) channelEventMatchRate(ctx context.Context) (float64, error) {
 	const query = `
 with paid_orders as (
   select id
-  from public.orders
+  from shop.orders
   where payment_status = 'paid'
     and created_at >= now() - interval '14 days'
 ),
 attributed as (
   select distinct a.order_id
-  from public.attributed_orders a
+  from shop.attributed_orders a
   join paid_orders p on p.id = a.order_id
 )
 select
@@ -115,7 +115,7 @@ select coalesce(
   percentile_cont(0.95) within group (order by extract(epoch from (completed_at - created_at))),
   0
 )::float8
-from public.channel_sync_runs
+from shop.channel_sync_runs
 where completed_at is not null
   and status = any($1::text[])
   and created_at >= now() - interval '7 days'

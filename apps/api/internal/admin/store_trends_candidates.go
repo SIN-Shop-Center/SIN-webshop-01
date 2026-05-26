@@ -10,7 +10,7 @@ import (
 func (s *Store) ListTrendCandidates(ctx context.Context, decision string, limit, offset int) ([]TrendCandidateSummary, error) {
 	query := `
 select id::text, product_id::text, title, cluster, score, lifecycle_state, decision_state, decision_reason, created_at, updated_at
-from public.trend_candidates
+from shop.trend_candidates
 `
 	args := []any{limit, offset}
 	if strings.TrimSpace(decision) != "" {
@@ -54,7 +54,7 @@ from public.trend_candidates
 
 func (s *Store) ApproveTrendCandidate(ctx context.Context, id string) (*TrendCandidateSummary, error) {
 	const query = `
-update public.trend_candidates
+update shop.trend_candidates
 set decision_state = 'allow',
     lifecycle_state = case when lifecycle_state = 'new' then 'validated' else lifecycle_state end,
     approved_at = now(),
@@ -91,8 +91,8 @@ func (s *Store) GetTrendPerformance(ctx context.Context) ([]map[string]any, erro
 	const query = `
 with touches as (
   select c.trend_candidate_id, count(*)::int as touch_count
-  from public.attribution_touchpoints t
-  left join public.campaigns c on c.id = t.campaign_id
+  from shop.attribution_touchpoints t
+  left join shop.campaigns c on c.id = t.campaign_id
   group by c.trend_candidate_id
 ),
 orders as (
@@ -100,8 +100,8 @@ orders as (
          count(*)::int as order_count,
          coalesce(sum(a.revenue_amount), 0)::numeric as gmv,
          coalesce(sum(a.cost_amount), 0)::numeric as cost
-  from public.attributed_orders a
-  left join public.campaigns c on c.id = a.campaign_id
+  from shop.attributed_orders a
+  left join shop.campaigns c on c.id = a.campaign_id
   group by c.trend_candidate_id
 )
 select tc.cluster,
@@ -110,8 +110,8 @@ select tc.cluster,
        coalesce(sum(o.gmv), 0)::float8 as gmv,
        case when coalesce(sum(o.cost), 0) > 0 then (sum(o.gmv) / sum(o.cost))::float8 else 0 end as roas,
        case when coalesce(sum(t.touch_count), 0) > 0 then ((sum(o.order_count)::numeric / sum(t.touch_count)::numeric) * 100)::float8 else 0 end as cvr
-from public.trend_candidates tc
-left join public.trend_launches tl on tl.trend_candidate_id = tc.id
+from shop.trend_candidates tc
+left join shop.trend_launches tl on tl.trend_candidate_id = tc.id
 left join orders o on o.trend_candidate_id = tc.id
 left join touches t on t.trend_candidate_id = tc.id
 group by tc.cluster

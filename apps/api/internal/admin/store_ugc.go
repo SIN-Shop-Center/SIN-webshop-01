@@ -141,7 +141,7 @@ from (
          metadata,
          created_at,
          updated_at
-  from public.ugc_person_assets
+  from shop.ugc_person_assets
   order by is_default desc, updated_at desc
   limit $1 offset $2
 ) t
@@ -211,20 +211,20 @@ func (s *Store) CreateUGCPersonAsset(ctx context.Context, body map[string]any, a
 	isDefault := requestedDefault
 	if !isDefault {
 		var hasDefault bool
-		if err := tx.QueryRow(ctx, `select exists(select 1 from public.ugc_person_assets where is_default = true)`).Scan(&hasDefault); err != nil {
+		if err := tx.QueryRow(ctx, `select exists(select 1 from shop.ugc_person_assets where is_default = true)`).Scan(&hasDefault); err != nil {
 			return nil, err
 		}
 		isDefault = !hasDefault
 	}
 	if isDefault {
-		if _, err := tx.Exec(ctx, `update public.ugc_person_assets set is_default = false, updated_at = now() where is_default = true`); err != nil {
+		if _, err := tx.Exec(ctx, `update shop.ugc_person_assets set is_default = false, updated_at = now() where is_default = true`); err != nil {
 			return nil, err
 		}
 	}
 
 	const query = `
 with created as (
-  insert into public.ugc_person_assets (
+  insert into shop.ugc_person_assets (
     label,
     source_kind,
     image_url,
@@ -262,7 +262,7 @@ func (s *Store) GetUGCPersonAssetContent(ctx context.Context, id string) (string
 select coalesce(source_data_url, ''),
        coalesce(preview_url, ''),
        coalesce(image_url, '')
-from public.ugc_person_assets
+from shop.ugc_person_assets
 where id::text = $1
 limit 1
 `
@@ -293,7 +293,7 @@ func (s *Store) ListUGCGenerationRuns(ctx context.Context, params UGCGenerationL
 	}
 	clause := strings.Join(where, " and ")
 
-	countQuery := "select count(*) from public.ugc_generation_runs r where " + clause
+	countQuery := "select count(*) from shop.ugc_generation_runs r where " + clause
 	var total int
 	if err := s.pool.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -320,7 +320,7 @@ from (
          pa.preview_url as person_preview_url,
          (
            select v.preview_url
-           from public.ugc_generation_variants v
+           from shop.ugc_generation_variants v
            where v.run_id = r.id
              and v.variant_role = 'hero'
            order by v.updated_at desc
@@ -328,12 +328,12 @@ from (
          ) as hero_preview_url,
          (
            select count(*)
-           from public.ugc_generation_variants v
+           from shop.ugc_generation_variants v
            where v.run_id = r.id
          ) as variant_count
-  from public.ugc_generation_runs r
-  left join public.products p on p.id = r.product_id
-  left join public.ugc_person_assets pa on pa.id = r.person_asset_id
+  from shop.ugc_generation_runs r
+  left join shop.products p on p.id = r.product_id
+  left join shop.ugc_person_assets pa on pa.id = r.person_asset_id
   where %s
   order by r.updated_at desc
   limit $%d offset $%d
@@ -444,7 +444,7 @@ func (s *Store) CreateUGCGenerationRun(ctx context.Context, body map[string]any,
 	}
 
 	const insertQuery = `
-insert into public.ugc_generation_runs (
+insert into shop.ugc_generation_runs (
   product_id,
   person_asset_id,
   title,
@@ -526,9 +526,9 @@ from (
            'preview_url', pa.preview_url,
            'image_url', pa.image_url
          ) end as person_asset
-  from public.ugc_generation_runs r
-  left join public.products p on p.id = r.product_id
-  left join public.ugc_person_assets pa on pa.id = r.person_asset_id
+  from shop.ugc_generation_runs r
+  left join shop.products p on p.id = r.product_id
+  left join shop.ugc_person_assets pa on pa.id = r.person_asset_id
   where r.id::text = $1
   limit 1
 ) t
@@ -555,7 +555,7 @@ from (
          v.metrics,
          v.created_at,
          v.updated_at
-  from public.ugc_generation_variants v
+  from shop.ugc_generation_variants v
   where v.run_id::text = $1
   order by case when v.variant_role = 'hero' then 0 else 1 end, v.created_at asc
 ) t
@@ -606,8 +606,8 @@ from (
          pa.preview_url,
          pa.image_url,
          pa.updated_at as person_updated_at
-  from public.products p
-  join public.ugc_person_assets pa on pa.id::text = $2
+  from shop.products p
+  join shop.ugc_person_assets pa on pa.id::text = $2
   where p.id::text = $1
   limit 1
 ) t
@@ -618,7 +618,7 @@ from (
 func (s *Store) findActiveUGCRunByFingerprint(ctx context.Context, fingerprintHash string) (string, bool, error) {
 	const query = `
 select id::text
-from public.ugc_generation_runs
+from shop.ugc_generation_runs
 where fingerprint_hash = $1
   and status = any($2::text[])
 order by created_at desc
@@ -638,12 +638,12 @@ limit 1
 func (s *Store) findReusableUGCRunByFingerprint(ctx context.Context, fingerprintHash string) (string, bool, error) {
 	const query = `
 select r.id::text
-from public.ugc_generation_runs r
+from shop.ugc_generation_runs r
 where r.fingerprint_hash = $1
   and r.status = any($2::text[])
   and exists (
     select 1
-    from public.ugc_generation_variants v
+    from shop.ugc_generation_variants v
     where v.run_id = r.id
       and coalesce(v.video_url, '') <> ''
   )
@@ -695,7 +695,7 @@ func (s *Store) cloneUGCGenerationRunFromCache(ctx context.Context, sourceRunID,
 	defer tx.Rollback(ctx)
 
 	const insertRunQuery = `
-insert into public.ugc_generation_runs (
+insert into shop.ugc_generation_runs (
   product_id,
   person_asset_id,
   title,
@@ -729,7 +729,7 @@ select $2::uuid,
        $12,
        $13,
        r.id
-from public.ugc_generation_runs r
+from shop.ugc_generation_runs r
 where r.id::text = $1
 returning id::text
 `
@@ -739,7 +739,7 @@ returning id::text
 	}
 
 	const copyVariantsQuery = `
-insert into public.ugc_generation_variants (
+insert into shop.ugc_generation_variants (
   run_id,
   creative_asset_id,
   variant_role,
@@ -765,7 +765,7 @@ select $1::uuid,
        voice_text,
        subtitle_text,
        coalesce(metrics, '{}'::jsonb) || $2::jsonb
-from public.ugc_generation_variants
+from shop.ugc_generation_variants
 where run_id::text = $3
 `
 	if _, err := tx.Exec(ctx, copyVariantsQuery, newRunID, string(cacheMetrics), sourceRunID); err != nil {
@@ -781,7 +781,7 @@ where run_id::text = $3
 func (s *Store) RetryUGCGenerationRun(ctx context.Context, id, actorID string) (map[string]any, error) {
 	const stateQuery = `
 select status, product_id::text, person_asset_id::text
-from public.ugc_generation_runs
+from shop.ugc_generation_runs
 where id::text = $1
 limit 1
 `
@@ -802,7 +802,7 @@ limit 1
 	}
 
 	_, err := s.pool.Exec(ctx, `
-update public.ugc_generation_runs
+update shop.ugc_generation_runs
 set status = 'queued',
     status_message = 'Erneut angestossen',
     last_error = null,
@@ -821,13 +821,13 @@ where id::text = $1
 
 func (s *Store) ensureUGCInputs(ctx context.Context, productID, personAssetID string) error {
 	var ok bool
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.products where id::text = $1)`, productID).Scan(&ok); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.products where id::text = $1)`, productID).Scan(&ok); err != nil {
 		return err
 	}
 	if !ok {
 		return pgx.ErrNoRows
 	}
-	if err := s.pool.QueryRow(ctx, `select exists(select 1 from public.ugc_person_assets where id::text = $1)`, personAssetID).Scan(&ok); err != nil {
+	if err := s.pool.QueryRow(ctx, `select exists(select 1 from shop.ugc_person_assets where id::text = $1)`, personAssetID).Scan(&ok); err != nil {
 		return err
 	}
 	if !ok {
@@ -840,7 +840,7 @@ func (s *Store) ensureNoActiveUGCRun(ctx context.Context, productID, personAsset
 	const query = `
 select exists (
   select 1
-  from public.ugc_generation_runs
+  from shop.ugc_generation_runs
   where product_id::text = $1
     and person_asset_id::text = $2
     and status = any($3::text[])
@@ -864,7 +864,7 @@ func (s *Store) ensureUGCDailyLimit(ctx context.Context, productID string, maxRu
 	var count int
 	if err := s.pool.QueryRow(ctx, `
 select count(*)
-from public.ugc_generation_runs
+from shop.ugc_generation_runs
 where product_id::text = $1
   and created_at >= date_trunc('day', now())
 `, productID).Scan(&count); err != nil {
@@ -893,7 +893,7 @@ func (s *Store) enqueueUGCRun(ctx context.Context, runID, triggerMode, actorID s
 		dedupeKey = fmt.Sprintf("%s:%d", runID, time.Now().UTC().Unix())
 	}
 	_, err = s.pool.Exec(ctx, `
-insert into public.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
 values ('automation', 'creative.ugc.generate.requested', $1, $2::jsonb, 'pending')
 on conflict (queue_name, dedupe_key) do nothing
 `, dedupeKey, string(body))
@@ -910,7 +910,7 @@ func (s *Store) RequestUGCAutopilotScan(ctx context.Context, reason string) erro
 	}
 	dedupeKey := fmt.Sprintf("ugc-autopilot-scan:%s", time.Now().UTC().Format("200601021504"))
 	_, err = s.pool.Exec(ctx, `
-insert into public.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
 values ('automation', 'creative.ugc.autopilot.scan.requested', $1, $2::jsonb, 'pending')
 on conflict (queue_name, dedupe_key) do nothing
 `, dedupeKey, string(payload))

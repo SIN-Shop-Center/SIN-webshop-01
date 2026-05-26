@@ -15,8 +15,8 @@ select cs.order_id::text,
        cs.status,
        o.payment_status,
        o.status
-from public.checkout_sessions cs
-join public.orders o on o.id = cs.order_id
+from shop.checkout_sessions cs
+join shop.orders o on o.id = cs.order_id
 where (nullif($1, '') is not null and cs.stripe_session_id = $1)
    or (nullif($2, '') is not null and cs.order_id::text = $2)
 order by cs.created_at desc

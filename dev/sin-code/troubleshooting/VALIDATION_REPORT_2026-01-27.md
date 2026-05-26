@@ -37,7 +37,7 @@
 
 ---
 
-### 3. Agent Configuration Template (`/Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template`)
+### 3. Agent Configuration Template (`/Users/jeremy/dev/sin-code/OpenCode/oh-my-openagent.json.template`)
 **Status:** ✅ JUST UPDATED (Commit: `98ff389`)  
 **Total Agents:** 12
 
@@ -120,7 +120,7 @@
    - Preserved Tavily API key in MCP config
 
 3. **Phase 3: Agent Model Configuration** ✅
-   - Updated `oh-my-opencode.json.template` with GitHub Copilot models
+   - Updated `oh-my-openagent.json.template` with GitHub Copilot models
    - Assigned all 11 agents to `github-copilot/claude-haiku-4-5`
    - Specialized frontend-ui-ux-engineer to `google/gemini-3-pro`
    - Removed fallback models (per user request)
@@ -128,7 +128,7 @@
 
 4. **Phase 4: Template Validation** ✅
    - Verified `opencode.json.template` has all 4 providers
-   - Verified `oh-my-opencode.json.template` has all 12 agents
+   - Verified `oh-my-openagent.json.template` has all 12 agents
    - Validated JSON syntax on both templates
    - Confirmed production config has all API keys
 
@@ -140,13 +140,13 @@
 COMMITTED:
 ├── 187e7eb - feat: Add XiaoMi, Streamlake, OpenCode ZEN API credentials
 ├── 9a79a6f - fix: Restore Google Gemini models in templates
-├── 2b9e057 - fix: Remove fallback models from oh-my-opencode.json.template  
+├── 2b9e057 - fix: Remove fallback models from oh-my-openagent.json.template  
 └── 98ff389 - fix: Update agent models - GitHub Copilot Claude Haiku + Google Gemini Pro
 
 LOCATIONS:
 ├── ~/.opencode/opencode.json (Production config - WITH API KEYS)
 ├── /Users/jeremy/dev/sin-code/OpenCode/opencode.json.template (Project template)
-├── /Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template (Agent config)
+├── /Users/jeremy/dev/sin-code/OpenCode/oh-my-openagent.json.template (Agent config)
 └── /Users/jeremy/dev/sin-code/troubleshooting/ts-ticket-05.md (Documentation)
 ```
 
@@ -204,7 +204,7 @@ curl -X POST https://api.opencode.ai/v1/chat/completions \
 
 # 4. Validate templates
 jq . /Users/jeremy/dev/sin-code/OpenCode/opencode.json.template
-jq . /Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template
+jq . /Users/jeremy/dev/sin-code/OpenCode/oh-my-openagent.json.template
 ```
 
 ### For GitHub Copilot Setup:
@@ -251,7 +251,7 @@ jq . /Users/jeremy/dev/sin-code/OpenCode/oh-my-opencode.json.template
 
 ### Agent-to-Model Mapping Authority:
 - **Source:** `~/.oh-my-opencode/src/agents/AGENTS.md` (official)
-- **Template:** `oh-my-opencode.json.template` (user config)
+- **Template:** `oh-my-openagent.json.template` (user config)
 - **Decision:** frontend-ui-ux uses Gemini 3 Pro for superior UI/UX quality
 
 ---

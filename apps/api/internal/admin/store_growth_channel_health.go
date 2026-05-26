@@ -14,7 +14,7 @@ func (s *Store) GetChannelHealth(ctx context.Context, channel string) (map[strin
 
 	const accountQuery = `
 select status, connection_mode, last_connected_at, last_health_at, auth_snapshot
-from public.channel_accounts
+from shop.channel_accounts
 where channel = $1
 order by updated_at desc
 limit 1
@@ -32,7 +32,7 @@ limit 1
 
 	const syncQuery = `
 select sync_type, status, created_at, completed_at, coalesce(error_message, '')
-from public.channel_sync_runs
+from shop.channel_sync_runs
 where channel = $1
 order by created_at desc
 limit 1
@@ -46,7 +46,7 @@ limit 1
 
 	const failQuery = `
 select count(*)::int
-from public.channel_sync_runs
+from shop.channel_sync_runs
 where channel = $1
   and status = 'failed'
   and created_at >= now() - interval '24 hours'

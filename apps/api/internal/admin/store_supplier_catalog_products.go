@@ -30,7 +30,7 @@ func (s *Store) ListSupplierCatalogProducts(ctx context.Context, supplierID stri
 	whereClause := strings.Join(where, " and ")
 
 	var total int
-	if err := s.pool.QueryRow(ctx, "select count(*) from public.supplier_catalog_products scp where "+whereClause, args...).Scan(&total); err != nil {
+	if err := s.pool.QueryRow(ctx, "select count(*) from shop.supplier_catalog_products scp where "+whereClause, args...).Scan(&total); err != nil {
 		return SupplierCatalogProductsPage{}, err
 	}
 
@@ -67,8 +67,8 @@ from (
            'slug', p.slug,
            'is_active', p.is_active
          ) end as imported_product
-  from public.supplier_catalog_products scp
-  left join public.products p on p.id = scp.imported_product_id
+  from shop.supplier_catalog_products scp
+  left join shop.products p on p.id = scp.imported_product_id
   where %s
   order by
     case
