@@ -34,6 +34,7 @@ type Config struct {
 	N8NWebhookURL            string
 	N8NSharedSecret          string
 	SupplierWebhookSecret    string
+	CronSharedSecret         string
 	TikTokBrowserRunnerToken string
 
 	CJAPIKey  string
@@ -122,6 +123,7 @@ func Load() Config {
 		N8NWebhookURL:            strings.TrimSpace(os.Getenv("N8N_WEBHOOK_URL")),
 		N8NSharedSecret:          strings.TrimSpace(os.Getenv("N8N_SHARED_SECRET")),
 		SupplierWebhookSecret:    strings.TrimSpace(os.Getenv("SUPPLIER_WEBHOOK_SECRET")),
+		CronSharedSecret:         strings.TrimSpace(os.Getenv("CRON_SHARED_SECRET")),
 		TikTokBrowserRunnerToken: strings.TrimSpace(os.Getenv("TIKTOK_BROWSER_RUNNER_TOKEN")),
 
 		CJAPIKey: strings.TrimSpace(os.Getenv("CJ_API_KEY")),
