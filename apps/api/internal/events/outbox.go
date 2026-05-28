@@ -48,7 +48,10 @@ func queueForEvent(eventType string) string {
 		"supplier.research.requested",
 		"supplier.catalog.sync.requested",
 		"inventory.low",
-		"ops.weekly.report.requested":
+		"ops.weekly.report.requested",
+		"cj.tracking.poll",
+		"cj.product.sync",
+		"cj.balance.check":
 		return "automation"
 	default:
 		return "automation"

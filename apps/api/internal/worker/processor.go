@@ -106,6 +106,12 @@ func (p *Processor) Handle(ctx context.Context, job Job) error {
 		return p.handleInventoryReorderScanRequested(ctx, job)
 	case job.JobType == "ops.weekly.report.requested":
 		return p.handleOpsWeeklyReport(ctx, job)
+	case job.JobType == "cj.tracking.poll":
+		return p.handleCJTrackingPoll(ctx, job)
+	case job.JobType == "cj.product.sync":
+		return p.handleCJProductSync(ctx, job)
+	case job.JobType == "cj.balance.check":
+		return p.handleCJBalanceCheck(ctx, job)
 	case strings.HasPrefix(job.JobType, "automation.") && strings.HasSuffix(job.JobType, ".run"):
 		return p.handleAutomationRun(ctx, job)
 	default:

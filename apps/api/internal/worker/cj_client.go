@@ -21,6 +21,8 @@ const (
 	cjGetBalance     = "/shopping/pay/getBalance"
 	cjConfirmOrder   = "/shopping/order/confirmOrder"
 	cjPayBalance     = "/shopping/pay/payBalance"
+	cjGetOrderDetail = "/shopping/order/getOrderDetail"
+	cjListOrders     = "/shopping/order/listOrder"
 )
 
 type cjClient struct {
@@ -285,6 +287,67 @@ func (c *cjClient) payWithBalance(ctx context.Context, orderID string) error {
 		return fmt.Errorf("cj_pay_failed: code=%d msg=%s", resp.Code, resp.Message)
 	}
 	return nil
+}
+
+type cjOrderDetailResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    *struct {
+		OrderID       string `json:"orderId"`
+		OrderNumber   string `json:"orderNumber"`
+		OrderStatus   string `json:"orderStatus"`
+		TrackNumber   string `json:"trackNumber"`
+		TrackingURL   string `json:"trackingUrl"`
+		LogisticName  string `json:"logisticName"`
+		TotalAmount   float64 `json:"totalAmount"`
+	} `json:"data"`
+}
+
+func (c *cjClient) getOrderDetail(ctx context.Context, cjOrderID string) (*cjOrderDetailResponse, error) {
+	path := fmt.Sprintf("%s?orderId=%s", cjGetOrderDetail, cjOrderID)
+	raw, err := c.doAuthenticated(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, fmt.Errorf("cj_order_detail_call: %w", err)
+	}
+	var resp cjOrderDetailResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("cj_order_detail_parse: %w", err)
+	}
+	if resp.Code != 200 {
+		return &resp, fmt.Errorf("cj_order_detail_failed: code=%d msg=%s", resp.Code, resp.Message)
+	}
+	return &resp, nil
+}
+
+type cjListOrdersResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		List []struct {
+			OrderID     string `json:"orderId"`
+			OrderNumber string `json:"orderNumber"`
+			OrderStatus string `json:"orderStatus"`
+			TrackNumber string `json:"trackNumber"`
+			TrackingURL string `json:"trackingUrl"`
+		} `json:"list"`
+		TotalCount int `json:"totalCount"`
+	} `json:"data"`
+}
+
+func (c *cjClient) listOrders(ctx context.Context, page, pageSize int) (*cjListOrdersResponse, error) {
+	path := fmt.Sprintf("%s?pageNum=%d&pageSize=%d", cjListOrders, page, pageSize)
+	raw, err := c.doAuthenticated(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, fmt.Errorf("cj_list_orders_call: %w", err)
+	}
+	var resp cjListOrdersResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("cj_list_orders_parse: %w", err)
+	}
+	if resp.Code != 200 {
+		return &resp, fmt.Errorf("cj_list_orders_failed: code=%d msg=%s", resp.Code, resp.Message)
+	}
+	return &resp, nil
 }
 
 func bestLogisticName(freightResp *cjFreightResponse) string {

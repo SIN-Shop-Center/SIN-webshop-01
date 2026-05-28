@@ -2,6 +2,8 @@ package http
 
 import (
 	"context"
+	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -120,8 +122,53 @@ func NewRouter(cfg config.Config, pool *pgxpool.Pool) *gin.Engine {
 	automationG := api.Group("/automation", authn.Middleware(), middleware.RequireRoles("admin", "ops"))
 	automationG.POST("/:target/run", socialH.Run)
 
+	cronG := api.Group("/cron")
+	cronG.POST("/cj/tracking-poll", cronAuth(cfg.CronSharedSecret, pool, "cj.tracking.poll"))
+	cronG.POST("/cj/product-sync", cronAuth(cfg.CronSharedSecret, pool, "cj.product.sync"))
+	cronG.GET("/cj/balance", cronAuth(cfg.CronSharedSecret, pool, "cj.balance.check"))
+
 	registerSupportRoutes(api, authn, supportH)
 	registerSupplierRoutes(api, suppliersH)
 
 	return r
+}
+
+func cronAuth(sharedSecret string, pool *pgxpool.Pool, jobType string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := strings.TrimSpace(c.GetHeader("X-Cron-Token"))
+		if sharedSecret != "" && token != sharedSecret {
+			c.JSON(401, gin.H{"error": "invalid_cron_token"})
+			return
+		}
+		enqueueCronJob(pool, jobType)(c)
+	}
+}
+
+func enqueueCronJob(pool *pgxpool.Pool, jobType string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var payload map[string]any
+		if err := c.ShouldBindJSON(&payload); err != nil {
+			payload = map[string]any{}
+		}
+		payload["triggered_by"] = "cron"
+		payload["triggered_at"] = time.Now().UTC().Format(time.RFC3339)
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "marshal_failed"})
+			return
+		}
+
+		var jobID string
+		err = pool.QueryRow(c.Request.Context(), `
+insert into shop.queue_jobs (queue_name, job_type, dedupe_key, payload, status)
+values ('automation', $1, gen_random_uuid()::text, $2::jsonb, 'pending')
+returning id::text
+`, jobType, string(b)).Scan(&jobID)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "enqueue_failed", "detail": err.Error()})
+			return
+		}
+		c.JSON(200, gin.H{"status": "enqueued", "job_id": jobID, "job_type": jobType})
+	}
 }
