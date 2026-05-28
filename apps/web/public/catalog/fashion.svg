@@ -1,7 +1,0 @@
-<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="1200" fill="#F6F2EA"/>
-  <rect x="120" y="120" width="960" height="960" rx="84" fill="#FFFFFF"/>
-  <path d="M428 258L512 188H688L772 258L876 384L770 456L696 390V930H504V390L430 456L324 384L428 258Z" fill="#121212"/>
-  <path d="M512 188L600 296L688 188" fill="#F6F2EA"/>
-  <text x="220" y="968" fill="#121212" fill-opacity="0.54" font-family="Arial, sans-serif" font-size="58" font-weight="700">FASHION</text>
-</svg>

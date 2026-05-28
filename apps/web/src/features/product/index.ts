@@ -1,7 +1,0 @@
-export * from './helpers'
-export * from './ProductComparisonSection'
-export * from './ProductInfoPanel'
-export * from './ProductShelfSection'
-export * from './ProductUnavailableState'
-export * from './media/ProductMediaPanel'
-export * from './hooks/useProductDetail'
