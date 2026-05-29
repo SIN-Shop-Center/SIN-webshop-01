@@ -1,6 +1,7 @@
 package suppliers
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -114,9 +115,9 @@ func (h *Handler) Webhook(c *gin.Context) {
 }
 
 type cjWebhookEvent struct {
-	MessageID   string `json:"messageId"`
-	MessageType string `json:"messageType"`
-	OpenID      string `json:"openId"`
+	MessageID   string      `json:"messageId"`
+	MessageType string      `json:"messageType"`
+	OpenID      json.Number `json:"openId"`
 	Data        struct {
 		OrderID       string `json:"orderId"`
 		OrderNumber   string `json:"orderNumber"`
@@ -128,35 +129,34 @@ type cjWebhookEvent struct {
 }
 
 func parseCJWebhookPayload(raw []byte) *cjWebhookEvent {
-	input := map[string]any{}
-	if err := json.Unmarshal(raw, &input); err != nil {
-		return nil
-	}
-	if _, ok := input["messageId"]; !ok {
-		return nil
-	}
-	if _, ok := input["messageType"]; !ok {
-		return nil
-	}
 	var evt cjWebhookEvent
-	if err := json.Unmarshal(raw, &evt); err != nil {
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	if err := dec.Decode(&evt); err != nil {
+		return nil
+	}
+	if strings.TrimSpace(evt.MessageID) == "" {
+		return nil
+	}
+	if strings.TrimSpace(evt.MessageType) == "" {
 		return nil
 	}
 	return &evt
 }
 
 func (e *cjWebhookEvent) isVerification() bool {
-	mt := strings.ToLower(strings.TrimSpace(e.MessageType))
-	return mt == "" || mt == "verification" || mt == "verify" || mt == "ping"
+	if e == nil || strings.TrimSpace(e.MessageType) == "" {
+		return true
+	}
+	return !e.isOrderEvent()
 }
 
 func (e *cjWebhookEvent) isOrderEvent() bool {
-	mt := strings.ToLower(strings.TrimSpace(e.MessageType))
-	return strings.Contains(mt, "order") || strings.Contains(mt, "track") || strings.Contains(mt, "logistic") || strings.Contains(mt, "ship")
+	return strings.TrimSpace(e.Data.OrderID) != "" || strings.TrimSpace(e.Data.OrderNumber) != ""
 }
 
 func (e *cjWebhookEvent) isOpenIDValid() bool {
-	return strings.TrimSpace(e.OpenID) != ""
+	return strings.TrimSpace(e.OpenID.String()) != ""
 }
 
 func (e *cjWebhookEvent) toStatus() string {
