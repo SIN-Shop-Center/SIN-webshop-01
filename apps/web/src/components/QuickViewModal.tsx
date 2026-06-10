@@ -137,7 +137,7 @@ export default function QuickViewModal({
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-bold text-gray-550">{product.rating.toFixed(1)} Bewertungen</span>
+                  <span className="text-xs font-bold text-gray-550">{product.ratingCount > 0 ? `${product.rating.toFixed(1)} (${product.ratingCount} Bewertungen)` : 'Noch keine Bewertungen'}</span>
                 </div>
 
                 <div className="flex items-baseline gap-2 mb-4">

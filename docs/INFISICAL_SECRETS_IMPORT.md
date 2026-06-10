@@ -48,34 +48,34 @@ Falls du verschiedene Umgebungen hast (dev, staging, prod):
 # Created: 2026-05-27
 
 # --- CJ Dropshipping ---
-CJ_API_KEY=d5d074918b1f434995c26af2fc932bb8
+CJ_API_KEY=REDACTED
 CJ_OPEN_ID=37995
 CJ_BASE_URL=https://developers.cjdropshipping.com/api2.0/v1
 CJ_EMAIL=CJ5240573@api
 
 # --- Stripe (Live) ---
-STRIPE_SECRET_KEY=sk_live_...Y67wA
-STRIPE_WEBHOOK_SECRET=whsec_THCR4ppa1RMhadpdJR9ziLLjuL7VEqgr
-STRIPE_PUBLISHABLE_KEY=pk_live_51TEhmvAZZTxFQVSB9xHz6nOTkXPFaPxIJaNHLjS2xzRsGUwDb3kc8wRILHHB3xP8Kr09vI7qQYClwB7rHuvcm4800BLtK3y0r
+STRIPE_SECRET_KEY=sk_live_REDACTED
+STRIPE_WEBHOOK_SECRET=REDACTED
+STRIPE_PUBLISHABLE_KEY=pk_live_REDACTED
 
 # --- Database (VM intern) ---
-DATABASE_URL=postgresql://simone:simone123@supabase-db:5433/postgres?sslmode=disable&search_path=shop
+DATABASE_URL=REDACTED
 
 # --- Supabase ---
 SUPABASE_URL=http://localhost:54321
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-SUPABASE_JWT_SECRET=aDKJ+tPZvBYR5JrYRpYbsFD/6hsc8BXCRmefE41D
+SUPABASE_ANON_KEY=REDACTED_JWT
+SUPABASE_JWT_SECRET=REDACTED
 
 # --- Cloudflare ---
-CLOUDFLARE_API_KEY=4d3a15a8dbaaca24904f3e0f4c503b80a1811
+CLOUDFLARE_API_KEY=REDACTED
 CLOUDFLARE_ACCOUNT_ID=1f7ab05e43657db15341b691070ea4c8
 CLOUDFLARE_ZONE_ID=3e7ca14550be834b017846ec7f960d16
 
 # --- Resend (E-Mail) ---
-RESEND_API_KEY=re_YAnqVXrV_DUsgUHWtdP8FcNWGQfPgLiL6
+RESEND_API_KEY=re_REDACTED
 
 # --- n8n ---
-N8N_ENCRYPTION_KEY=l0NetY+GIrFOauHsXyBj8kyRIYiJ6GTE
+N8N_ENCRYPTION_KEY=REDACTED
 
 # --- App ---
 APP_ENV=development
@@ -91,7 +91,7 @@ Für künftige automatische Updates:
 1. **Infisical CLI** installieren: https://infisical.com/docs/cli/overview
 2. Login: `infisical login`
 3. Projekt initialisieren: `infisical init`
-4. Secrets pushen: `infisical secrets set --env=dev CJ_API_KEY=d5d074918b1f434995c26af2fc932bb8`
+4. Secrets pushen: `infisical secrets set --env=dev CJ_API_KEY=REDACTED
 
 **Hinweis:** Die CLI erfordert einmalige Browser-Authentifizierung für E2EE.
 
