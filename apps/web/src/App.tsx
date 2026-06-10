@@ -159,26 +159,23 @@ export default function App() {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
-  // Temu style live flash discount timer state
-  const [countdown, setCountdown] = useState({
-    hours: 14,
-    minutes: 24,
-    seconds: 54,
-  });
+  // Daily deal countdown: counts down to local midnight (real daily deal end)
+  const getTimeUntilMidnight = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = Math.max(0, Math.floor((midnight.getTime() - now.getTime()) / 1000));
+    return {
+      hours: Math.floor(diff / 3600),
+      minutes: Math.floor((diff % 3600) / 60),
+      seconds: diff % 60,
+    };
+  };
+  const [countdown, setCountdown] = useState(getTimeUntilMidnight);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else {
-          return { hours: 23, minutes: 59, seconds: 59 };
-        }
-      });
+      setCountdown(getTimeUntilMidnight());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -628,7 +625,7 @@ export default function App() {
         <div className="flex items-center gap-1.5 text-[11px] text-slate-950 font-bold justify-center shrink-0">
           <span>Gutscheincode: </span>
           <span className="font-mono bg-slate-950 text-white px-2 py-0.5 rounded font-black text-[10px] select-all border border-slate-900/40">
-            TEMU20
+            BLITZ80
           </span>
           <div className="h-3 w-px bg-slate-950/20 hidden md:block" />
           <span className="flex items-center gap-1 font-mono font-black text-rose-950">
@@ -1124,23 +1121,6 @@ export default function App() {
         browsingHistory={browsingHistory}
         currentUser={currentUser}
         onToggleUser={handleToggleUser}
-        /* NEW: Category/Subcategory filter props for Navbar dropdown */
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        selectedSubcategory={selectedSubcategory}
-        setSelectedSubcategory={setSelectedSubcategory}
-        availableSubcategories={availableSubcategories}
-        categories={CATEGORIES}
-        subcategoryCounts={
-          products
-            .filter(p => selectedCategory === "All Products" || p.category === selectedCategory)
-            .reduce((acc, p) => {
-              if (p.subcategory) {
-                acc[p.subcategory] = (acc[p.subcategory] || 0) + 1;
-              }
-              return acc;
-            }, {} as Record<string, number>)
-        }
         onAddReview={handleAddReview}
         onViewProduct={handleViewProduct}
       />

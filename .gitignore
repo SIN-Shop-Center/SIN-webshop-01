@@ -22,8 +22,6 @@ workers/*/dist/
 .env.development.local
 .env.test.local
 .env.production.local
-!secrets/
-!secrets/*.enc.env
 secrets/*.dec.env
 secrets/*.plain.env
 secrets/*.tmp.env
@@ -99,3 +97,16 @@ probe_*.png
 # Patch/orig leftovers
 *.orig
 *.patch
+
+# SECURITY: never commit env/secrets files anywhere in the repo
+**/*.env
+**/.env*
+!**/.env.example
+!**/.env.*.example
+!**/*.env.example
+docs/infisical-secrets.env
+
+# Browser-agent screenshots / artifacts (root)
+/*.jpg
+/*.jpeg
+/*.png

@@ -32,18 +32,12 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  // Temu/Amazon style gamified urgency and social proof calculations:
-  const demandCount = (product.id.charCodeAt(0) * 17) % 500 + 45;
-  const deliveryDays = (product.id.charCodeAt(0) % 2) + 2;
-  const claimPercent = (product.id.charCodeAt(0) * 11) % 36 + 60; // 60% - 95%
-  const activeViewers = (product.id.charCodeAt(0) * 5) % 14 + 4; // 4 - 17 real web shoppers
-
   // Image gallery preview
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const gallery = product.imageGallery?.length ? product.imageGallery : [product.imageUrl];
 
   React.useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isHovered && gallery.length > 1 && !isManualActive) {
       interval = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % gallery.length);
@@ -133,12 +127,6 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
           </button>
         </div>
 
-        {/* Real-time viewer counter overlay */}
-        <div className="absolute bottom-2.5 left-2.5 z-10 bg-slate-950/75 backdrop-blur-xs text-white rounded-md px-2 py-0.5 text-[8px] font-bold flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-ping"></span>
-          <span>{activeViewers} Betrachter live!</span>
-        </div>
-
         {/* Dynamic Slide-up Tactical Drawer (Overlaid over the image on hover, constant card height!) */}
         <div 
           onClick={(e) => e.stopPropagation()}
@@ -146,22 +134,6 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
             isHovered ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'
           }`}
         >
-          {/* Lightning Deal Progress Claim Bar */}
-          {!isOutOfStock && (
-            <div className="space-y-0.5">
-              <div className="flex justify-between items-center text-[8.5px] font-black">
-                <span className="text-orange-600">{claimPercent}% reserviert</span>
-                <span className="text-amber-550 animate-pulse">⚡ BLITZVERKAUF</span>
-              </div>
-              <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-200/50">
-                <div 
-                  className="h-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 rounded-full"
-                  style={{ width: `${claimPercent}%` }}
-                />
-              </div>
-            </div>
-          )}
-
           {/* Compact Size & Color selection */}
           {!!((product.sizes && product.sizes.length > 0) || (product.colors && product.colors.length > 0)) && (
             <div className="flex items-center justify-between gap-2 bg-slate-50/70 p-1 rounded border border-gray-150/50">
@@ -233,7 +205,19 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
           src={displayImage}
           alt={product.title}
           referrerPolicy="no-referrer"
+          loading="lazy"
           onClick={() => setIsQuickViewOpen(true)}
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (!img.dataset.fallbackApplied) {
+              img.dataset.fallbackApplied = "true";
+              img.src =
+                "data:image/svg+xml," +
+                encodeURIComponent(
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-family="sans-serif" font-size="16" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">Bild nicht verfügbar</text></svg>'
+                );
+            }
+          }}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
         />
 
@@ -319,24 +303,26 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
         </p>
 
         {/* Dynamic Static Details Strip (Always visible, zero layout shifts, high Trust!) */}
-        <div className="flex items-center gap-1.5 mt-2.5 text-[10px] text-gray-400 font-bold border-t border-dashed border-gray-150 pt-2.5">
-          <div className="flex items-center text-amber-400 shrink-0">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 fill-current ${
-                  i < Math.round(product.rating) ? 'text-amber-400' : 'text-gray-200'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-[9.5px] text-gray-500 font-extrabold whitespace-nowrap">
-            {product.rating.toFixed(1)} ({product.ratingCount || '342'})
-          </span>
-          <span className="text-gray-300">|</span>
-          <span className="text-orange-650 font-extrabold text-[9px] truncate">
-            🔥 {demandCount} bestellt
-          </span>
+        <div className="flex items-center gap-1.5 mt-2.5 text-[10px] text-gray-400 font-bold border-t border-dashed border-gray-150 pt-2.5 min-h-[22px]">
+          {product.ratingCount > 0 ? (
+            <>
+              <div className="flex items-center text-amber-400 shrink-0">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-3 w-3 fill-current ${
+                      i < Math.round(product.rating) ? 'text-amber-400' : 'text-gray-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[9.5px] text-gray-500 font-extrabold whitespace-nowrap">
+                {product.rating.toFixed(1)} ({product.ratingCount})
+              </span>
+            </>
+          ) : (
+            <span className="text-[9.5px] text-gray-400 font-bold">Noch keine Bewertungen</span>
+          )}
         </div>
 
         {/* Flexible spacer to layout buttons beautifully */}

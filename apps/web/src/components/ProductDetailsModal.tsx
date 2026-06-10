@@ -225,8 +225,9 @@ export default function ProductDetailsModal({
                     ))}
                   </div>
                   <span className="text-xs text-gray-650 hover:text-orange-600 hover:underline transition-colors font-bold">
-                    {product.rating.toFixed(1)} ({reviewsList.length}{" "}
-                    verifizierte Kundenstimmen)
+                    {reviewsList.length > 0
+                      ? `${product.rating.toFixed(1)} (${reviewsList.length} Kundenstimmen)`
+                      : "Noch keine Bewertungen"}
                   </span>
                 </div>
 

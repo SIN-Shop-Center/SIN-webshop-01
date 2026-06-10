@@ -148,7 +148,7 @@ export default function Navbar({
             </div>
             <div className="hidden sm:block">
               <span className="font-sans text-sm font-black tracking-tight text-slate-900 line-height-1">
-                BLITZ<span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">_SHOP</span>
+                SIN<span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">_WEBSHOP</span>
               </span>
               <p className="text-[9px] uppercase tracking-widest text-orange-500 font-black -mt-1">Concept Portal</p>
             </div>
