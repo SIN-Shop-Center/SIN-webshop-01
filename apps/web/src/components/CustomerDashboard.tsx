@@ -162,11 +162,11 @@ export default function CustomerDashboard({
     }, 1200);
   };
 
-  // Safe delivery status calculator matching DHL tracker API standard
-  const getDeliveryStatus = (orderId: string) => {
-    const num = orderId.charCodeAt(orderId.length - 1) || 0;
-    const progressStep = (num % 3) + 1; // 1: Preparation, 2: In transit, 3: Delivered
-    
+  // Delivery status derived from the real order status (no fabricated progress)
+  const getDeliveryStatus = (order: Order) => {
+    const status = order.status ?? 'processing';
+    const progressStep = status === 'delivered' ? 3 : status === 'shipped' ? 2 : 1;
+
     return {
       step: progressStep,
       text: progressStep === 1 
@@ -219,14 +219,14 @@ export default function CustomerDashboard({
 
   const countByStatus = {
     all: orders.length,
-    processing: orders.filter((o) => getDeliveryStatus(o.id).step === 1).length,
-    shipped: orders.filter((o) => getDeliveryStatus(o.id).step === 2).length,
-    delivered: orders.filter((o) => getDeliveryStatus(o.id).step === 3).length,
+    processing: orders.filter((o) => getDeliveryStatus(o).step === 1).length,
+    shipped: orders.filter((o) => getDeliveryStatus(o).step === 2).length,
+    delivered: orders.filter((o) => getDeliveryStatus(o).step === 3).length,
   };
 
   const filteredOrders = orders.filter((order) => {
     if (statusFilter === "all") return true;
-    const s = getDeliveryStatus(order.id);
+    const s = getDeliveryStatus(order);
     if (statusFilter === "processing" && s.step === 1) return true;
     if (statusFilter === "shipped" && s.step === 2) return true;
     if (statusFilter === "delivered" && s.step === 3) return true;
@@ -602,7 +602,7 @@ export default function CustomerDashboard({
                     </div>
                   ) : (
                     filteredOrders.map((order) => {
-                      const status = getDeliveryStatus(order.id);
+                      const status = getDeliveryStatus(order);
                       const isExpanded = !!expandedOrders[order.id];
 
                       return (

@@ -536,7 +536,7 @@ export default function ProductDetailsModal({
                         className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-orange-50 border border-orange-100 px-3 py-1.5 text-[10px] font-extrabold text-orange-600 hover:bg-orange-100"
                       >
                         <LogIn className="h-3.5 w-3.5" />
-                        Jetzt mit Demo-Konto einloggen & testen
+                        Jetzt einloggen & bewerten
                       </button>
                     </div>
                   )}
