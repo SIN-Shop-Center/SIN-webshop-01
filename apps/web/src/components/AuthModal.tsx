@@ -65,8 +65,7 @@ export default function AuthModal({
       return;
     }
 
-    // Success simulation
-    const finalName = activeTab === 'register' ? name : (selectedRole === 'seller' ? 'Sinan Verkäufer (Admin)' : 'Christian Müller');
+    const finalName = activeTab === 'register' ? name : email.split('@')[0];
     
     const newUser: UserType = {
       name: finalName,
@@ -87,36 +86,6 @@ export default function AuthModal({
       setPassword('');
       setSuccess('');
     }, 800);
-  };
-
-  const handleQuickLogin = (role: 'buyer' | 'seller') => {
-    setError('');
-    setSuccess('');
-    
-    let quickUser: UserType;
-    if (role === 'seller') {
-      quickUser = {
-        name: 'Sinan Verkäufer (Admin)',
-        email: 'admin.seller@sin-concept.de',
-        isLoggedIn: true,
-        avatar: 'SV',
-        role: 'seller'
-      };
-    } else {
-      quickUser = {
-        name: 'Christian Müller',
-        email: 'christian.buyer@temu-deals.de',
-        isLoggedIn: true,
-        avatar: 'CM',
-        role: 'buyer'
-      };
-    }
-
-    setSuccess(`Schnellzugriff erfolgreich: ${role === 'seller' ? 'Verkäufer' : 'Käufer'} angemeldet!`);
-    setTimeout(() => {
-      onLogin(quickUser);
-      onClose();
-    }, 600);
   };
 
   return (
@@ -282,7 +251,7 @@ export default function AuthModal({
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="z.B. Christian Müller"
+                        placeholder="Max Mustermann"
                         className="w-full rounded-xl border border-gray-250 bg-gray-50 py-2 pl-9 pr-4 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-orange-500 focus:bg-white font-semibold"
                       />
                     </div>
@@ -342,39 +311,6 @@ export default function AuthModal({
                   {activeTab === 'login' ? 'Jetzt einloggen' : 'Konto erstellen'}
                 </button>
               </form>
-
-              {/* Divider for Quick Access */}
-              <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-gray-150"></div>
-                <span className="flex-shrink mx-3 text-[9px] text-gray-400 font-extrabold uppercase tracking-wider">Schnellzugriff (Demo)</span>
-                <div className="flex-grow border-t border-gray-150"></div>
-              </div>
-
-              {/* Temu-like instant test buttons */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('buyer')}
-                  className="flex flex-col items-center justify-center border border-gray-200 bg-gray-55 p-2.5 rounded-xl hover:bg-gray-100 transition-all cursor-pointer text-center"
-                >
-                  <span className="text-[10px] font-black text-gray-900 mb-0.5">Demokunde</span>
-                  <span className="text-[8px] text-gray-500 font-bold">1-Klick Login</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('seller')}
-                  className="flex flex-col items-center justify-center border border-orange-100 bg-orange-50 p-2.5 rounded-xl hover:bg-orange-100 transition-all cursor-pointer text-center animate-pulse"
-                >
-                  <span className="text-[10px] font-black text-orange-600 mb-0.5">Verkäufer (Admin)</span>
-                  <span className="text-[8px] text-orange-500 font-bold">1-Klick Login</span>
-                </button>
-              </div>
-
-              <div className="text-center">
-                <p className="text-[9px] text-gray-400 leading-normal font-bold">
-                  Hinweis: Das Verkäufer-Konto gewährt Ihnen den Zugriff auf den geschützten Admin-Bereich mit Statistiken, Charts und Produkten.
-                </p>
-              </div>
 
             </div>
           )}

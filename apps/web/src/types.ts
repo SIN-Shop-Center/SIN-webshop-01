@@ -64,6 +64,7 @@ export interface Order {
   zipCode: string;
   paymentMethod: string;
   date: string;
+  status?: 'processing' | 'shipped' | 'delivered';
 }
 
 export interface User {

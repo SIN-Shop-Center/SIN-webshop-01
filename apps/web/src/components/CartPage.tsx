@@ -249,11 +249,11 @@ export default function CartPage({
             subtotal,
             shipping: shippingCost,
             total,
-            customerName: customerName || "Christian Müller",
-            email: email || "christian.mueller@example.com",
-            address: address || "Musterweg 123",
-            city: city || "Berlin",
-            zipCode: zipCode || "12345",
+            customerName,
+            email,
+            address,
+            city,
+            zipCode,
             paymentMethod: paymentMethod === "card" ? "Kreditkarte" : paymentMethod === "paypal" ? "PayPal" : "Klarna",
             date: formattedDate,
           };
@@ -556,7 +556,7 @@ export default function CartPage({
                           required
                           value={customerName}
                           onChange={(e) => setCustomerName(e.target.value)}
-                          placeholder="z. B. Christian Müller"
+                          placeholder="Max Mustermann"
                           className="w-full rounded-xl border border-gray-250 bg-gray-50 px-3.5 py-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-orange-500 focus:bg-white transition-all font-semibold"
                         />
                         {addressErrors.customerName && (
@@ -575,7 +575,7 @@ export default function CartPage({
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="z. B. christian.mueller@example.com"
+                          placeholder="name@beispiel.de"
                           className="w-full rounded-xl border border-gray-250 bg-gray-50 px-3.5 py-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-orange-500 focus:bg-white transition-all font-semibold"
                         />
                         {addressErrors.email && (
@@ -732,7 +732,7 @@ export default function CartPage({
                             required
                             value={cardHolder}
                             onChange={(e) => setCardHolder(e.target.value)}
-                            placeholder="z. B. Christian Müller"
+                            placeholder="Max Mustermann"
                             className="w-full rounded-xl border border-gray-250 bg-white px-3.5 py-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-orange-500 transition-all font-semibold"
                           />
                           {paymentErrors.cardHolder && (

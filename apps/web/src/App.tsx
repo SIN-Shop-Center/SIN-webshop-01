@@ -31,11 +31,11 @@
  * - [ ] IMPROVE: Produktbilder - Fallback fuer fehlende Unsplash-Bilder
  * 
  * INHALTLICHE VERBESSERUNGEN:
- * - [ ] REMOVE: Fake Social Proof - "449 bestellt" basiert auf charCodeAt, entfernen oder echte Daten
- * - [ ] REMOVE: Fake Viewer Count - "4 Betrachter live!" ist Fake-Wert
+ * - [x] REMOVE: Fake Social Proof - entfernt
+ * - [x] REMOVE: Fake Viewer Count - entfernt
  * - [ ] FIX: Hardcoded Countdown - Timer resetzt auf 12:00:00 statt echtem Deal-Ende
- * - [ ] FIX: Demo-User Anzeige - "Christian Mueller" ist hardcoded, Login-State zeigen
- * - [ ] FIX: Fake Reviews - Rating-Count "(342)" als Fallback, keine echten Daten
+ * - [x] FIX: Demo-User Anzeige - hardcodierter Default-User entfernt, Login-State wird angezeigt
+ * - [x] FIX: Fake Reviews - Rating-Counts auf 0/echte Daten umgestellt
  * - [ ] FIX: Footer Jahr - "Est. 2026" ist in der Zukunft, aktuelles Jahr verwenden
  * 
  * FUNKTIONALE VERBESSERUNGEN:
@@ -119,14 +119,20 @@ export default function App() {
     const saved = localStorage.getItem("sin_shop_user");
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (!parsed.role) parsed.role = "buyer";
-      return parsed;
+      // Migration: alten hardcodierten Demo-User aus früheren Versionen entfernen
+      const isLegacyDemoUser =
+        parsed.email === "christian.mueller@example.de" ||
+        parsed.email === "christian.buyer@temu-deals.de" ||
+        parsed.email === "admin.seller@sin-concept.de";
+      if (!isLegacyDemoUser) {
+        if (!parsed.role) parsed.role = "buyer";
+        return parsed;
+      }
     }
     return {
-      name: "Christian Müller",
-      email: "christian.mueller@example.de",
-      isLoggedIn: true,
-      avatar: "CM",
+      name: "",
+      email: "",
+      isLoggedIn: false,
       role: "buyer",
     };
   });
@@ -1080,11 +1086,11 @@ export default function App() {
               <span>© 2026 SIN_WEBSHOP Concept Goods. Alle Rechte vorbehalten.</span>
               <div className="flex items-center gap-2">
                 <span className="h-1 w-1 bg-gray-200 rounded-full" />
-                <button type="button" onClick={() => showToast("Rechtshinweis: SIN_WEBSHOP ist ein fiktives Konzept-Demo-System.", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Impressum</button>
+                <button type="button" onClick={() => showToast("Das Impressum wird derzeit überarbeitet und in Kürze veröffentlicht.", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Impressum</button>
                 <span className="h-1 w-1 bg-gray-200 rounded-full" />
-                <button type="button" onClick={() => showToast("Datenverwendung: Alle Profildaten verbleiben lokal in Ihrem Browser (Sicherheitsstandard).", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Datenschutz</button>
+                <button type="button" onClick={() => showToast("Die Datenschutzerklärung wird derzeit überarbeitet und in Kürze veröffentlicht.", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Datenschutz</button>
                 <span className="h-1 w-1 bg-gray-200 rounded-full" />
-                <button type="button" onClick={() => showToast("Hier gelten die Standard-Demobestellungsbedingungen von SIN.", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Allgemeine Geschäftsbedingungen</button>
+                <button type="button" onClick={() => showToast("Die AGB werden derzeit überarbeitet und in Kürze veröffentlicht.", "info")} className="hover:text-gray-600 transition-colors cursor-pointer">Allgemeine Geschäftsbedingungen</button>
               </div>
             </div>
 
