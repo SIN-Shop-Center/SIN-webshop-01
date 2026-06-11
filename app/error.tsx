@@ -1,13 +1,13 @@
-// Purpose: Error boundary for /produkt/[id] route
+// Purpose: Global error boundary (Step 10 — UX safety net)
 // Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { AlertCircleIcon, ArrowLeftIcon } from '@/components/icons'
+import { AlertCircleIcon } from './components/icons'
 
-export default function ProductError({
+export default function GlobalError({
   error,
   reset,
 }: {
@@ -15,7 +15,8 @@ export default function ProductError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[produkt/[id]/error.tsx]', error)
+    // Server-side error logging
+    console.error('[app/error.tsx]', error)
   }, [error])
 
   return (
@@ -24,9 +25,10 @@ export default function ProductError({
         className="mb-4 size-12 text-destructive"
         aria-hidden
       />
-      <h1 className="mb-2 text-2xl font-bold">Fehler beim Laden des Produkts</h1>
-      <p className="mb-6 text-pretty text-muted-foreground">
-        Das Produkt konnte nicht geladen werden. Bitte versuche es erneut.
+      <h1 className="mb-2 text-2xl font-bold">Etwas ist schiefgelaufen</h1>
+      <p className="mb-6 text-muted-foreground text-pretty">
+        Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut —
+        sollte der Fehler bestehen bleiben, melde dich gerne bei uns.
       </p>
       <div className="flex gap-3">
         <button
@@ -36,9 +38,8 @@ export default function ProductError({
         >
           Erneut versuchen
         </button>
-        <Link href="/" className="btn btn-outline btn-md">
-          <ArrowLeftIcon className="size-4" aria-hidden />
-          Zur Übersicht
+        <Link href="/kontakt" className="btn btn-outline btn-md">
+          Kontakt
         </Link>
       </div>
     </div>

@@ -1,10 +1,12 @@
-// Purpose: Admin orders list with filter and retry (Step 8)
-// Docs: PLAN-VERKAUFSFAEHIG.md (Step 8 — Admin Dashboard)
+// Purpose: Admin orders list with filter chips (Step 8 + Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 import Link from 'next/link'
 import { getAdminOrders } from '@/lib/actions/admin'
 import { FulfillmentBadge } from '../components/FulfillmentBadge'
 import { RetryCjButton } from '../components/RetryCjButton'
+import { formatEuro, formatDateTime } from '@/lib/format'
+import { PackageIcon, ExternalLinkIcon } from '@/components/icons'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +16,7 @@ const FILTERS = [
   { value: 'forwarded', label: 'An CJ übergeben' },
   { value: 'shipped', label: 'Versendet' },
   { value: 'failed', label: 'Fehlgeschlagen' },
-]
+] as const
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -26,47 +28,64 @@ export default async function AdminOrdersPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={`/admin/bestellungen?filter=${f.value}`}
-            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-              filter === f.value
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border hover:bg-muted'
-            }`}
-          >
-            {f.label}
-          </Link>
-        ))}
+      <div role="tablist" aria-label="Filter" className="flex flex-wrap gap-2">
+        {FILTERS.map((f) => {
+          const active = filter === f.value
+          return (
+            <Link
+              key={f.value}
+              href={`/admin/bestellungen?filter=${f.value}`}
+              role="tab"
+              aria-selected={active}
+              className={
+                'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ' +
+                (active
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border hover:bg-muted')
+              }
+            >
+              {f.label}
+            </Link>
+          )
+        })}
       </div>
 
       {orders.length === 0 ? (
-        <div className="rounded-lg border border-border bg-muted p-8 text-center">
-          <p className="text-muted-foreground">Keine Bestellungen gefunden.</p>
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
+          <PackageIcon
+            className="mb-4 size-12 text-muted-foreground"
+            aria-hidden
+          />
+          <h2 className="mb-1 text-lg font-semibold">Keine Bestellungen gefunden</h2>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Für diesen Filter sind aktuell keine Bestellungen vorhanden.
+          </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="rounded-lg border border-border p-4">
+            <li
+              key={order.id}
+              className="rounded-lg border border-border bg-card p-4"
+            >
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
                     <span className="font-mono text-sm font-semibold">
                       {order.id.slice(0, 8).toUpperCase()}
                     </span>
                     <FulfillmentBadge status={order.fulfillment_status} />
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {order.email} ·{' '}
-                    {new Date(order.created_at).toLocaleString('de-DE')}
+                    {order.email} · {formatDateTime(order.created_at)}
                   </p>
                   <ul className="mt-2 text-sm">
                     {order.items.map((item, i) => (
                       <li key={i}>
-                        {item.quantity}x {item.title} —{' '}
-                        {((item.unit_amount * item.quantity) / 100).toFixed(2)} €
+                        {item.quantity}× {item.title} —{' '}
+                        <span className="text-muted-foreground">
+                          {formatEuro(item.unit_amount * item.quantity)}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -77,9 +96,10 @@ export default async function AdminOrdersPage({
                         href={`https://t.17track.net/de#nums=${encodeURIComponent(order.tracking_number)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-mono text-primary underline"
+                        className="inline-flex items-center gap-1 font-mono text-primary underline"
                       >
                         {order.tracking_number}
+                        <ExternalLinkIcon className="size-3" aria-hidden />
                       </a>
                     </p>
                   )}
@@ -91,17 +111,17 @@ export default async function AdminOrdersPage({
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <span className="text-lg font-bold">
-                    {(order.amount_total / 100).toFixed(2)} €
+                  <span className="text-lg font-bold tabular-nums">
+                    {formatEuro(order.amount_total)}
                   </span>
                   {order.fulfillment_status === 'failed' && (
                     <RetryCjButton orderId={order.id} />
                   )}
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   )

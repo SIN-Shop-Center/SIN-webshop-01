@@ -103,14 +103,9 @@ export async function getProductById(id: string): Promise<Product | null> {
     .eq('id', id)
     .maybeSingle()
 
-  console.log('[QUERY-DEBUG] getProductById', id, '-> error:', error?.message, 'code:', error?.code, 'data keys:', data ? Object.keys(data).length : 0)
-  if (error) {
-    console.log('[QUERY-DEBUG] error details:', JSON.stringify(error, null, 2))
-    throw error
-  }
+  if (error) throw error
   if (!data) return null
   const transformed = transformProduct(data as DbProductRow)
-  console.log('[QUERY-DEBUG] transformed:', JSON.stringify(transformed, null, 2).slice(0, 200))
   return transformed
 }
 

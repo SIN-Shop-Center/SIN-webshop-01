@@ -1,11 +1,12 @@
-// Purpose: Checkout success page (Step 4 of migration)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Checkout success page with CheckIcon (Step 4 + Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { CheckIcon, PackageIcon, ArrowRightIcon } from '@/components/icons'
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -27,23 +28,31 @@ export default async function CheckoutSuccessPage({
     await supabase.from('cart_items').delete().eq('cart_id', cartId)
   }
 
+  const email = session.customer_details?.email
+
   return (
-    <div className="container mx-auto max-w-md px-4 py-24 text-center">
-      <h1 className="mb-4 text-2xl font-bold">Vielen Dank für deine Bestellung</h1>
-      <p className="mb-6 text-muted-foreground text-pretty">
+    <div className="container mx-auto max-w-md px-4 py-16 text-center">
+      <div className="mx-auto mb-6 inline-flex size-16 items-center justify-center rounded-full bg-success/10">
+        <CheckIcon className="size-8 text-success" aria-hidden />
+      </div>
+      <h1 className="mb-3 text-3xl font-bold tracking-tight">
+        Vielen Dank für deine Bestellung!
+      </h1>
+      <p className="mb-8 text-pretty text-muted-foreground">
         Deine Zahlung war erfolgreich. Du erhältst in Kürze eine
         Bestellbestätigung per E-Mail
-        {session.customer_details?.email
-          ? ` an ${session.customer_details.email}`
-          : ''}
-        .
+        {email ? <> an <strong>{email}</strong></> : null}.
       </p>
-      <Link
-        href="/"
-        className="inline-block rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-      >
-        Weiter einkaufen
-      </Link>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <Link href="/" className="btn btn-primary btn-md">
+          Weiter einkaufen
+          <ArrowRightIcon className="size-4" aria-hidden />
+        </Link>
+        <Link href="/konto/bestellungen" className="btn btn-outline btn-md">
+          <PackageIcon className="size-4" aria-hidden />
+          Meine Bestellungen
+        </Link>
+      </div>
     </div>
   )
 }

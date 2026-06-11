@@ -1,14 +1,37 @@
-// Purpose: Homepage with featured products from Supabase (Step 2)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Homepage with hero, trust strip, featured products (Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
+import Link from 'next/link'
 import { getFeaturedProducts } from '@/lib/queries'
 import { ProductCard } from '@/components/ProductCard'
+import {
+  TruckIcon,
+  ShieldCheckIcon,
+  RotateCcwIcon,
+  ArrowRightIcon,
+} from '@/components/icons'
 
-// ISR: revalidate every 60 seconds (featured products may change)
 export const revalidate = 60
 
+const TRUST_ITEMS = [
+  {
+    icon: TruckIcon,
+    title: 'Kostenloser Versand ab 49 €',
+    description: 'Schnelle Lieferung innerhalb Deutschlands',
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: 'Sichere Zahlung',
+    description: 'Stripe-verschlüsselt. Deine Daten sind sicher.',
+  },
+  {
+    icon: RotateCcwIcon,
+    title: '14 Tage Widerruf',
+    description: 'Problemlose Rückgabe gemäß Fernabsatzgesetz',
+  },
+] as const
+
 export default async function HomePage() {
-  // Graceful fallback if Supabase is unavailable (e.g. during build/CI without secrets)
   let featuredProducts: Awaited<ReturnType<typeof getFeaturedProducts>> = []
   try {
     featuredProducts = await getFeaturedProducts()
@@ -17,21 +40,72 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <section className="mb-16 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-balance md:text-6xl">
-          Premium Tech & Lifestyle
-        </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground text-pretty">
-          Entdecke handverlesene Produkte für deinen digitalen Alltag
-        </p>
+    <>
+      {/* Hero */}
+      <section className="border-b border-border bg-gradient-to-b from-muted/40 to-background">
+        <div className="container mx-auto flex flex-col items-center px-4 py-20 text-center md:py-28">
+          <span className="mb-4 inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            Handverlesen. Geprüft. Geliefert.
+          </span>
+          <h1 className="mb-4 max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-6xl">
+            Premium Tech &amp; Lifestyle für deinen Alltag
+          </h1>
+          <p className="mb-8 max-w-2xl text-pretty text-lg text-muted-foreground">
+            Entdecke handverlesene Produkte für deinen digitalen Alltag — von
+            High-Fidelity-Audio über taktile Tastaturen bis zu zeitlosen
+            Accessoires.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="#featured" className="btn btn-primary btn-lg">
+              Jetzt entdecken
+              <ArrowRightIcon className="size-5" aria-hidden />
+            </Link>
+            <Link href="/versand" className="btn btn-outline btn-lg">
+              Versandinfos
+            </Link>
+          </div>
+        </div>
       </section>
 
-      <section>
-        <h2 className="mb-8 text-2xl font-bold">Featured Products</h2>
+      {/* Trust strip */}
+      <section
+        aria-label="Unsere Versprechen"
+        className="border-b border-border bg-muted/30"
+      >
+        <div className="container mx-auto grid gap-6 px-4 py-8 sm:grid-cols-3">
+          {TRUST_ITEMS.map((item) => (
+            <div key={item.title} className="flex items-start gap-3">
+              <div className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-background text-primary ring-1 ring-border">
+                <item.icon className="size-5" aria-hidden />
+              </div>
+              <div>
+                <p className="font-semibold">{item.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured products */}
+      <section id="featured" className="container mx-auto px-4 py-16">
+        <div className="mb-8 flex flex-col gap-1">
+          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+            Unsere Empfehlungen
+          </h2>
+          <p className="text-muted-foreground">
+            Eine kuratierte Auswahl unserer beliebtesten Produkte.
+          </p>
+        </div>
+
         {featuredProducts.length === 0 ? (
-          <div className="rounded-lg border border-border bg-muted p-8 text-center text-muted-foreground">
-            <p>Produkte werden geladen… (Supabase nicht erreichbar)</p>
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-12 text-center">
+            <p className="font-medium">Noch keine Produkte verfügbar</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Wir arbeiten daran, bald eine Auswahl für dich bereitzustellen.
+            </p>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -41,6 +115,6 @@ export default async function HomePage() {
           </div>
         )}
       </section>
-    </div>
+    </>
   )
 }

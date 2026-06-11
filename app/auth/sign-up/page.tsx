@@ -1,14 +1,17 @@
-// Purpose: Sign-up page (Step 2 of migration)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Sign-up page (Step 2 + Step 10 — a11y, password hint)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { AlertCircleIcon, SpinnerIcon } from '@/components/icons'
 
 export default function SignUpPage() {
+  const emailId = useId()
+  const passwordId = useId()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -41,39 +44,67 @@ export default function SignUpPage() {
   return (
     <div className="container mx-auto flex min-h-[60vh] max-w-md items-center px-4 py-12">
       <div className="w-full">
-        <h1 className="mb-8 text-3xl font-bold">Konto erstellen</h1>
-        <form onSubmit={handleSignUp} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-medium">
-            E-Mail
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">Konto erstellen</h1>
+        <p className="mb-8 text-sm text-muted-foreground">
+          Erstelle ein Konto, um deine Bestellungen zu verfolgen und eine
+          Wunschliste zu führen.
+        </p>
+        <form onSubmit={handleSignUp} className="flex flex-col gap-4" noValidate>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={emailId} className="text-sm font-medium">
+              E-Mail
+            </label>
             <input
+              id={emailId}
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-input bg-background px-3 py-2"
+              className="field-input"
+              autoComplete="email"
             />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-medium">
-            Passwort
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={passwordId} className="text-sm font-medium">
+              Passwort
+            </label>
             <input
+              id={passwordId}
               type="password"
               required
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border border-input bg-background px-3 py-2"
+              className="field-input"
+              autoComplete="new-password"
             />
-          </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            <p className="field-hint">Mindestens 8 Zeichen.</p>
+          </div>
+          {error && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
+            >
+              <AlertCircleIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+              <span>{error}</span>
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className="btn btn-primary btn-lg w-full"
           >
-            {loading ? 'Wird erstellt…' : 'Registrieren'}
+            {loading ? (
+              <>
+                <SpinnerIcon className="size-5 animate-spin" aria-hidden />
+                Wird erstellt…
+              </>
+            ) : (
+              'Registrieren'
+            )}
           </button>
         </form>
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="mt-6 text-sm text-muted-foreground">
           Bereits ein Konto?{' '}
           <Link href="/auth/login" className="font-medium text-primary underline">
             Anmelden

@@ -1,9 +1,17 @@
-// Purpose: Widerrufsrecht page (Step 5 — real content from config/storefront-legal)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Widerrufsrecht page
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
+import type { Metadata } from 'next'
 import { LegalPage } from '@/components/LegalPage'
 import { STOREFRONT_LEGAL_PAGES } from '../../config/storefront-legal'
 
+export const metadata: Metadata = {
+  title: 'Widerrufsrecht',
+  description: 'Gesetzliches Widerrufsrecht für Verbraucher bei ShopSIN.',
+}
+
 export default function WiderrufsrechtPage() {
-  return <LegalPage page={STOREFRONT_LEGAL_PAGES.widerrufsrecht} />
+  return (
+    <LegalPage page={STOREFRONT_LEGAL_PAGES.widerrufsrecht} />
+  )
 }
