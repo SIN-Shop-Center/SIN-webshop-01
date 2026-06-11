@@ -4,6 +4,7 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getProductById } from '@/lib/queries'
+import { AddToCartButton } from '@/components/AddToCartButton'
 
 // TODO(#26): Remove force-dynamic once data is stable enough for ISR.
 export const dynamic = 'force-dynamic'
@@ -57,9 +58,7 @@ export default async function ProductPage({
             </div>
           )}
 
-          <button className="w-full rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-            In den Warenkorb
-          </button>
+          <AddToCartButton productId={product.id} stock={product.stock} />
 
           <p className="mt-4 text-sm text-muted-foreground">
             Lagerbestand: {product.stock} verfügbar
