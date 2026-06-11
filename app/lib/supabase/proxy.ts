@@ -43,6 +43,14 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Admin-Bereich: nicht eingeloggt → Login. (Admin-Rolle prüft requireAdmin()
+  // in den Pages selbst — Metadata ist hier nicht verlässlich genug.)
+  if (request.nextUrl.pathname.startsWith('/admin') && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    return NextResponse.redirect(url)
+  }
+
   // WICHTIG: supabaseResponse unverändert zurückgeben,
   // sonst gehen Session-Cookies verloren.
   return supabaseResponse
