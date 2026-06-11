@@ -8,6 +8,14 @@
     {
       "path": "/api/cron/cj-sync",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/tiktok-publish",
+      "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/tiktok-sync",
+      "schedule": "0 4 * * *"
     }
   ]
 }
