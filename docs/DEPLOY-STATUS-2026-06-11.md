@@ -298,3 +298,82 @@ Statt `supabase.delqhi.com` als eigene Zone zu konfigurieren, könnten wir `shop
 - `docs/DEPLOY-CLOUDFLARE.md` — Full Runbook (Dashboard + CLI + GitHub auto-deploy + Troubleshooting + Rollback)
 - `docs/PLAN-VERKAUFSFAEHIG.md` — Migration-Plan, Status issues #20–#26
 - `CLOUDFLARE.md` (Root) — Schnell-Anleitung für Dashboard-Schritte
+
+---
+
+## Subagent-A Session: 2026-06-11 (17:00–17:05)
+
+### Was passiert ist
+
+1. **DNS-Token-Scope-Test:** wrangler-OAuth-Token hat **kein** `dns:edit` Scope — Auth-Error 10000 bei `POST /zones/{id}/dns_records` und sogar `GET .../dns_records`. Token-Scopes sind: `account (read), user (read), workers (write), workers_kv (write), workers_routes (write), workers_scripts (write), workers_tail (read), d1 (write), pages (write), zone (read), ssl_certs (write), ai (write)`. **Option A via API BLOCKED.**
+
+2. **Cloudflared Origin-Cert fehlt:** `cloudflared tunnel route dns simone-api supabase.delqhi.com` schlägt fehl mit `Error decoding origin cert: missing token in the certificate` (self-signed cert reicht nicht, Cloudflare-Origin-Cert muss PKCS#7-format haben). Auf der VM existiert KEIN `/home/ubuntu/.cloudflared/cert.pem`. **Option B cert-pfad BLOCKED ohne Browser-Login.**
+
+3. **DNS-Record `supabase.delqhi.com` existiert FALSCH:** A-Records zeigen auf `104.21.10.244` und `172.67.131.189` (Cloudflare-Anycast, **falsche** Anycast-Edge, NICHT der Tunnel-Endpoint). Das verursacht HTTP 530 "Invalid hostname" wenn `https://supabase.delqhi.com/` aufgerufen wird — die Cloudflare-Anycast-IP nimmt die Verbindung an, leitet sie aber nicht zum Tunnel weiter.
+
+4. **Tunnel-Ingress repariert:** `/home/ubuntu/.cloudflared/config.yml` Ingress für `supabase.delqhi.com` zeigte auf `http://supabase-kong:8000`, was **nicht** vom Host aufgelöst werden kann (kong läuft in Docker-Netzwerk `haus-netzwerk`, cloudflared läuft als nativer Linux-Prozess). **Fix:** `service: http://172.20.0.76:8000` (kong-IP im haus-netzwerk).
+
+5. **Cloudflared neu gestartet** mit korrigierter Config (kill alter PID, nohup neu starten, ohne systemd-unit).
+
+6. **Worker-Config umgestellt:** `NEXT_PUBLIC_SUPABASE_URL: "http://supabase.delqhi.com:8006"` (vorher `http://92.5.60.87:8006`). **Worker re-deployed** (Version `47d994f8-a497-4a0b-9e84-04c0e5abc5ed`).
+
+7. **E2E-Test:** `/produkt/[id]` wirft weiterhin HTTP 500, weil DNS für `supabase.delqhi.com` auf falsche IPs zeigt. Worker-Logs: `error code: 1003` (SSRF-Block, weil DNS-aufgelöste IP als nicht-öffentlich eingestuft wird). Bestätigt: Token-Deploy war erfolgreich, aber ohne DNS-Fix funktioniert es nicht.
+
+8. **Andere Routen weiterhin 200:** `/`, `/impressum`, `/warenkorb`, `/kontakt`, `/auth/login`.
+
+### Was der User manuell machen muss
+
+Im Cloudflare-Dashboard: <https://dash.cloudflare.com>
+
+**Schritt 1: API-Token mit DNS-Edit erstellen** (optional, für CLI-Zukunft)
+- → <https://dash.cloudflare.com/profile/api-tokens>
+- → "Create Token" → Template "Edit zone DNS" → Zone Resources = `delqhi.com`
+- → Token sicher speichern
+
+**Schritt 2: Falsche DNS-Records löschen**
+- → <https://dash.cloudflare.com/1f7ab05e43657db15341b691070ea4c8/delqhi.com/dns/records>
+- → `supabase` A-Record löschen (104.21.10.244)
+- → `supabase` A-Record löschen (172.67.131.189)
+
+**Schritt 3: Korrekten DNS-Record anlegen** (eine der zwei Optionen)
+
+**Option X (empfohlen — mit TLS): CNAME auf Tunnel**
+- Type: `CNAME`
+- Name: `supabase`
+- Target: `fb25fb11-8840-41fd-8a85-518674c86725.cfargotunnel.com`
+- Proxy: **DNS only** (gray cloud) — Tunnel routet intern
+
+**Option Y (simpel, ohne TLS): A-Record auf VM-IP**
+- Type: `A`
+- Name: `supabase`
+- Content: `92.5.60.87`
+- Proxy: **DNS only** (gray cloud, KRITISCH)
+
+**Schritt 4: Verifizieren** (nach 1-2 Min DNS-Propagation)
+```bash
+dig +short supabase.delqhi.com @1.1.1.1   # muss cfargotunnel.com zeigen (X) oder 92.5.60.87 (Y)
+curl -sS -o /dev/null -w "%{http_code}\n" https://supabase.delqhi.com/rest/v1/products?limit=1 -H "apikey: eyJ..."  # muss 200 oder 401 sein
+```
+
+**Schritt 5: Worker re-deployen (optional, Config ist schon gepusht)**
+```bash
+cd /Users/jeremy/dev/SIN-webshop-01 && pnpm build:cf && wrangler deploy
+```
+
+**Schritt 6: E2E-Test**
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" https://shopsin.delqhi.com/produkt/e1347b4f-b9ce-434b-923a-6d33d63ad046
+# Erwartet: 200
+```
+
+### Geänderte Dateien in diesem Commit
+
+- `wrangler.jsonc` — `NEXT_PUBLIC_SUPABASE_URL` von `http://92.5.60.87:8006` auf `http://supabase.delqhi.com:8006`
+- `.gitignore` — `.open-next-deploy/` hinzugefügt (wrangler dry-run Artefakt)
+- `docs/DEPLOY-STATUS-2026-06-11.md` — dieser Subagent-A-Bericht
+
+### Was ich NICHT machen konnte und warum
+
+- **DNS-Record anlegen:** wrangler-OAuth-Token hat kein `dns:edit` (nur `dns:read`/zone-read). Selbst GET-Requests auf `/dns_records` schlagen mit Auth-Error 10000 fehl. User-Aktion im Dashboard erforderlich.
+- **Cloudflare-Origin-Cert generieren:** `cloudflared tunnel route dns` benötigt das cert.pem aus `cloudflared tunnel login` (Browser-Login). Geht nicht headless, User-Aktion erforderlich.
+- **Den Worker-Connectivity-Issue komplett fixen:** Worker-Config + Tunnel-Ingress + Cloudflared-Restart ist alles vorbereitet. Der einzige verbleibende Schritt ist DNS-Record-Erstellung im Dashboard, was technisch nur der User machen kann.
