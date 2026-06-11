@@ -7,7 +7,7 @@ import {
   STOREFRONT_FOOTER_LEGAL_NOTE,
   STOREFRONT_LEGAL_LINKS,
   STOREFRONT_LEGAL_PAGES,
-} from '../config/storefront-legal.mjs'
+} from '../config/storefront-legal.ts'
 
 const ROOT = process.cwd()
 
@@ -31,31 +31,27 @@ test('shared storefront legal config covers every legal footer route', () => {
   )
 })
 
-// TODO(#20-26): Re-enable after Next.js migration completes.
-// References Next.js file paths (apps/web/src/app/...) that do not exist
-// in the current Vite SPA. These checks are valid for the Next.js target
-// architecture described in docs/PLAN-VERKAUFSFAEHIG.md.
-test.skip('apps/web and workers/cloudflare consume the shared legal/footer source', async () => {
-  const [footer, footerLegalLinks, impressumPage, datenschutzPage, agbPage, widerrufsrechtPage, worker] = await Promise.all([
-    read('apps/web/src/components/layout/Footer.tsx'),
-    read('apps/web/src/components/layout/FooterLegalLinks.tsx'),
-    read('apps/web/src/app/impressum/page.tsx'),
-    read('apps/web/src/app/datenschutz/page.tsx'),
-    read('apps/web/src/app/agb/page.tsx'),
-    read('apps/web/src/app/widerrufsrecht/page.tsx'),
-    read('workers/cloudflare/worker.mjs'),
+test('Next.js app pages and components consume the shared legal/footer source', async () => {
+  const [impressumPage, datenschutzPage, agbPage, widerrufsrechtPage, legalComponent, footerComponent] = await Promise.all([
+    read('app/impressum/page.tsx'),
+    read('app/datenschutz/page.tsx'),
+    read('app/agb/page.tsx'),
+    read('app/widerrufsrecht/page.tsx'),
+    read('app/components/LegalPage.tsx'),
+    read('app/components/Footer.tsx'),
   ])
 
-  assert.match(footer, /STOREFRONT_LEGAL_LINKS/)
-  assert.match(footer, /STOREFRONT_FOOTER_LEGAL_NOTE/)
-  assert.match(footerLegalLinks, /STOREFRONT_LEGAL_LINKS/)
-
+  // Each legal page imports STOREFRONT_LEGAL_PAGES from the shared config
   assert.match(impressumPage, /STOREFRONT_LEGAL_PAGES/)
   assert.match(datenschutzPage, /STOREFRONT_LEGAL_PAGES/)
   assert.match(agbPage, /STOREFRONT_LEGAL_PAGES/)
   assert.match(widerrufsrechtPage, /STOREFRONT_LEGAL_PAGES/)
 
-  assert.match(worker, /STOREFRONT_LEGAL_LINKS/)
-  assert.match(worker, /STOREFRONT_LEGAL_PAGES/)
-  assert.match(worker, /STOREFRONT_FOOTER_LEGAL_NOTE/)
+  // LegalPage component uses the shared footer links and note
+  assert.match(legalComponent, /STOREFRONT_LEGAL_LINKS/)
+  assert.match(legalComponent, /STOREFRONT_FOOTER_LEGAL_NOTE/)
+
+  // Footer uses the shared legal links and footer note
+  assert.match(footerComponent, /STOREFRONT_LEGAL_LINKS/)
+  assert.match(footerComponent, /STOREFRONT_FOOTER_LEGAL_NOTE/)
 })

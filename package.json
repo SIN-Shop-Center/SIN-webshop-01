@@ -24,7 +24,7 @@
     "seed": "node scripts/supabase/seed-products.mjs",
     "seed:dev": "node scripts/supabase/seed-products.mjs --dev",
     "build": "pnpm -r --if-present build",
-    "test": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && node --test scripts/lib/cli-env.test.mjs scripts/lib/google-api.test.mjs scripts/lib/web-production-env.test.mjs scripts/governance-doc-sync.test.mjs scripts/project-ssot-doc-sync.test.mjs scripts/google-secret-sync.test.mjs scripts/sin-a2a-doc-sync.test.mjs scripts/check-governance-preflight.test.mjs scripts/storefront-legal-sync.test.mjs scripts/guard-baseline-validate.test.mjs && pnpm -r --if-present test && pnpm test:api",
+    "test": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && node --experimental-strip-types --no-warnings --test scripts/lib/cli-env.test.mjs scripts/lib/google-api.test.mjs scripts/lib/web-production-env.test.mjs scripts/governance-doc-sync.test.mjs scripts/project-ssot-doc-sync.test.mjs scripts/google-secret-sync.test.mjs scripts/sin-a2a-doc-sync.test.mjs scripts/check-governance-preflight.test.mjs scripts/storefront-legal-sync.test.mjs scripts/guard-baseline-validate.test.mjs && pnpm -r --if-present test && pnpm test:api",
     "test:api": "node scripts/ensure-supported-node.mjs && node scripts/test-api-essential.mjs",
     "test:api:native": "cd apps/api && go test ./...",
     "test:api:full": "cd apps/api && go test ./...",

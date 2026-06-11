@@ -1,7 +1,8 @@
-// Purpose: Footer component for Next.js storefront (Step 1)
+// Purpose: Footer with real legal links from config/storefront-legal
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
 import Link from 'next/link'
+import { STOREFRONT_FOOTER_LEGAL_NOTE, STOREFRONT_LEGAL_LINKS } from '../../config/storefront-legal'
 
 export function Footer() {
   return (
@@ -11,18 +12,18 @@ export function Footer() {
           <div>
             <h3 className="mb-4 text-sm font-semibold">Rechtliches</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/impressum">Impressum</Link></li>
-              <li><Link href="/datenschutz">Datenschutz</Link></li>
-              <li><Link href="/agb">AGB</Link></li>
-              <li><Link href="/versand">Versand</Link></li>
+              {STOREFRONT_LEGAL_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>{link.label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Kategorien</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/?category=Tech">Tech &amp; Gadgets</Link></li>
-              <li><Link href="/?category=Fashion">Fashion</Link></li>
-            </ul>
+          <div className="md:col-span-3">
+            <h3 className="mb-4 text-sm font-semibold">SIN Shop Center</h3>
+            <p className="text-sm text-muted-foreground text-pretty">
+              {STOREFRONT_FOOTER_LEGAL_NOTE}
+            </p>
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">

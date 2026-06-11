@@ -5,7 +5,7 @@ import {
   STOREFRONT_LEGAL_LINKS,
   STOREFRONT_LEGAL_PAGES,
   STOREFRONT_FOOTER_LEGAL_NOTE,
-} from '../../config/storefront-legal.mjs';
+} from '../../config/storefront-legal';
 
 export default {
   async fetch(request, env, ctx) {
