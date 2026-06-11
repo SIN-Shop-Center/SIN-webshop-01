@@ -20,6 +20,9 @@ export async function Navbar() {
           <Link href="/wunschliste" className="text-sm font-medium hover:text-primary">
             Wunschliste
           </Link>
+          <Link href="/konto/bestellungen" className="hidden text-sm font-medium hover:text-primary md:block">
+            Bestellungen
+          </Link>
           <Link href="/warenkorb" className="relative text-sm font-medium hover:text-primary">
             Warenkorb
             {cartCount > 0 && (

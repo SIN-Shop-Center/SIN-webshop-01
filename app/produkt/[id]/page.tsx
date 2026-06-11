@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
 import { AddToCartButton } from '@/components/AddToCartButton'
+import { PriceTag } from '@/components/PriceTag'
 
 // ISR: revalidate every 5 minutes (product details change rarely)
 export const revalidate = 300
@@ -45,13 +46,16 @@ export default async function ProductPage({
           <h1 className="mb-4 text-3xl font-bold text-balance">{product.title}</h1>
           <p className="mb-6 text-muted-foreground text-pretty">{product.description}</p>
 
-          <div className="mb-6 flex items-center gap-4">
-            <span className="text-3xl font-bold">{product.price.toFixed(2)} €</span>
-            {product.originalPrice && (
-              <span className="text-xl text-muted-foreground line-through">
-                {product.originalPrice.toFixed(2)} €
-              </span>
-            )}
+          <div className="mb-6">
+            <PriceTag
+              priceCents={Math.round(Number(product.price) * 100)}
+              originalPriceCents={
+                product.originalPrice != null
+                  ? Math.round(Number(product.originalPrice) * 100)
+                  : null
+              }
+              size="lg"
+            />
           </div>
 
           {product.features && product.features.length > 0 && (

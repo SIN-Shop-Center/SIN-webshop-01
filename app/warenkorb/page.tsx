@@ -1,4 +1,4 @@
-// Purpose: Warenkorb page — real cart via Server Actions (Step 3)
+// Purpose: Warenkorb page — real cart via Server Actions (Step 3 + Step 9 shipping)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
 import Link from 'next/link'
@@ -7,6 +7,7 @@ import { getCartItems } from '@/lib/actions/cart'
 import { getProductById } from '@/lib/queries'
 import { CartItemControls } from '@/components/CartItemControls'
 import { CheckoutButton } from '@/components/CheckoutButton'
+import { SHIPPING, getShippingCents } from '@/lib/shipping'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,6 +27,10 @@ export default async function CartPage() {
     (sum, item) => sum + Number(item.product.price) * item.quantity,
     0,
   )
+  const subtotalCents = Math.round(total * 100)
+  const shippingCents = getShippingCents(subtotalCents)
+  const grandTotalCents = subtotalCents + shippingCents
+  const missingForFreeCents = SHIPPING.freeAboveCents - subtotalCents
 
   if (enriched.length === 0) {
     return (
@@ -82,10 +87,36 @@ export default async function CartPage() {
 
         <div className="h-fit rounded-lg border border-border p-6">
           <h2 className="mb-4 text-lg font-semibold">Zusammenfassung</h2>
-          <div className="mb-4 flex justify-between border-b border-border pb-4">
-            <span className="text-muted-foreground">Zwischensumme</span>
-            <span className="font-semibold">{total.toFixed(2)} €</span>
+          <div className="flex flex-col gap-2 border-b border-border pb-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Zwischensumme</span>
+              <span>{(subtotalCents / 100).toFixed(2)} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Versand</span>
+              <span>
+                {shippingCents === 0
+                  ? 'Kostenlos'
+                  : `${(shippingCents / 100).toFixed(2)} €`}
+              </span>
+            </div>
           </div>
+          <div className="flex justify-between py-4">
+            <span className="font-semibold">Gesamt</span>
+            <span className="text-lg font-bold">
+              {(grandTotalCents / 100).toFixed(2)} €
+            </span>
+          </div>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Alle Preise inkl. MwSt. Lieferzeit:{' '}
+            {SHIPPING.deliveryDaysMin}-{SHIPPING.deliveryDaysMax} Werktage.
+          </p>
+          {missingForFreeCents > 0 && (
+            <p className="mb-4 rounded-lg bg-muted p-3 text-xs">
+              Noch {(missingForFreeCents / 100).toFixed(2)} € bis zum kostenlosen
+              Versand.
+            </p>
+          )}
           <CheckoutButton />
           <p className="mt-2 text-center text-xs text-muted-foreground">
             Sichere Zahlung über Stripe
