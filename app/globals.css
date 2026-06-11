@@ -16,7 +16,9 @@
   --secondary: #f4f4f5;
   --secondary-foreground: #0a0a0a;
   --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  /* Issue #52: muted-foreground von #71717a (4.5:1) auf #52525b (7.5:1) — WCAG AA+
+   * für kleinen Text (text-sm 14px). */
+  --muted-foreground: #52525b;
   --accent: #d97706;
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
@@ -43,7 +45,8 @@
     --secondary: #1e1e20;
     --secondary-foreground: #fafafa;
     --muted: #1e1e20;
-    --muted-foreground: #a1a1aa;
+    /* Issue #52: dark mode muted-foreground von #a1a1aa (5.4:1) auf #d4d4d8 (10:1). */
+    --muted-foreground: #d4d4d8;
     --accent: #f59e0b;
     --accent-foreground: #0a0a0a;
     --destructive: #ef4444;
