@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { getCartItems } from '@/lib/actions/cart'
 import { getProductById } from '@/lib/queries'
 import { CartItemControls } from '@/components/CartItemControls'
+import { CheckoutButton } from '@/components/CheckoutButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,11 +86,9 @@ export default async function CartPage() {
             <span className="text-muted-foreground">Zwischensumme</span>
             <span className="font-semibold">{total.toFixed(2)} €</span>
           </div>
-          <button className="w-full rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-            Zur Kasse
-          </button>
+          <CheckoutButton />
           <p className="mt-2 text-center text-xs text-muted-foreground">
-            Stripe Checkout folgt in einem späteren Schritt
+            Sichere Zahlung über Stripe
           </p>
         </div>
       </div>
