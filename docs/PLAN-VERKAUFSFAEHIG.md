@@ -21,8 +21,14 @@
 ### Erledigt
 - ✅ Rechtstexte mit echten Firmendaten (ShopSIN, Jeremy Schulze, Kurfürstenstraße 124, 10785 Berlin, opensin@gmx.com)
 - ✅ `.env.local` angelegt mit allen Secret-Slots (Infisical-Befüllung für Live)
-- ⚠️ **Stripe-Keys bewusst NICHT rotiert** für Woche 1 (Keys bereits in Git-History geleakt — Risiko akzeptiert für schnellen Launch, Rotation ASAP nach Go-Live)
-- ⚠️ **Telefonnummer fehlt** — KI-Telefonassistent in Vorbereitung; bis dahin kein Telefon-Support
+- ⚠️ **Telefonnummer fehlt** — KI-Telefonassistent in Vorbereitung; bis dahin kein Telefon-Support (Kontaktformular als zweiter Kanal nach § 5 DDG)
+
+### 🔴 BLOCKER — Stripe-Keys rotieren (VOR erstem echten Euro)
+- ⛔ **NICHT "akzeptiertes Risiko"** — geleakter `sk_live_` in öffentlichem GitHub-Repo ist ein aktiver Angriffsvektor
+- Solange nur **Test-Keys** (`sk_test_`) im Spiel sind: harmlos
+- **VOR erstem echten Euro-Flow**: Dashboard → Developers → API Keys → Roll key, neuen Wert in Infisical
+- GitHub + Stripe scannen öffentliche Repos aktiv — Key wird vermutlich zwangsweise deaktiviert, dann mitten im Betrieb statt kontrolliert vorher
+- Aufwand: 5 Minuten
 
 ### Noch manuell zu erledigen
 - `nlm login` refreshen für Governance-Check

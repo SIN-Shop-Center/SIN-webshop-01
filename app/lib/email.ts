@@ -3,21 +3,20 @@
 //
 // Note: Lazy initialization to avoid build-time errors when RESEND_API_KEY
 // is not set (e.g. in CI without secrets).
+//
+// Domain: delqhi.com (Resend muss vor Live-Domain verifizieren).
+// Fallback 'onboarding@resend.dev' ist nur für lokale Tests erlaubt
+// (Resend blockiert Versand an Empfänger außerhalb des eigenen Kontos).
 
 import 'server-only'
 
 import { Resend } from 'resend'
+import { FROM_EMAIL, FOOTER_COMPANY, getResend } from '@/lib/email-constants'
 
 interface OrderItem {
   title: string
   quantity: number
   unit_amount: number // Cents
-}
-
-function getResend(): Resend {
-  const key = process.env.RESEND_API_KEY
-  if (!key) throw new Error('RESEND_API_KEY is not set')
-  return new Resend(key)
 }
 
 export async function sendOrderConfirmation(params: {
@@ -36,7 +35,7 @@ export async function sendOrderConfirmation(params: {
     .join('')
 
   await getResend().emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? 'SIN Shop <onboarding@resend.dev>',
+    from: FROM_EMAIL,
     to,
     subject: `Bestellbestätigung ${orderId.slice(0, 8).toUpperCase()}`,
     html: `
@@ -48,7 +47,7 @@ export async function sendOrderConfirmation(params: {
           <tr><td colspan="2" style="padding:8px;border-top:1px solid #ddd"><strong>Gesamt</strong></td>
           <td style="padding:8px;text-align:right;border-top:1px solid #ddd"><strong>${(totalCents / 100).toFixed(2)} €</strong></td></tr>
         </table>
-        <p style="color:#666;font-size:13px">SIN Shop Center – diese E-Mail wurde automatisch erstellt.</p>
+        <p style="color:#666;font-size:13px">${FOOTER_COMPANY} – diese E-Mail wurde automatisch erstellt.</p>
       </div>
     `,
   })
@@ -62,7 +61,7 @@ export async function sendShippingNotification(params: {
   const { to, orderId, trackingNumber } = params
 
   await getResend().emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? 'SIN Shop <onboarding@resend.dev>',
+    from: FROM_EMAIL,
     to,
     subject: `Deine Bestellung ${orderId.slice(0, 8).toUpperCase()} wurde versendet`,
     html: `
