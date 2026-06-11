@@ -1,13 +1,11 @@
-// Purpose: Datenschutz page (Step 1; placeholder per plan)
+// Purpose: Datenschutz page (Step 5 — real content from config/storefront-legal)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
+import { LegalPage } from '@/components/LegalPage'
+import { STOREFRONT_LEGAL_PAGES } from '../../config/storefront-legal'
+
+export const dynamic = 'force-dynamic'
+
 export default function DatenschutzPage() {
-  return (
-    <div className="container mx-auto max-w-3xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold">Datenschutzerklärung</h1>
-      <div className="prose prose-slate">
-        <p>Placeholder für Datenschutzerklärung.</p>
-      </div>
-    </div>
-  )
+  return <LegalPage page={STOREFRONT_LEGAL_PAGES.datenschutz} />
 }

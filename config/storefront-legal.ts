@@ -16,7 +16,20 @@ export const STOREFRONT_LEGAL_LINKS = [
 export const STOREFRONT_FOOTER_LEGAL_NOTE =
   'Alle Preise inkl. MwSt. Versand innerhalb Deutschlands. Widerrufsrecht: 14 Tage.'
 
-export const STOREFRONT_LEGAL_PAGES = {
+export interface StorefrontLegalSection {
+  title: string
+  body: string
+}
+
+export interface StorefrontLegalPage {
+  path: string
+  title: string
+  description: string
+  intro: string
+  sections?: StorefrontLegalSection[]
+}
+
+export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
   impressum: {
     path: '/impressum',
     title: 'Impressum',
