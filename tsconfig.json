@@ -48,8 +48,6 @@
   ],
   "exclude": [
     "node_modules",
-    "apps/web",
-    "apps/api",
     "workers"
   ]
 }
