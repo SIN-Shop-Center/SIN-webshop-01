@@ -8,8 +8,6 @@
 import Link from 'next/link'
 import { STOREFRONT_FOOTER_LEGAL_NOTE, STOREFRONT_LEGAL_LINKS } from '../../config/storefront-legal'
 
-export const dynamic = 'force-dynamic'
-
 export default function VersandPage() {
   return (
     <div className="container mx-auto max-w-3xl px-4 py-12">

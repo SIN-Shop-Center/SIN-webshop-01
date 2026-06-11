@@ -1,5 +1,9 @@
 # Frontend Architecture Refactoring - Issue #4 Status Report
 
+> **ARCHIVIERT (Stand 11.06.2026):** Vite-SPA-Refactoring. Ersetzt durch
+> Next.js 16 App Router (siehe [`docs/PLAN-VERKAUFSFAEHIG.md`](docs/PLAN-VERKAUFSFAEHIG.md)).
+> Bleibt im Repo als historische Referenz.
+
 ## ✅ COMPLETED: Phase 2 - Issue #4 - Frontend Architecture Refactoring
 
 ### Summary

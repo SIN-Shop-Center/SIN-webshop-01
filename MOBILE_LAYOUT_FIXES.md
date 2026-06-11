@@ -1,5 +1,9 @@
 # Issue #5: Mobile Layout Fixes - Status Report
 
+> **ARCHIVIERT (Stand 11.06.2026):** Vite-SPA Mobile-Fixes. Ersetzt durch
+> Next.js 16 mit `force-dynamic` (siehe [`docs/PLAN-VERKAUFSFAEHIG.md`](docs/PLAN-VERKAUFSFAEHIG.md)).
+> Bleibt im Repo als historische Referenz.
+
 ## ✅ COMPLETED: All Mobile Layout Issues Fixed
 
 ---

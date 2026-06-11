@@ -1,34 +1,69 @@
-# Simone Webshop: Cross-Category Trend-Commerce Engine
+# Simone Webshop
 
-Stand: **26. Mai 2026**
+Stand: **11. Juni 2026** — Next.js 16 Stack (v1.0.0)
 
-## Cloudflare Production
+> Vorher: Vite-SPA + Go-API + Cloudflare Worker (Stand 26. Mai 2026).
+> Migration dokumentiert in [`docs/PLAN-VERKAUFSFAEHIG.md`](docs/PLAN-VERKAUFSFAEHIG.md) — alle 6 Schritte abgeschlossen.
 
-- Runtime: **Cloudflare Workers**
-- Canonical deployment record: `CLOUDFLARE.md`
-- Live URL: `https://delqhi.com`
-- Live storefront routes:
-  - `/` home
-  - `/products` catalog
-  - `/products/:slug` product detail
-  - `/cart` cart
-  - `/checkout` checkout
-  - `/order-success` success page
-- Legal pages (all verified 200):
-  - `/impressum` Impressum
-  - `/agb` AGB (Dropshipping)
-  - `/datenschutz` Datenschutz
-  - `/widerrufsrecht` Widerrufsrecht
-  - `/versand` Versand
-- Payment methods: Card, SEPA Direct Debit, Klarna
-- Email: Resend (primary) + Gmail API (fallback)
-- Supplier: CJ Dropshipping (auto-fulfill 3-step flow: create→confirm→payBalance)
-- Deploy command:
+## Stack
+
+- **Framework**: Next.js 16 (App Router, Server Actions, Turbopack)
+- **Datenbank**: Supabase (self-hosted auf OCI VM 92.5.60.87, Port 5433, Schema `shop`)
+- **Auth**: Supabase SSR (Email/Password, httpOnly-Cookie-Sessions)
+- **Payments**: Stripe Hosted Checkout (gehostet, keine PCI-Last im Shop)
+- **Email**: Resend (Bestellbestätigungen)
+- **Storage / Hosting**: geplant Vercel
+
+## Routes
+
+| Pfad | Inhalt |
+|------|--------|
+| `/` | Startseite mit Featured Products (Supabase-backed) |
+| `/produkt/[id]` | Produktdetailseite |
+| `/warenkorb` | Warenkorb (Gast-fähig via httpOnly-Cookie) |
+| `/wunschliste` | Wunschliste (Login erforderlich, RLS-scoped) |
+| `/kasse/erfolg` | Stripe Success Page (verifiziert Session, leert Cart) |
+| `/impressum`, `/datenschutz`, `/agb`, `/widerrufsrecht`, `/versand` | Rechtstexte (shared via `config/storefront-legal.ts`) |
+| `/auth/login`, `/auth/sign-up`, `/auth/sign-up-success`, `/auth/error`, `/auth/callback` | Auth-Flow |
+| `/api/stripe/webhook` | Stripe Webhook → Order in DB + Resend Mail |
+
+## Entwicklung
 
 ```bash
-cd /Users/jeremy/dev/projects/family-projects/simone-webshop-01
-pnpm deploy:cloudflare
+pnpm install
+pnpm dev          # next dev auf :3000
+pnpm build        # next build
+pnpm test         # Unit-Tests (governance-check braucht nlm login)
 ```
+
+## Datenbank-Setup (einmalig)
+
+```bash
+psql "$DATABASE_URL" -f scripts/supabase/setup-rls.sql
+psql "$DATABASE_URL" -f scripts/supabase/setup-cart.sql
+psql "$DATABASE_URL" -f scripts/supabase/setup-orders.sql
+```
+
+Seed (optional, legt 8 Demo-Produkte an):
+```bash
+pnpm seed:dev    # ohne Supabase-Verbindung (Simulation)
+# oder
+SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… pnpm seed
+```
+
+## Env-Variablen
+
+Siehe [`.env.example`](.env.example) — benötigt: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`.
+
+## Architektur
+
+- **Warenkorb**: Guest-fähig via httpOnly-Cookie + RLS-deny-all `cart_items` (Service-Role-Client in Server Actions)
+- **Wishlist**: Login erforderlich, RLS-scoped per `auth.uid()`
+- **Preise**: IMMER aus der DB im Server Action (`startCheckout`), niemals vom Client
+- **Bestellungen**: Webhook-insert (idempotent via `stripe_session_id`)
+- **Auth-Proxy**: `proxy.ts` (Next.js 16 Middleware-Replacement) refresht Session-Cookies
+
+## Wahrheitsprinzip (keine Fake-Claims)
 
 ## Docs SSOT Sync
 

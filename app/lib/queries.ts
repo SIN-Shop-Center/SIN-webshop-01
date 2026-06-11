@@ -7,6 +7,7 @@
 // transformProduct() accordingly. Run `select * from products limit 1` to verify.
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { Product } from './data'
 
 // ── Raw row type from Supabase ────────────────────────────────────────────────
@@ -104,4 +105,24 @@ export async function getProductById(id: string): Promise<Product | null> {
 
   if (error) throw error
   return data ? transformProduct(data as DbProductRow) : null
+}
+
+/**
+ * Build-time product list using the admin client (no cookies needed).
+ * Used by generateStaticParams at build time.
+ * Returns [] if Supabase env vars are not configured (e.g. CI without secrets),
+ * in which case pages render on-demand via dynamicParams.
+ */
+export async function getAllProductIdsForBuild(): Promise<string[]> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return []
+  }
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('products')
+    .select('id')
+    .eq('is_active', true)
+
+  if (error) throw error
+  return (data ?? []).map((row) => row.id)
 }

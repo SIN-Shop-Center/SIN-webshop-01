@@ -1,5 +1,9 @@
 # 🎯 SIN Webshop - Supabase Integration (Issue #1) - Status Update
 
+> **ARCHIVIERT (Stand 11.06.2026):** Vite-SPA + Supabase-Variante. Ersetzt durch
+> Next.js 16 Stack (siehe [`docs/PLAN-VERKAUFSFAEHIG.md`](docs/PLAN-VERKAUFSFAEHIG.md)).
+> Bleibt im Repo als historische Referenz.
+
 ## ✅ COMPLETED: Phase 1 - Supabase Integration
 
 ### What Was Done

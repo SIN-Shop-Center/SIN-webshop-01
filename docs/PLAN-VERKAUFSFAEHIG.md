@@ -2,7 +2,7 @@
 
 > Entscheidung: Next.js/Serverless statt Go-Backend (kein eigener Server nötig, ein Deploy auf Vercel)
 > Bezug: Issues #20–#26 (siehe unten)
-> Stand: 2026-06-11 — Schritte 1–3 in Umsetzung, 4–6 offen
+> Stand: 2026-06-11 — **Code-Fertig (Steps 20–26)**, Stripe-Key-Rotation ausstehend
 
 ## Migrations-Status (Issues #20–#26)
 
@@ -11,10 +11,17 @@
 | 20 | Next.js-App aufsetzen + UI portieren | ✅ | `18d7ea9` |
 | 21 | Supabase (bestehende self-hosted Instanz) + Auth | ✅ | `a35bbd7` |
 | 22 | Cart + Wishlist via Server Actions | ✅ | `e232892` |
-| 23 | Stripe Hosted Checkout + Resend Mail | ⬜ blocked (Prerequisites ausstehend) | — |
-| 24 | Rechtstexte final | 🟡 Platzhalter im Code | — |
-| 25 | Stripe-Key-Rotation + Force-Dynamic → ISR | ⬜ (nach Step 23) | — |
-| 26 | Aufräumen: `apps/web`, `apps/api`, Worker | ⬜ (zuletzt) | — |
+| 23 | Stripe Hosted Checkout + Resend Mail | ✅ | `6a2c1e3` |
+| 24 | Rechtstexte final (Config → Komponente) | ✅ | `c19a1e2` |
+| 25 | Stripe-Key-Rotation + Force-Dynamic → ISR | ✅ Code (Rotation ausstehend) | — |
+| 26 | Aufräumen: `apps/web`, `apps/api`, Worker, Docker | ✅ | `274bbc0` |
+
+**Code: 100% fertig. Vor Live-Deployment noch manuell zu erledigen:**
+- Stripe-Keys rotieren (Dashboard) — sicherheitskritisch, alte Keys sind in Git-History
+- `nlm login` refreshen für Governance-Check
+- SQL-Scripts gegen Live-DB ausführen (`setup-rls.sql`, `setup-cart.sql`, `setup-orders.sql`)
+- `.env.local` mit echten Werten anlegen
+- Manuelle Tests: `pnpm dev`, Stripe-CLI Webhook-Forwarding, Testkarte 4242…
 
 ## Ausgangslage
 
