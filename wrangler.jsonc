@@ -65,5 +65,28 @@
     }
   ],
 
-  "placement": { "mode": "smart" }
+  "placement": { "mode": "smart" },
+
+  // Cloudflare Cron Triggers (Issue #36, #37, #53, #54)
+  // Worker 30s CPU-Limit → Batches klein halten.
+  //
+  // WICHTIG: Diese `crons` triggern den Worker-`scheduled`-Handler, NICHT
+  // direkt unsere /api/cron/*-Routen. OpenNext/Next.js haben keinen
+  // nativen Bridge. Lösung: ein separater Mini-Worker (siehe Kommentar)
+  // oder Cloudflare Dashboard → Workers → Triggers → Cron mit URL
+  // https://shopsin.delqhi.com/api/cron/<job> und Header
+  // "Authorization: Bearer $CRON_SECRET" einrichten.
+  //
+  // Workaround (ohne Custom Worker):
+  //   1. wrangler.jsonc → crons entfernen
+  //   2. Cloudflare Dashboard → Workers → shopsin-storefront → Triggers → Cron
+  //   3. 4 Cron-Einträge wie unten mit expliziter URL + Header anlegen
+  "triggers": {
+    "crons": [
+      "0 1 * * *",   // fx-update: täglich 1 Uhr
+      "0 */3 * * *", // cj-sync: alle 3h, 10er-Batch
+      "0 */4 * * *", // cj-fulfillment: alle 4h, 15er-Batch
+      "30 * * * *"   // cart-cleanup: stündlich, verlassene Carts freigeben
+    ]
+  }
 }

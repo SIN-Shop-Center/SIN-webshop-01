@@ -4,6 +4,8 @@
 import Link from 'next/link'
 import { getFeaturedProducts } from '@/lib/queries'
 import { ProductCard } from '@/components/ProductCard'
+import { SHIPPING } from '@/lib/shipping'
+import { formatEuro } from '@/lib/format'
 import {
   TruckIcon,
   ShieldCheckIcon,
@@ -16,8 +18,8 @@ export const revalidate = 60
 const TRUST_ITEMS = [
   {
     icon: TruckIcon,
-    title: 'Kostenloser Versand ab 49 €',
-    description: 'Schnelle Lieferung innerhalb Deutschlands',
+    title: `Kostenloser Versand ab ${formatEuro(SHIPPING.freeAboveCents)}`,
+    description: `Lieferung in ${SHIPPING.deliveryDaysMin}–${SHIPPING.deliveryDaysMax} Werktagen innerhalb Deutschlands`,
   },
   {
     icon: ShieldCheckIcon,
@@ -41,26 +43,26 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — kompakteres Padding auf Mobile, full-width CTAs */}
       <section className="border-b border-border bg-gradient-to-b from-muted/40 to-background">
-        <div className="container mx-auto flex flex-col items-center px-4 py-20 text-center md:py-28">
+        <div className="container mx-auto flex flex-col items-center px-4 py-14 text-center sm:py-20 md:py-28">
           <span className="mb-4 inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
             Handverlesen. Geprüft. Geliefert.
           </span>
           <h1 className="mb-4 max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-6xl">
             Premium Tech &amp; Lifestyle für deinen Alltag
           </h1>
-          <p className="mb-8 max-w-2xl text-pretty text-lg text-muted-foreground">
+          <p className="mb-8 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
             Entdecke handverlesene Produkte für deinen digitalen Alltag — von
             High-Fidelity-Audio über taktile Tastaturen bis zu zeitlosen
             Accessoires.
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href="#featured" className="btn btn-primary btn-lg">
+          <div className="flex w-full max-w-sm flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
+            <Link href="#featured" className="btn btn-primary btn-lg w-full sm:w-auto">
               Jetzt entdecken
               <ArrowRightIcon className="size-5" aria-hidden />
             </Link>
-            <Link href="/versand" className="btn btn-outline btn-lg">
+            <Link href="/versand" className="btn btn-outline btn-lg w-full sm:w-auto">
               Versandinfos
             </Link>
           </div>
@@ -90,7 +92,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured products */}
-      <section id="featured" className="container mx-auto px-4 py-16">
+      <section id="featured" className="container mx-auto scroll-mt-20 px-4 py-16">
         <div className="mb-8 flex flex-col gap-1">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
             Unsere Empfehlungen

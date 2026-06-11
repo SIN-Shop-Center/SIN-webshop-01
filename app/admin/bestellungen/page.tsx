@@ -28,15 +28,14 @@ export default async function AdminOrdersPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div role="tablist" aria-label="Filter" className="flex flex-wrap gap-2">
+      <nav aria-label="Bestellungen filtern" className="flex flex-wrap gap-2">
         {FILTERS.map((f) => {
           const active = filter === f.value
           return (
             <Link
               key={f.value}
               href={`/admin/bestellungen?filter=${f.value}`}
-              role="tab"
-              aria-selected={active}
+              aria-current={active ? 'page' : undefined}
               className={
                 'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ' +
                 (active
@@ -48,7 +47,7 @@ export default async function AdminOrdersPage({
             </Link>
           )
         })}
-      </div>
+      </nav>
 
       {orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 py-16 text-center">

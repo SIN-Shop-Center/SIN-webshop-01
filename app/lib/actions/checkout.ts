@@ -3,26 +3,32 @@
 
 'use server'
 
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getStripe } from '@/lib/stripe'
 import { getCartItems } from '@/lib/actions/cart'
-import { getProductById } from '@/lib/queries'
+import { getProductsByIds } from '@/lib/queries'
 import { createClient } from '@/lib/supabase/server'
 import { SHIPPING, getShippingCents } from '@/lib/shipping'
+import { toCents } from '@/lib/format'
 
 export async function startCheckout() {
   const items = await getCartItems()
   if (items.length === 0) redirect('/warenkorb')
 
-  // Preise IMMER aus der DB — niemals vom Client
+  // Preise IMMER aus der DB — niemals vom Client.
+  // Batch-Query statt N+1: ein Roundtrip für alle Produkte.
+  const products = await getProductsByIds(items.map((i) => i.product_id))
+  const productMap = new Map(products.map((p) => [p.id, p]))
+
   const lineItems = []
   let subtotalCents = 0
 
   for (const item of items) {
-    const product = await getProductById(item.product_id)
+    const product = productMap.get(item.product_id)
     if (!product || product.stock <= 0) continue
 
-    const unitAmount = Math.round(Number(product.price) * 100)
+    const unitAmount = toCents(product.price)
     const quantity = Math.min(item.quantity, product.stock)
     subtotalCents += unitAmount * quantity
 
@@ -45,6 +51,12 @@ export async function startCheckout() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // cart_id mitgeben, damit der Stripe-Webhook den Warenkorb nach
+  // erfolgreicher Zahlung serverseitig leeren kann (statt als
+  // Render-Seiteneffekt auf der Erfolgsseite).
+  const cookieStore = await cookies()
+  const cartId = cookieStore.get('sin_cart_id')?.value ?? ''
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const shippingCents = getShippingCents(subtotalCents)
 
@@ -56,6 +68,7 @@ export async function startCheckout() {
     customer_email: user?.email ?? undefined,
     metadata: {
       user_id: user?.id ?? '',
+      cart_id: cartId,
     },
     // CJ Dropshipping verlangt eine Telefonnummer für den Versand
     phone_number_collection: { enabled: true },
