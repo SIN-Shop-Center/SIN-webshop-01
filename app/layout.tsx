@@ -10,7 +10,7 @@ import { Footer } from './components/Footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SIN Shop Center',
+  title: 'ShopSIN — Premium Tech & Lifestyle',
   description: 'Premium Tech & Lifestyle Products',
 }
 

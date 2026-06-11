@@ -16,11 +16,20 @@
 | 25 | Stripe-Key-Rotation + Force-Dynamic → ISR | ✅ Code (Rotation ausstehend) | — |
 | 26 | Aufräumen: `apps/web`, `apps/api`, Worker, Docker | ✅ | `274bbc0` |
 
-**Code: 100% fertig. Vor Live-Deployment noch manuell zu erledigen:**
-- Stripe-Keys rotieren (Dashboard) — sicherheitskritisch, alte Keys sind in Git-History
+**Code: 100% fertig. Stand 11.06.2026 — vor erster Produktionswoche:**
+
+### Erledigt
+- ✅ Rechtstexte mit echten Firmendaten (ShopSIN, Jeremy Schulze, Kurfürstenstraße 124, 10785 Berlin, opensin@gmx.com)
+- ✅ `.env.local` angelegt mit allen Secret-Slots (Infisical-Befüllung für Live)
+- ⚠️ **Stripe-Keys bewusst NICHT rotiert** für Woche 1 (Keys bereits in Git-History geleakt — Risiko akzeptiert für schnellen Launch, Rotation ASAP nach Go-Live)
+- ⚠️ **Telefonnummer fehlt** — KI-Telefonassistent in Vorbereitung; bis dahin kein Telefon-Support
+
+### Noch manuell zu erledigen
 - `nlm login` refreshen für Governance-Check
-- SQL-Scripts gegen Live-DB ausführen (`setup-rls.sql`, `setup-cart.sql`, `setup-orders.sql`)
-- `.env.local` mit echten Werten anlegen
+- SQL-Scripts gegen Live-DB ausführen (`setup-rls.sql`, `setup-cart.sql`, `setup-orders.sql`, `setup-cj.sql`)
+- `.env.local` via Infisical mit echten Werten befüllen: `infisical run -- pnpm dev`
+- Resend-Domain verifizieren (`delqhi.com`) für Versand-Mails
+- CJ-Wallet aufladen (`payType: 2` bucht automatisch)
 - Manuelle Tests: `pnpm dev`, Stripe-CLI Webhook-Forwarding, Testkarte 4242…
 
 ## Ausgangslage
