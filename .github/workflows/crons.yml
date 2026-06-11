@@ -1,0 +1,48 @@
+# Purpose: $0-Ersatz für Vercel Crons (Hobby-Plan erlaubt nur 2)
+# Secrets im Repo setzen: CRON_SECRET, APP_URL (z.B. https://sin-shop.example.com)
+
+name: scheduled-crons
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+    - cron: "30 3 * * *"
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * 1"
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      endpoint:
+        description: "Cron-Endpoint manuell triggern (z.B. tiktok-publish)"
+        required: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine endpoints for this schedule
+        id: pick
+        run: |
+          case "${{ github.event.schedule }}" in
+            "0 3 * * *")    echo "endpoints=cj-sync" >> "$GITHUB_OUTPUT" ;;
+            "30 3 * * *")   echo "endpoints=tiktok-publish" >> "$GITHUB_OUTPUT" ;;
+            "0 4 * * *")    echo "endpoints=tiktok-sync" >> "$GITHUB_OUTPUT" ;;
+            "0 5 * * *")    echo "endpoints=tiktok-returns" >> "$GITHUB_OUTPUT" ;;
+            "0 6 * * *")    echo "endpoints=tiktok-token-watchdog" >> "$GITHUB_OUTPUT" ;;
+            "0 7 * * 1")    echo "endpoints=tiktok-report" >> "$GITHUB_OUTPUT" ;;
+            "*/30 * * * *") echo "endpoints=cj-fulfillment tiktok-orders" >> "$GITHUB_OUTPUT" ;;
+            *)              echo "endpoints=${{ github.event.inputs.endpoint }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Call cron endpoints
+        run: |
+          set -e
+          for ep in ${{ steps.pick.outputs.endpoints }}; do
+            echo "Triggering /api/cron/$ep"
+            curl -fsS --max-time 290 \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              "${{ secrets.APP_URL }}/api/cron/$ep"
+            echo
+          done

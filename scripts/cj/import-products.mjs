@@ -14,6 +14,10 @@ import { createClient } from '@supabase/supabase-js'
 const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1'
 const MULTIPLIER = Number(process.env.CJ_PRICE_MULTIPLIER ?? '2.5')
 
+// EU/DE-Lager-Codes — TikTok-DE-Versandfristen (siehe docs/SIN_TIKTOK_MASTER_PIPELINE.md).
+// Produkte ohne EU-Lagerbestand werden übersprungen, wenn --eu-only gesetzt ist.
+const EU_WAREHOUSES = new Set(['DE', 'EU', 'GB', 'FR', 'ES', 'IT', 'PL', 'CZ'])
+
 const args = process.argv.slice(2)
 function arg(name) {
   const i = args.indexOf(`--${name}`)
@@ -68,6 +72,20 @@ async function cj(path, query = {}) {
   return json.data
 }
 
+async function hasEuStock(vid) {
+  try {
+    const data = await cj('/product/stock/queryByVid', { vid })
+    const list = Array.isArray(data) ? data : []
+    return list.some(
+      (w) =>
+        EU_WAREHOUSES.has(String(w.countryCode || w.areaEn || '').toUpperCase()) &&
+        Number(w.storageNum ?? w.num ?? 0) > 0,
+    )
+  } catch {
+    return false
+  }
+}
+
 function calcPrice(costUsd) {
   // CJ-Preise sind USD. Vereinfachung: 1:1 als EUR-Basis behandeln und
   // Marge draufschlagen. Bei Bedarf hier echten Wechselkurs einbauen.
@@ -84,6 +102,15 @@ async function importProduct(pid) {
   if (!firstVariant) {
     console.warn(`Übersprungen (keine Varianten): ${detail.productNameEn}`)
     return
+  }
+
+  // EU-Warehouse-Filter (TikTok-DE-Versandfristen)
+  if (args.includes('--eu-only')) {
+    const ok = await hasEuStock(firstVariant.vid)
+    if (!ok) {
+      console.warn(`Übersprungen (kein EU-Lager): ${detail.productNameEn}`)
+      return
+    }
   }
 
   const cost = Number(firstVariant.variantSellPrice ?? detail.sellPrice)
@@ -118,7 +145,9 @@ if (pid) {
   const keyword = arg('keyword')
   const limit = Number(arg('limit') ?? '10')
   if (!keyword) {
-    console.error('Usage: --keyword "suchbegriff" [--limit 10] ODER --pid <id>')
+    console.error(
+      'Usage: --keyword "suchbegriff" [--limit 10] [--eu-only] ODER --pid <id> [--eu-only]',
+    )
     process.exit(1)
   }
   const data = await cj('/product/list', {
