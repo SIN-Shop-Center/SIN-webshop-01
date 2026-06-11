@@ -1,5 +1,9 @@
 # Stripe Checkout Integration - Issue #3 Status Report
 
+> **ARCHIVIERT (Stand 11.06.2026):** Vite-SPA + Supabase-Variante. Ersetzt durch
+> Next.js 16 + Stripe Hosted Checkout (siehe [`docs/PLAN-VERKAUFSFAEHIG.md`](docs/PLAN-VERKAUFSFAEHIG.md)).
+> Bleibt im Repo als historische Referenz.
+
 ## ✅ COMPLETED: Phase 2 - Issue #3 - Stripe Checkout Integration
 
 ### Summary

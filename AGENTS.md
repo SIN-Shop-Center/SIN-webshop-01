@@ -2,7 +2,7 @@
 
 ## Project Identity
 
-- `PROJECT_ROOT=/Users/jeremy/dev/projects/family-projects/simone-webshop-01`
+- `PROJECT_ROOT=/Users/jeremy/dev/SIN-webshop-01`
 - `PROJECT_NOTEBOOK_ID=8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
 - `PROJECT_NOTEBOOK_URL=https://notebooklm.google.com/notebook/8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
 - `PROJECT_GOOGLE_DOC_ID=1wwA4zgr7GCmS-9fBaEi8NOi3Atd0WjRkK_WQwR9VtLQ`
@@ -122,7 +122,7 @@ Use this pattern when the Master Google Doc is updated:
 - **Resend From**: `Delqhi Shop <onboarding@resend.dev>` until delqhi.com domain verified, then `shop@delqhi.com`
 - **n8n**: Port 5678, 12 workflows imported, login `zukunftsorientierte.energie@gmail.com` / `simone2026`
 - **Stripe**: Live mode, account `acct_1TEhmvAZZTxFQVSB` (DE), webhook `we_1Tb9KHAZZTxFQVSBxnWV6N1p`
-- **Go API env**: `/home/ubuntu/simone-api.env` on VM
+- **Go API env**: `/home/ubuntu/simone-api.env` on VM (historisch — Go API wurde im Step 26 gelöscht)
 - **CJ Bundle Repo**: https://github.com/SIN-Shop-Center/SIN-CJDropshipping-Bundle (CLI + MCP + docs + scripts)
 - **Supabase Bundle Repo**: https://github.com/SIN-Shop-Center/SIN-Supabase-OCI-Bundle (docker-compose + migrations + provisioning scripts)
 
@@ -153,7 +153,11 @@ SOPS (`secrets/agents.enc.env`) remains in repo for backward compat but is no lo
 
 ### Schema Note
 
-Go API SQL uses explicit `shop.` schema prefix (was `public.` before migration). All Go source files under `apps/api/` were updated via bulk replace. Only `cmd/migrate/db_ops.go` retains `public.app_migrations`.
+> **HISTORISCH (Pre-11.06.2026):** Go API in `apps/api/` benutzte `shop.` Schema-Prefix.
+> Seit Step 26 der Next.js-Migration (siehe `docs/PLAN-VERKAUFSFAEHIG.md`)
+> ist `apps/api/` gelöscht. SQL-Operations laufen jetzt direkt gegen Supabase
+> via `@supabase/supabase-js` aus Server Actions und Route Handlers.
+> Bestand: Self-hosted Supabase auf OCI VM 92.5.60.87 (Port 5433, Schema `shop`).
 
 ### Skills
 

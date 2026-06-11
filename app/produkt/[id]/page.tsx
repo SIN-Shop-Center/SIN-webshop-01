@@ -3,11 +3,18 @@
 
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { getProductById } from '@/lib/queries'
+import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
 import { AddToCartButton } from '@/components/AddToCartButton'
 
-// TODO(#26): Remove force-dynamic once data is stable enough for ISR.
-export const dynamic = 'force-dynamic'
+// ISR: revalidate every 5 minutes (product details change rarely)
+export const revalidate = 300
+export const dynamicParams = true // render unknown IDs on-demand
+
+// Pre-render known product IDs at build time (uses admin client — no cookies)
+export async function generateStaticParams() {
+  const ids = await getAllProductIdsForBuild()
+  return ids.map((id) => ({ id }))
+}
 
 export default async function ProductPage({
   params,
