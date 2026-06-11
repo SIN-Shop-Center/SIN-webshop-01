@@ -1,9 +1,10 @@
-// Purpose: Product card for Next.js storefront (Step 1)
+// Purpose: Product card for Next.js storefront (Step 1 + Step 9 PAngV)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Product } from '../lib/data'
+import { PriceTag } from './PriceTag'
 
 export function ProductCard({ product }: { product: Product }) {
   const discount = product.originalPrice
@@ -33,14 +34,14 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="mb-2 text-sm text-muted-foreground line-clamp-2">
           {product.description}
         </p>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">{product.price.toFixed(2)} €</span>
-          {product.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
-              {product.originalPrice.toFixed(2)} €
-            </span>
-          )}
-        </div>
+        <PriceTag
+          priceCents={Math.round(Number(product.price) * 100)}
+          originalPriceCents={
+            product.originalPrice != null
+              ? Math.round(Number(product.originalPrice) * 100)
+              : null
+          }
+        />
         {product.rating > 0 && (
           <div className="mt-2 flex items-center gap-1 text-sm">
             <span className="text-yellow-500">★</span>
