@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
@@ -14,9 +14,11 @@ import {
   Lock, 
   Mail, 
   CheckCircle,
-  Gem
+  Gem,
+  Loader2
 } from 'lucide-react';
 import { User as UserType } from '../types';
+import { supabase } from '../lib/supabase/client';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -44,48 +46,151 @@ export default function AuthModal({
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setIsLoading(true);
 
+    // Validation
     if (activeTab === 'register' && !name.trim()) {
       setError('Bitte geben Sie Ihren Namen ein.');
+      setIsLoading(false);
       return;
     }
     if (!email.trim() || !email.includes('@')) {
       setError('Bitte eine gültige E-Mail-Adresse angeben.');
+      setIsLoading(false);
       return;
     }
-    if (password.length < 5) {
-      setError('Das Passwort muss mindestens 5 Zeichen lang sein.');
+    if (password.length < 6) {
+      setError('Das Passwort muss mindestens 6 Zeichen lang sein.');
+      setIsLoading(false);
       return;
     }
 
-    const finalName = activeTab === 'register' ? name : email.split('@')[0];
-    
-    const newUser: UserType = {
-      name: finalName,
-      email: email.toLowerCase(),
-      isLoggedIn: true,
-      avatar: finalName.substring(0, 2).toUpperCase(),
-      role: selectedRole
-    };
+    try {
+      if (activeTab === 'register') {
+        // Supabase Sign Up
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: email.toLowerCase(),
+          password,
+          options: {
+            data: {
+              name: name.trim(),
+              role: selectedRole
+            }
+          }
+        });
 
-    setSuccess(`Erfolgreich als ${selectedRole === 'seller' ? 'Verkäufer (Admin)' : 'Käufer'} angemeldet!`);
-    
-    setTimeout(() => {
-      onLogin(newUser);
-      onClose();
-      // Clear forms
-      setName('');
-      setEmail('');
-      setPassword('');
-      setSuccess('');
-    }, 800);
+        if (signUpError) {
+          setError(signUpError.message === 'User already registered' 
+            ? 'Diese E-Mail ist bereits registriert. Bitte loggen Sie sich ein.' 
+            : signUpError.message);
+          setIsLoading(false);
+          return;
+        }
+
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setError('Diese E-Mail ist bereits registriert. Bitte loggen Sie sich ein.');
+          setIsLoading(false);
+          return;
+        }
+
+        setSuccess('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail für den Bestätigungslink.');
+        
+        // Auto-login if email confirmation is not required (development mode)
+        if (data.session) {
+          const finalName = name || email.split('@')[0];
+          const newUser: UserType = {
+            name: finalName,
+            email: email.toLowerCase(),
+            isLoggedIn: true,
+            avatar: finalName.substring(0, 2).toUpperCase(),
+            role: selectedRole
+          };
+          
+          setTimeout(() => {
+            onLogin(newUser);
+            onClose();
+            clearForm();
+          }, 1500);
+        }
+        
+      } else {
+        // Supabase Sign In
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase(),
+          password
+        });
+
+        if (signInError) {
+          if (signInError.message.includes('Invalid login credentials')) {
+            setError('Ungültige E-Mail oder Passwort. Bitte versuchen Sie es erneut.');
+          } else if (signInError.message.includes('Email not confirmed')) {
+            setError('E-Mail noch nicht bestätigt. Bitte überprüfen Sie Ihren Posteingang.');
+          } else {
+            setError(signInError.message);
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        if (data.user) {
+          const userName = data.user.user_metadata?.name || email.split('@')[0];
+          const userRole = data.user.user_metadata?.role || 'buyer';
+          
+          const newUser: UserType = {
+            name: userName,
+            email: data.user.email || email.toLowerCase(),
+            isLoggedIn: true,
+            avatar: userName.substring(0, 2).toUpperCase(),
+            role: userRole
+          };
+
+          setSuccess('Erfolgreich eingeloggt!');
+          
+          setTimeout(() => {
+            onLogin(newUser);
+            onClose();
+            clearForm();
+          }, 800);
+        }
+      }
+    } catch (err: any) {
+      console.error('Auth error:', err);
+      setError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      onLogout();
+      setActiveTab('login');
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearForm = () => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setError('');
+    setSuccess('');
   };
 
   return (
@@ -162,14 +267,16 @@ export default function AuthModal({
 
               <div className="flex flex-col gap-2 pt-2">
                 <button
-                  onClick={() => {
-                    onLogout();
-                    setActiveTab('login');
-                  }}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2.5 text-xs font-black text-red-600 hover:bg-red-100 active:scale-98 transition-all cursor-pointer"
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2.5 text-xs font-black text-red-600 hover:bg-red-100 active:scale-98 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <LogIn className="h-4 w-4" />
-                  Abmelden / Logout
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogIn className="h-4 w-4" />
+                  )}
+                  {isLoading ? 'Wird abgemeldet...' : 'Abmelden / Logout'}
                 </button>
                 <button
                   onClick={onClose}
@@ -265,7 +372,7 @@ export default function AuthModal({
                       <Mail className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
-                      type="text"
+                      type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -278,7 +385,7 @@ export default function AuthModal({
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <label className="text-[11px] font-extrabold text-gray-500 uppercase">Passwort</label>
-                    <span className="text-[9px] text-gray-400 font-bold">mind. 5 Zeichen</span>
+                    <span className="text-[9px] text-gray-400 font-bold">mind. 6 Zeichen</span>
                   </div>
                   <div className="relative">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -305,10 +412,18 @@ export default function AuthModal({
 
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-orange-500 py-2.5 text-xs font-black text-white hover:bg-orange-600 active:scale-95 transition-all shadow-md shadow-orange-500/10 cursor-pointer"
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-orange-500 py-2.5 text-xs font-black text-white hover:bg-orange-600 active:scale-95 transition-all shadow-md shadow-orange-500/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <LogIn className="h-4 w-4 text-white" />
-                  {activeTab === 'login' ? 'Jetzt einloggen' : 'Konto erstellen'}
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogIn className="h-4 w-4 text-white" />
+                  )}
+                  {isLoading 
+                    ? 'Wird verarbeitet...' 
+                    : activeTab === 'login' ? 'Jetzt einloggen' : 'Konto erstellen'
+                  }
                 </button>
               </form>
 
