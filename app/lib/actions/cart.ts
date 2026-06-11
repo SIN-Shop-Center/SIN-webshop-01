@@ -61,6 +61,20 @@ export async function addToCart(productId: string, quantity = 1) {
   const cartId = await getOrCreateCartId()
   const supabase = createAdminClient()
 
+  // Serverseitige Validierung: Produkt muss existieren und auf Lager sein.
+  const { data: product, error: productError } = await supabase
+    .from('products')
+    .select('id, stock')
+    .eq('id', productId)
+    .maybeSingle()
+
+  if (productError) throw productError
+  if (!product || product.stock <= 0) {
+    throw new Error('Produkt nicht verfügbar')
+  }
+
+  const maxQty = Math.min(product.stock, 99)
+
   const { data: existing } = await supabase
     .from('cart_items')
     .select('id, quantity')
@@ -72,7 +86,7 @@ export async function addToCart(productId: string, quantity = 1) {
     await supabase
       .from('cart_items')
       .update({
-        quantity: Math.min(existing.quantity + quantity, 99),
+        quantity: Math.min(existing.quantity + quantity, maxQty),
         updated_at: new Date().toISOString(),
       })
       .eq('id', existing.id)
@@ -80,7 +94,7 @@ export async function addToCart(productId: string, quantity = 1) {
     await supabase.from('cart_items').insert({
       cart_id: cartId,
       product_id: productId,
-      quantity: Math.min(quantity, 99),
+      quantity: Math.min(quantity, maxQty),
     })
   }
 

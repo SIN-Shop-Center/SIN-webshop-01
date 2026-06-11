@@ -1,4 +1,4 @@
-// Purpose: Contact form server action (Step 8 of migration)
+// Purpose: Contact form server action (Step 8 of migration + Issue #41 rate-limit)
 // Docs: PLAN-VERKAUFSFAEHIG.md (Step 8 — Admin Dashboard)
 //
 // Validates input, stores message in Supabase, sends notification email
@@ -8,6 +8,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getResend, FOOTER_COMPANY, FROM_EMAIL } from '@/lib/email-constants'
+import { checkRateLimit, RateLimitError } from '@/lib/rate-limit'
 
 export interface ContactFormState {
   ok: boolean
@@ -16,6 +17,24 @@ export interface ContactFormState {
 }
 
 export async function submitContactForm(formData: FormData): Promise<ContactFormState> {
+  // Issue #41: Rate-Limit 3/h pro IP gegen Spam-Flut
+  try {
+    await checkRateLimit('contact', { limit: 3, windowSec: 3600 })
+  } catch (e) {
+    if (e instanceof RateLimitError) {
+      return {
+        ok: false,
+        error: 'Zu viele Anfragen. Bitte in einer Stunde erneut versuchen.',
+      }
+    }
+    throw e
+  }
+
+  // Honeypot: Bots füllen das versteckte Feld — still als Erfolg quittieren
+  if (formData.get('website')) {
+    return { ok: true, success: 'Vielen Dank für deine Nachricht!' }
+  }
+
   const name = String(formData.get('name') ?? '').trim()
   const email = String(formData.get('email') ?? '').trim()
   const subject = String(formData.get('subject') ?? '').trim().slice(0, 200)

@@ -15,6 +15,11 @@
     "seed": "node scripts/supabase/seed-products.mjs",
     "seed:dev": "node scripts/supabase/seed-products.mjs --dev",
     "test": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && node --experimental-strip-types --no-warnings --test scripts/lib/cli-env.test.mjs scripts/lib/google-api.test.mjs scripts/lib/web-production-env.test.mjs scripts/governance-doc-sync.test.mjs scripts/project-ssot-doc-sync.test.mjs scripts/google-secret-sync.test.mjs scripts/sin-a2a-doc-sync.test.mjs scripts/check-governance-preflight.test.mjs scripts/storefront-legal-sync.test.mjs scripts/guard-baseline-validate.test.mjs",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:mobile": "playwright test --project=mobile-safari",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "check:governance": "node scripts/check-governance-preflight.mjs",
@@ -69,18 +74,23 @@
     "react-dom": "^19.2.7",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
-    "stripe": "^22.2.0"
+    "stripe": "^22.2.0",
+    "svix": "^1.95.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^25.9.3",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.8",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.8",
     "wrangler": "^4.99.0"
   }
 }

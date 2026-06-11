@@ -3,6 +3,12 @@
 //
 // Schedule: Vercel Cron "0 3 * * *" (täglich um 3 Uhr).
 // Auth: Authorization: Bearer $CRON_SECRET
+//
+// Issue #36: Batch auf 10 limitiert — Cloudflare Worker 30s CPU-Limit.
+//   10 Produkte × (2 CJ-Calls + 1.1s Sleep) ≈ 35s, knapp unter Limit.
+//   Bei zu vielen Produkten Schedule auf */3h umstellen.
+
+export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -22,14 +28,13 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient()
 
-  // Die am längsten nicht gesyncten CJ-Produkte zuerst (Batch von 20 pro Lauf,
-  // um CJ-Rate-Limits zu respektieren)
+  // Issue #36: Batch 20 → 10, Cloudflare Worker 30s CPU-Limit
   const { data: products } = await supabase
     .from('products')
     .select('id, cj_product_id, cj_variant_id')
     .not('cj_product_id', 'is', null)
     .order('cj_last_synced_at', { ascending: true, nullsFirst: true })
-    .limit(20)
+    .limit(10)
 
   let updated = 0
   const errors: string[] = []
@@ -75,5 +80,13 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ synced: updated, errors })
+  // Warn-Log bei unvollständigem Batch → Hinweis auf mögliches Timeout
+  const total = products?.length ?? 0
+  if (total > 0 && updated < total * 0.8) {
+    console.warn(
+      `[cj-sync] nur ${updated}/${total} aktualisiert — mögliches Cloudflare-Worker-Timeout`,
+    )
+  }
+
+  return NextResponse.json({ synced: updated, total, errors })
 }

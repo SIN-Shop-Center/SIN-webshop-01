@@ -3,6 +3,14 @@
 //
 // Schedule: Vercel Cron "0 */4 * * *" (alle 4 Stunden).
 // Auth: Authorization: Bearer $CRON_SECRET
+//
+// tracking_notified_at wird erst NACH erfolgreicher Mail gesetzt — bei
+// Mail-Fehler catcht der nächste Lauf die Order erneut.
+//
+// Issue #36: Batch 50 → 15, Cloudflare Worker 30s CPU-Limit.
+// Issue #39: Heartbeat an Uptime Kuma am Ende.
+
+export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -16,14 +24,16 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient()
   let trackedCount = 0
+  const errors: string[] = []
 
-  // Forwarded Orders: Tracking-Nummer abfragen
+  // Forwarded + bereits shipped aber unbenachrichtigte Orders abholen
   const { data: forwarded } = await supabase
     .from('orders')
     .select('id, email, cj_order_id')
-    .eq('fulfillment_status', 'forwarded')
+    .in('fulfillment_status', ['forwarded', 'shipped'])
+    .is('tracking_notified_at', null)
     .not('cj_order_id', 'is', null)
-    .limit(50)
+    .limit(15) // Issue #36: Worker 30s CPU-Limit
 
   for (const order of forwarded ?? []) {
     try {
@@ -36,10 +46,11 @@ export async function GET(request: Request) {
             tracking_number: detail.trackNumber,
             cj_order_status: detail.orderStatus,
             fulfillment_status: 'shipped',
-            tracking_notified_at: new Date().toISOString(),
           })
           .eq('id', order.id)
 
+        // tracking_notified_at erst NACH erfolgreicher Mail setzen —
+        // bei Fehler bleibt es NULL und der nächste Cron-Lauf retryt.
         if (order.email) {
           try {
             await sendShippingNotification({
@@ -47,8 +58,12 @@ export async function GET(request: Request) {
               orderId: order.id,
               trackingNumber: detail.trackNumber,
             })
+            await supabase
+              .from('orders')
+              .update({ tracking_notified_at: new Date().toISOString() })
+              .eq('id', order.id)
           } catch (e) {
-            console.error(`Shipping mail failed for ${order.id}:`, e)
+            errors.push(`mail ${order.id}: ${e instanceof Error ? e.message : 'unknown'}`)
           }
         }
         trackedCount++
@@ -59,20 +74,37 @@ export async function GET(request: Request) {
           .eq('id', order.id)
       }
     } catch (e) {
-      console.error(`Tracking check failed for ${order.id}:`, e)
+      errors.push(`tracking ${order.id}: ${e instanceof Error ? e.message : 'unknown'}`)
     }
   }
 
-  // Failed Orders zählen (manuelle Prüfung nötig — bewusst kein Blind-Retry,
-  // da der Fehlergrund geklärt werden muss, z.B. leeres CJ-Wallet)
   const { count: failedCount } = await supabase
     .from('orders')
     .select('id', { count: 'exact', head: true })
     .eq('fulfillment_status', 'failed')
 
+  // Issue #39: Heartbeat — Fehler schlagen Uptime-Kuma-Monitor an
+  try {
+    await fetch(new URL('/api/monitoring/heartbeat', request.url), {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${process.env.CRON_SECRET}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        job: 'cj-fulfillment',
+        status: errors.length ? 'fail' : 'ok',
+        msg: `tracked=${trackedCount} failed_awaiting_attention=${failedCount ?? 0} errors=${errors.length}`,
+      }),
+    })
+  } catch {
+    // Heartbeat-Fehler nicht fatal
+  }
+
   return NextResponse.json({
     checked: forwarded?.length ?? 0,
     shipped: trackedCount,
     failedNeedingAttention: failedCount ?? 0,
+    errors,
   })
 }

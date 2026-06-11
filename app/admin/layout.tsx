@@ -9,6 +9,8 @@ const NAV_LINKS = [
   { href: '/admin', label: 'Übersicht' },
   { href: '/admin/bestellungen', label: 'Bestellungen' },
   { href: '/admin/produkte', label: 'Produkte' },
+  { href: '/admin/ruecksendungen', label: 'Rücksendungen' },
+  { href: '/admin/audit', label: 'Audit-Log' },
 ] as const
 
 export default async function AdminLayout({

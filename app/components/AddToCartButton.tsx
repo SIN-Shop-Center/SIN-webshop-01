@@ -1,11 +1,11 @@
-// Purpose: Add-to-cart button with pending/added/sold-out states (Step 3 + Step 10)
+// Purpose: Add-to-cart button with pending/added/sold-out/error states (Step 3 + Step 10)
 // Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
 import { addToCart } from '@/lib/actions/cart'
-import { CartIcon, CheckIcon, SpinnerIcon } from './icons'
+import { CartIcon, CheckIcon, SpinnerIcon, AlertCircleIcon } from './icons'
 
 export function AddToCartButton({
   productId,
@@ -16,6 +16,7 @@ export function AddToCartButton({
 }) {
   const [isPending, startTransition] = useTransition()
   const [added, setAdded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!added) return
@@ -37,14 +38,19 @@ export function AddToCartButton({
   }
 
   function handleAdd() {
+    setError(null)
     startTransition(async () => {
-      await addToCart(productId)
-      setAdded(true)
+      try {
+        await addToCart(productId)
+        setAdded(true)
+      } catch {
+        setError('Das Produkt konnte nicht hinzugefügt werden. Bitte versuche es erneut.')
+      }
     })
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <button
         type="button"
         onClick={handleAdd}
@@ -68,9 +74,15 @@ export function AddToCartButton({
           </>
         )}
       </button>
-      <span className="sr-only" aria-live="polite">
-        {added ? 'Produkt wurde zum Warenkorb hinzugefügt' : ''}
+      {error && (
+        <p className="flex items-center gap-1.5 text-sm text-destructive">
+          <AlertCircleIcon className="size-4 shrink-0" aria-hidden />
+          {error}
+        </p>
+      )}
+      <span className="sr-only" role="status" aria-live="polite">
+        {added ? 'Produkt wurde zum Warenkorb hinzugefügt' : (error ?? '')}
       </span>
-    </>
+    </div>
   )
 }

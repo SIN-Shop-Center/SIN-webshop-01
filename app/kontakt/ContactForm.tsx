@@ -35,6 +35,17 @@ export function ContactForm() {
       action={handleSubmit}
       className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6"
     >
+      {/* Honeypot — für Menschen unsichtbar, Bots füllen es aus */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="hp-website">Website</label>
+        <input
+          id="hp-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor={nameId} className="text-sm font-medium">
           Name <span className="text-destructive" aria-hidden>*</span>

@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
 import { AddToCartButton } from '@/components/AddToCartButton'
 import { PriceTag } from '@/components/PriceTag'
+import { toCents } from '@/lib/format'
 import { ProductGallery } from '@/components/ProductGallery'
 import { WishlistButton } from '@/components/WishlistButton'
 import { ProductJsonLd } from '@/components/ProductJsonLd'
@@ -73,17 +74,17 @@ export default async function ProductPage({
 
   if (!product) notFound()
 
-  const priceCents = Math.round(Number(product.price) * 100)
+  const priceCents = toCents(product.price)
   const originalPriceCents =
     product.originalPrice != null
-      ? Math.round(Number(product.originalPrice) * 100)
+      ? toCents(product.originalPrice)
       : null
   const lowStock = product.stock > 0 && product.stock <= 5
 
   return (
     <>
       <ProductJsonLd product={product} />
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 pb-28 md:py-12 lg:pb-12">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -216,6 +217,25 @@ export default async function ProductPage({
               )}
           </div>
         </div>
+
+        {product.stock > 0 && (
+          <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden">
+            <div className="container mx-auto flex items-center gap-4 px-4 py-3">
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-xs text-muted-foreground">
+                  {product.title}
+                </span>
+                <PriceTag
+                  priceCents={priceCents}
+                  originalPriceCents={originalPriceCents}
+                />
+              </div>
+              <div className="flex-1">
+                <AddToCartButton productId={product.id} stock={product.stock} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )

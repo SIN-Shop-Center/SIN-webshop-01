@@ -3,12 +3,18 @@
 //
 // Extracted from email.ts so server actions (contact.ts) can reuse the
 // FROM_EMAIL and FOOTER_COMPANY constants without re-instantiating Resend.
+//
+// Domain: delqhi.com (Resend muss verifiziert sein, siehe Issue #33).
+// Fallback 'onboarding@resend.dev' ist nur für lokale Tests / Resend-Sandbox.
+// In Production MUSS RESEND_FROM_EMAIL gesetzt sein (delqhi.com verifiziert).
 
 import 'server-only'
 
 import { Resend } from 'resend'
 
-export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'ShopSIN <onboarding@resend.dev>'
+export const FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL ?? 'ShopSIN <onboarding@resend.dev>'
+export const REPLY_TO_EMAIL = process.env.RESEND_REPLY_TO ?? 'opensin@gmx.com'
 export const FOOTER_COMPANY = 'ShopSIN'
 
 /**

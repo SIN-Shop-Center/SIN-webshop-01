@@ -13,6 +13,14 @@ export function formatEuro(cents: number): string {
   return EUR_FORMATTER.format(cents / 100)
 }
 
+/**
+ * Convert a euro amount (number | string from DB) to integer cents.
+ * Centralizes the previously duplicated Math.round(Number(x) * 100) pattern.
+ */
+export function toCents(euros: number | string): number {
+  return Math.round(Number(euros) * 100)
+}
+
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('de-DE', {
     day: '2-digit',

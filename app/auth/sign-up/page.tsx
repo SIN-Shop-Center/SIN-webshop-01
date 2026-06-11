@@ -7,7 +7,10 @@ import { useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { translateAuthError } from '@/lib/auth-errors'
+import { PasswordInput } from '@/components/PasswordInput'
 import { AlertCircleIcon, SpinnerIcon } from '@/components/icons'
+import { checkRateLimit, RateLimitError } from '@/lib/rate-limit'
 
 export default function SignUpPage() {
   const emailId = useId()
@@ -23,6 +26,20 @@ export default function SignUpPage() {
     setLoading(true)
     setError(null)
 
+    // Issue #41: Rate-Limit 3 Registrierungen / Std pro IP
+    try {
+      await checkRateLimit('signup', { limit: 3, windowSec: 3600 })
+    } catch (e) {
+      if (e instanceof RateLimitError) {
+        setError(
+          'Zu viele Registrierungen. Bitte in einer Stunde erneut versuchen.',
+        )
+        setLoading(false)
+        return
+      }
+      throw e
+    }
+
     const supabase = createClient()
     const { error } = await supabase.auth.signUp({
       email,
@@ -33,7 +50,7 @@ export default function SignUpPage() {
     })
 
     if (error) {
-      setError(error.message)
+      setError(translateAuthError(error.message))
       setLoading(false)
       return
     }
@@ -68,15 +85,12 @@ export default function SignUpPage() {
             <label htmlFor={passwordId} className="text-sm font-medium">
               Passwort
             </label>
-            <input
+            <PasswordInput
               id={passwordId}
-              type="password"
-              required
-              minLength={8}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="field-input"
+              onChange={setPassword}
               autoComplete="new-password"
+              minLength={8}
             />
             <p className="field-hint">Mindestens 8 Zeichen.</p>
           </div>

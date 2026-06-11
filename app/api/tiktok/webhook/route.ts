@@ -15,7 +15,9 @@ const APP_KEY = process.env.TIKTOK_APP_KEY ?? ''
 const APP_SECRET = process.env.TIKTOK_APP_SECRET ?? ''
 
 function verifySignature(rawBody: string, signature: string | null): boolean {
-  if (!signature) return false
+  // Ohne konfiguriertes Secret IMMER ablehnen — sonst würde mit '' gehasht
+  // und ein Angreifer könnte gültige Signaturen fälschen.
+  if (!APP_SECRET || !APP_KEY || !signature) return false
   const expected = createHmac('sha256', APP_SECRET)
     .update(`${APP_KEY}${rawBody}`)
     .digest('hex')
@@ -33,11 +35,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
-  const event = JSON.parse(rawBody) as {
+  let event: {
     type: number
     shop_id: string
     timestamp: number
     data: { order_id: string; order_status: string }
+  }
+  try {
+    event = JSON.parse(rawBody)
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
   // Nur als "received" vormerken — die eigentliche CJ-Weiterleitung macht

@@ -1,11 +1,13 @@
 // Purpose: Checkout success page with CheckIcon (Step 4 + Step 10)
 // Docs: PLAN-VERKAUFSFAEHIG.md
+//
+// Cart-Clearing passiert jetzt serverseitig im Stripe-Webhook
+// (checkout.session.completed → cart_id aus session.metadata).
+// Diese Seite rendert nur noch den Erfolg — kein Seiteneffekt.
 
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { CheckIcon, PackageIcon, ArrowRightIcon } from '@/components/icons'
 
 export default async function CheckoutSuccessPage({
@@ -19,14 +21,6 @@ export default async function CheckoutSuccessPage({
   // Session bei Stripe verifizieren — nicht blind dem Query-Param vertrauen
   const session = await getStripe().checkout.sessions.retrieve(session_id)
   if (session.payment_status !== 'paid') redirect('/warenkorb')
-
-  // Cart serverseitig leeren
-  const cookieStore = await cookies()
-  const cartId = cookieStore.get('sin_cart_id')?.value
-  if (cartId) {
-    const supabase = createAdminClient()
-    await supabase.from('cart_items').delete().eq('cart_id', cartId)
-  }
 
   const email = session.customer_details?.email
 

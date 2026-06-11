@@ -1,50 +1,51 @@
 // Purpose: Server-side product queries via Supabase (Step 2 of migration)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 //
-// TODO(Step 2 verification): The real Supabase schema has nested JSONB fields
-// (images, variants, metadata) — the transformation below maps them to the
-// flat Product type used by ProductCard. If the live schema differs, adjust
-// transformProduct() accordingly. Run `select * from products limit 1` to verify.
+// Schema-Mapping: Die App erwartete ursprünglich snake_case-Spalten ('title',
+// 'image_url'). Die echte shop.products-Tabelle hat aber 'name' und
+// 'images' (jsonb). Lösung: SQL-View 'shop.products_v' (siehe
+// scripts/supabase/setup-products-view.sql) liefert die erwarteten
+// Spaltennamen via PostgREST column-aliasing. Diese Queries lesen
+// aus der View, schreiben weiter in die Tabelle direkt.
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Product } from './data'
 
-// ── Raw row type from Supabase ────────────────────────────────────────────────
-interface DbProductRow {
+// ── Raw row type from products_v View (bereits schema-gemappt) ─────────────
+interface DbProductViewRow {
   id: string
-  name: string
+  title: string               // = products.name (in der View aliased)
   slug: string
-  description: string
+  description: string | null
   price: number | string
   original_price: number | string | null
-  images: string[] | null
-  variants: { colors?: string[]; sizes?: string[] } | null
+  image_url: string           // = products.images->>0 (in der View berechnet)
+  image_gallery: string[]
   stock: number
   is_active: boolean
-  metadata: {
-    rating?: number
-    ratingCount?: number
-    features?: string[]
-    specifications?: Record<string, string>
-    category_id?: string
-    supplier_id?: string
-    is_featured?: boolean
-  } | null
+  variants: { colors?: string[]; sizes?: string[] } | null
+  metadata: Record<string, any> | null
+  rating: number
+  rating_count: number
+  is_featured: boolean
   created_at: string
   updated_at: string
+  cj_product_id: string | null
+  cj_variant_id: string | null
 }
 
-// ── Transform DB row → Product (camelCase, used by ProductCard) ──────────────
-function transformProduct(row: DbProductRow): Product {
-  const images = row.images ?? []
-  const variants = row.variants ?? {}
-  const metadata = row.metadata ?? {}
+// ── Transform View-row → Product (camelCase, used by ProductCard) ──────────
+function transformProduct(row: DbProductViewRow): Product {
+  const metadata = (row.metadata ?? {}) as {
+    features?: string[]
+    specifications?: Record<string, string>
+  }
 
   return {
     id: row.id,
-    title: row.name,
-    description: row.description,
+    title: row.title,
+    description: row.description ?? '',
     price: typeof row.price === 'string' ? Number(row.price) : row.price,
     originalPrice:
       row.original_price != null
@@ -52,16 +53,16 @@ function transformProduct(row: DbProductRow): Product {
           ? Number(row.original_price)
           : row.original_price
         : undefined,
-    rating: metadata.rating ?? 0,
-    ratingCount: metadata.ratingCount ?? 0,
-    category: '', // TODO: join with categories table
+    rating: row.rating,
+    ratingCount: row.rating_count,
+    category: '', // TODO: join mit categories Tabelle
     subcategory: undefined,
-    imageUrl: images[0] ?? '',
-    imageGallery: images,
+    imageUrl: row.image_url,
+    imageGallery: row.image_gallery,
     stock: row.stock,
-    isFeatured: metadata.is_featured ?? false,
-    colors: variants.colors,
-    sizes: variants.sizes,
+    isFeatured: row.is_featured,
+    colors: row.variants?.colors,
+    sizes: row.variants?.sizes,
     features: metadata.features,
     specifications: metadata.specifications,
   }
@@ -72,50 +73,59 @@ function transformProduct(row: DbProductRow): Product {
 export async function getFeaturedProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
-    .from('products')
+    .from('products_v')
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
   if (error) throw error
   return (data ?? [])
-    .map((row) => transformProduct(row as DbProductRow))
+    .map((row) => transformProduct(row as DbProductViewRow))
     .filter((p) => p.isFeatured)
 }
 
 export async function getAllProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
-    .from('products')
+    .from('products_v')
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return (data ?? []).map((row) => transformProduct(row as DbProductRow))
+  return (data ?? []).map((row) => transformProduct(row as DbProductViewRow))
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
-    .from('products')
+    .from('products_v')
     .select('*')
     .eq('id', id)
     .maybeSingle()
 
   if (error) throw error
   if (!data) return null
-  const transformed = transformProduct(data as DbProductRow)
-  return transformed
+  return transformProduct(data as DbProductViewRow)
+}
+
+/**
+ * Batch fetch products by IDs — fixes the N+1 pattern in the cart page.
+ */
+export async function getProductsByIds(ids: string[]): Promise<Product[]> {
+  if (ids.length === 0) return []
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('products_v')
+    .select('*')
+    .in('id', ids)
+
+  if (error) throw error
+  return (data ?? []).map((row) => transformProduct(row as DbProductViewRow))
 }
 
 /**
  * Build-time product list using the admin client (no cookies needed).
- * Used by generateStaticParams at build time.
- * Returns [] if Supabase env vars are not configured (e.g. CI without secrets)
- * OR if the database is unreachable from the build environment (e.g. when
- * SUPABASE_URL points to a private IP that the build container cannot resolve).
- * In that case pages render on-demand via dynamicParams.
  */
 export async function getAllProductIdsForBuild(): Promise<string[]> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -124,7 +134,7 @@ export async function getAllProductIdsForBuild(): Promise<string[]> {
   try {
     const supabase = createAdminClient()
     const { data, error } = await supabase
-      .from('products')
+      .from('products_v')
       .select('id')
       .eq('is_active', true)
       .limit(100)
@@ -135,8 +145,6 @@ export async function getAllProductIdsForBuild(): Promise<string[]> {
     }
     return (data ?? []).map((row) => row.id)
   } catch (e) {
-    // Build must not fail if the build-time DB is unreachable.
-    // Pages will still render on-demand via dynamicParams=true.
     console.warn('[build] getAllProductIdsForBuild unreachable:', e instanceof Error ? e.message : e)
     return []
   }

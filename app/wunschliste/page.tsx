@@ -3,7 +3,7 @@
 
 import Link from 'next/link'
 import { getWishlist } from '@/lib/actions/wishlist'
-import { getProductById } from '@/lib/queries'
+import { getProductsByIds } from '@/lib/queries'
 import { ProductCard } from '@/components/ProductCard'
 import { createClient } from '@/lib/supabase/server'
 import { HeartIcon, ArrowRightIcon } from '@/components/icons'
@@ -42,9 +42,7 @@ export default async function WishlistPage() {
   }
 
   const productIds = await getWishlist()
-  const products = (
-    await Promise.all(productIds.map((id) => getProductById(id)))
-  ).filter((p): p is NonNullable<typeof p> => p !== null)
+  const products = await getProductsByIds(productIds)
 
   if (products.length === 0) {
     return (
