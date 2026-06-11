@@ -53,3 +53,33 @@ export async function sendOrderConfirmation(params: {
     `,
   })
 }
+
+export async function sendShippingNotification(params: {
+  to: string
+  orderId: string
+  trackingNumber: string
+}) {
+  const { to, orderId, trackingNumber } = params
+
+  await getResend().emails.send({
+    from: process.env.RESEND_FROM_EMAIL ?? 'SIN Shop <onboarding@resend.dev>',
+    to,
+    subject: `Deine Bestellung ${orderId.slice(0, 8).toUpperCase()} wurde versendet`,
+    html: `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto">
+        <h1 style="font-size:20px">Deine Bestellung ist unterwegs</h1>
+        <p>Bestellnummer: <strong>${orderId.slice(0, 8).toUpperCase()}</strong></p>
+        <p>Sendungsnummer: <strong>${trackingNumber}</strong></p>
+        <p>Verfolge deine Sendung hier:<br/>
+          <a href="https://t.17track.net/de#nums=${encodeURIComponent(trackingNumber)}">
+            Sendungsverfolgung öffnen
+          </a>
+        </p>
+        <p style="color:#666;font-size:13px">
+          Hinweis: Die Lieferung erfolgt aus unserem internationalen Lager,
+          die Zustellung dauert in der Regel 7-15 Werktage.
+        </p>
+      </div>
+    `,
+  })
+}
