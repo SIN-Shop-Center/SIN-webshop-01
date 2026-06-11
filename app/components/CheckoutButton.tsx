@@ -1,21 +1,30 @@
-// Purpose: Checkout button — triggers Stripe checkout (Step 4 of migration)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Checkout button — triggers Stripe checkout (Step 4 + Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
 import { useTransition } from 'react'
 import { startCheckout } from '@/lib/actions/checkout'
+import { SpinnerIcon } from './icons'
 
 export function CheckoutButton() {
   const [isPending, startTransition] = useTransition()
 
   return (
     <button
+      type="button"
       onClick={() => startTransition(() => startCheckout())}
       disabled={isPending}
-      className="w-full rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+      className="btn btn-primary btn-lg w-full"
     >
-      {isPending ? 'Weiterleitung zu Stripe…' : 'Zur Kasse'}
+      {isPending ? (
+        <>
+          <SpinnerIcon className="size-5 animate-spin" aria-hidden />
+          Weiterleitung zu Stripe…
+        </>
+      ) : (
+        'Zur Kasse'
+      )}
     </button>
   )
 }

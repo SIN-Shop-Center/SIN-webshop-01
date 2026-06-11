@@ -1,38 +1,53 @@
-// Purpose: PriceTag component with PAngV-compliant "inkl. MwSt." label
-// Docs: PLAN-VERKAUFSFAEHIG.md (Step 9 — PAngV compliance)
+// Purpose: PAngV-compliant price display with optional strikethrough original price
+// Docs: PLAN-VERKAUFSFAEHIG.md (Step 9 — PAngV + Step 10 polish)
 //
 // PAngV (Preisangabenverordnung): "inkl. MwSt., zzgl. Versand" muss an jedem
 // Preis im Online-Shop stehen.
-//
-// Bei Kleinunternehmerregelung (§19 UStG) stattdessen:
-// "Gemäß §19 UStG wird keine Umsatzsteuer ausgewiesen"
 
 import Link from 'next/link'
+import { formatEuro } from '@/lib/format'
+
+interface PriceTagProps {
+  priceCents: number
+  originalPriceCents?: number | null
+  size?: 'md' | 'lg'
+}
 
 export function PriceTag({
   priceCents,
   originalPriceCents,
   size = 'md',
-}: {
-  priceCents: number
-  originalPriceCents?: number | null
-  size?: 'md' | 'lg'
-}) {
+}: PriceTagProps) {
+  const hasDiscount =
+    originalPriceCents != null && originalPriceCents > priceCents
+
   return (
-    <div>
-      <div className="flex items-center gap-2">
-        <span className={size === 'lg' ? 'text-3xl font-bold' : 'text-lg font-bold'}>
-          {(priceCents / 100).toFixed(2)} €
+    <div className="flex flex-col gap-1">
+      <div className="flex items-baseline gap-2">
+        <span
+          className={
+            size === 'lg'
+              ? 'text-3xl font-bold tracking-tight'
+              : 'text-lg font-bold tracking-tight'
+          }
+        >
+          {formatEuro(priceCents)}
         </span>
-        {originalPriceCents != null && originalPriceCents > priceCents && (
+        {hasDiscount && (
           <span
             className={
               size === 'lg'
-                ? 'text-xl text-muted-foreground line-through'
+                ? 'text-lg text-muted-foreground line-through'
                 : 'text-sm text-muted-foreground line-through'
             }
           >
-            {(originalPriceCents / 100).toFixed(2)} €
+            {formatEuro(originalPriceCents)}
+          </span>
+        )}
+        {hasDiscount && (
+          <span className="sr-only">
+            Reduziert von {formatEuro(originalPriceCents)} auf{' '}
+            {formatEuro(priceCents)}
           </span>
         )}
       </div>

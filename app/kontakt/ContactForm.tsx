@@ -1,14 +1,22 @@
-// Purpose: Contact form client component (Step 8)
-// Docs: PLAN-VERKAUFSFAEHIG.md (Step 8 — Admin Dashboard)
+// Purpose: Contact form with ref-based reset, a11y, aria-live (Step 8 + Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useId, useRef, useState, useTransition } from 'react'
 import { submitContactForm, type ContactFormState } from '@/lib/actions/contact'
+import { AlertCircleIcon, CheckIcon, SpinnerIcon } from '@/components/icons'
 
 export function ContactForm() {
   const [isPending, startTransition] = useTransition()
   const [result, setResult] = useState<ContactFormState | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const nameId = useId()
+  const emailId = useId()
+  const subjectId = useId()
+  const messageId = useId()
+  const liveId = useId()
 
   function handleSubmit(formData: FormData) {
     setResult(null)
@@ -16,86 +24,113 @@ export function ContactForm() {
       const res = await submitContactForm(formData)
       setResult(res)
       if (res.ok) {
-        const form = document.querySelector('form') as HTMLFormElement | null
-        form?.reset()
+        formRef.current?.reset()
       }
     })
   }
 
   return (
     <form
+      ref={formRef}
       action={handleSubmit}
-      className="flex flex-col gap-4 rounded-lg border border-border p-6"
+      className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6"
     >
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">
-          Name <span className="text-red-600">*</span>
-        </span>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={nameId} className="text-sm font-medium">
+          Name <span className="text-destructive" aria-hidden>*</span>
+        </label>
         <input
+          id={nameId}
           name="name"
           type="text"
           required
           minLength={2}
           maxLength={100}
           autoComplete="name"
-          className="rounded-lg border border-input bg-background px-3 py-2"
+          className="field-input"
         />
-      </label>
+      </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">
-          E-Mail <span className="text-red-600">*</span>
-        </span>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={emailId} className="text-sm font-medium">
+          E-Mail <span className="text-destructive" aria-hidden>*</span>
+        </label>
         <input
+          id={emailId}
           name="email"
           type="email"
           required
           autoComplete="email"
-          className="rounded-lg border border-input bg-background px-3 py-2"
+          className="field-input"
         />
-      </label>
+      </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Betreff (optional)</span>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={subjectId} className="text-sm font-medium">
+          Betreff (optional)
+        </label>
         <input
+          id={subjectId}
           name="subject"
           type="text"
           maxLength={200}
-          className="rounded-lg border border-input bg-background px-3 py-2"
+          className="field-input"
         />
-      </label>
+      </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">
-          Nachricht <span className="text-red-600">*</span>
-        </span>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={messageId} className="text-sm font-medium">
+          Nachricht <span className="text-destructive" aria-hidden>*</span>
+        </label>
         <textarea
+          id={messageId}
           name="message"
           required
           minLength={10}
           maxLength={5000}
           rows={6}
-          className="rounded-lg border border-input bg-background px-3 py-2"
+          className="field-input"
         />
-      </label>
+        <p className="field-hint">Mindestens 10 Zeichen, maximal 5000.</p>
+      </div>
 
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+        className="btn btn-primary btn-lg w-full sm:w-auto"
       >
-        {isPending ? 'Wird gesendet…' : 'Nachricht senden'}
+        {isPending ? (
+          <>
+            <SpinnerIcon className="size-5 animate-spin" aria-hidden />
+            Wird gesendet…
+          </>
+        ) : (
+          'Nachricht senden'
+        )}
       </button>
 
+      <div id={liveId} aria-live="polite" className="sr-only">
+        {result?.error ? 'Fehler: ' + result.error : null}
+        {result?.success ? 'Erfolg: ' + result.success : null}
+      </div>
+
       {result?.error && (
-        <p className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          {result.error}
-        </p>
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
+        >
+          <AlertCircleIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>{result.error}</span>
+        </div>
       )}
       {result?.success && (
-        <p className="rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-300">
-          {result.success}
-        </p>
+        <div
+          role="status"
+          className="flex items-start gap-2 rounded-lg border border-success/30 bg-success/5 p-3 text-sm text-success"
+        >
+          <CheckIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>{result.success}</span>
+        </div>
       )}
     </form>
   )

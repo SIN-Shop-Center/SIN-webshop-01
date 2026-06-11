@@ -1,40 +1,60 @@
-// Purpose: Cart item quantity controls (client component, Step 3)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Purpose: Cart-item quantity stepper + remove (Step 3 + Step 10 a11y)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
 import { useTransition } from 'react'
 import { updateCartQuantity, removeFromCart } from '@/lib/actions/cart'
+import { MinusIcon, PlusIcon, TrashIcon } from './icons'
 
-export function CartItemControls({ itemId, quantity }: { itemId: string; quantity: number }) {
+export function CartItemControls({
+  itemId,
+  quantity,
+}: {
+  itemId: string
+  quantity: number
+}) {
   const [isPending, startTransition] = useTransition()
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center rounded-lg border border-border">
+      <div className="inline-flex items-center rounded-lg border border-border">
         <button
+          type="button"
           aria-label="Menge verringern"
-          disabled={isPending}
-          onClick={() => startTransition(() => updateCartQuantity(itemId, quantity - 1))}
-          className="px-3 py-1 text-lg hover:bg-muted disabled:opacity-50"
+          disabled={isPending || quantity <= 1}
+          onClick={() =>
+            startTransition(() => updateCartQuantity(itemId, quantity - 1))
+          }
+          className="inline-flex h-9 w-9 items-center justify-center rounded-l-lg text-foreground/80 transition-colors hover:bg-muted disabled:opacity-50"
         >
-          −
+          <MinusIcon className="size-4" aria-hidden />
         </button>
-        <span className="min-w-8 text-center text-sm font-medium">{quantity}</span>
+        <span
+          aria-live="polite"
+          className="min-w-10 px-2 text-center text-sm font-medium tabular-nums"
+        >
+          {quantity}
+        </span>
         <button
+          type="button"
           aria-label="Menge erhöhen"
           disabled={isPending}
-          onClick={() => startTransition(() => updateCartQuantity(itemId, quantity + 1))}
-          className="px-3 py-1 text-lg hover:bg-muted disabled:opacity-50"
+          onClick={() =>
+            startTransition(() => updateCartQuantity(itemId, quantity + 1))
+          }
+          className="inline-flex h-9 w-9 items-center justify-center rounded-r-lg text-foreground/80 transition-colors hover:bg-muted disabled:opacity-50"
         >
-          +
+          <PlusIcon className="size-4" aria-hidden />
         </button>
       </div>
       <button
+        type="button"
         disabled={isPending}
         onClick={() => startTransition(() => removeFromCart(itemId))}
-        className="text-sm text-muted-foreground underline hover:text-foreground disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-destructive transition-colors hover:text-destructive/80 disabled:opacity-50"
       >
+        <TrashIcon className="size-4" aria-hidden />
         Entfernen
       </button>
     </div>

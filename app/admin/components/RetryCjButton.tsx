@@ -1,14 +1,16 @@
-// Purpose: Retry CJ forwarding button (client component, Step 8)
-// Docs: PLAN-VERKAUFSFAEHIG.md (Step 8 — Admin Dashboard)
+// Purpose: Retry CJ forwarding button (client component, Step 8 + Step 10)
+// Docs: PLAN-VERKAUFSFAEHIG.md
 
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 import { retryCjForwarding } from '@/lib/actions/admin'
+import { AlertCircleIcon, SpinnerIcon } from '@/components/icons'
 
 export function RetryCjButton({ orderId }: { orderId: string }) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const errorId = useId()
 
   function handleRetry() {
     setError(null)
@@ -23,14 +25,29 @@ export function RetryCjButton({ orderId }: { orderId: string }) {
   return (
     <div className="flex flex-col items-end gap-1">
       <button
+        type="button"
         onClick={handleRetry}
         disabled={isPending}
-        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+        className="btn btn-primary btn-md"
       >
-        {isPending ? 'Wird übertragen…' : 'Erneut an CJ senden'}
+        {isPending ? (
+          <>
+            <SpinnerIcon className="size-4 animate-spin" aria-hidden />
+            Wird übertragen…
+          </>
+        ) : (
+          'Erneut an CJ senden'
+        )}
       </button>
       {error && (
-        <p className="max-w-60 text-right text-xs text-red-600">{error}</p>
+        <p
+          id={errorId}
+          role="alert"
+          className="flex max-w-60 items-start gap-1 text-right text-xs text-destructive"
+        >
+          <AlertCircleIcon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+          <span>{error}</span>
+        </p>
       )}
     </div>
   )
