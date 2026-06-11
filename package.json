@@ -13,6 +13,9 @@
     "prebuild": "node scripts/ensure-supported-node.mjs",
     "pretypecheck": "node scripts/ensure-supported-node.mjs",
     "dev": "pnpm -r --parallel --if-present dev",
+    "dev:next": "next dev",
+    "build:next": "next build",
+    "start:next": "next start",
     "dev:web": "pnpm --filter @simone/web dev",
     "dev:storefront": "pnpm dlx wrangler dev --config workers/cloudflare/wrangler.toml --local --port 3000",
     "dev:api": "cd apps/api && go run ./cmd/api",
@@ -67,5 +70,18 @@
   "engines": {
     "node": ">=20.9.0 <25"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3"
+  }
 }
