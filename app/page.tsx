@@ -1,11 +1,14 @@
-// Purpose: Homepage with featured products (Step 1)
+// Purpose: Homepage with featured products from Supabase (Step 2)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
-import { INITIAL_PRODUCTS } from './lib/data'
-import { ProductCard } from './components/ProductCard'
+import { getFeaturedProducts } from '@/lib/queries'
+import { ProductCard } from '@/components/ProductCard'
 
-export default function HomePage() {
-  const featuredProducts = INITIAL_PRODUCTS.filter((p) => p.isFeatured)
+// TODO(#26): Remove force-dynamic once data is stable enough for ISR.
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage() {
+  const featuredProducts = await getFeaturedProducts()
 
   return (
     <div className="container mx-auto px-4 py-12">

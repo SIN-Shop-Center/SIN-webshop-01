@@ -1,18 +1,20 @@
-// Purpose: Product detail page route (Step 1)
+// Purpose: Product detail page route (Step 2 of migration, DB-backed)
 // Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
 
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { INITIAL_PRODUCTS } from '@/app/lib/data'
+import { getProductById } from '@/lib/queries'
 
-export function generateStaticParams() {
-  return INITIAL_PRODUCTS.map((product) => ({
-    id: product.id,
-  }))
-}
+// TODO(#26): Remove force-dynamic once data is stable enough for ISR.
+export const dynamic = 'force-dynamic'
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = INITIAL_PRODUCTS.find((p) => p.id === params.id)
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const product = await getProductById(id)
 
   if (!product) {
     notFound()
