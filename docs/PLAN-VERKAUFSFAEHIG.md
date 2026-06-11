@@ -1,7 +1,20 @@
 # Komplettpaket: SIN-Webshop verkaufsfähig machen
 
-> Status: Geplant — Umsetzung erfolgt Schritt für Schritt (siehe GitHub-Issues)
 > Entscheidung: Next.js/Serverless statt Go-Backend (kein eigener Server nötig, ein Deploy auf Vercel)
+> Bezug: Issues #20–#26 (siehe unten)
+> Stand: 2026-06-11 — Schritte 1–3 in Umsetzung, 4–6 offen
+
+## Migrations-Status (Issues #20–#26)
+
+| # | Schritt | Status | Commit |
+|---|---------|:------:|--------|
+| 20 | Next.js-App aufsetzen + UI portieren | ✅ | `18d7ea9` |
+| 21 | Supabase (bestehende self-hosted Instanz) + Auth | ✅ | `a35bbd7` |
+| 22 | Cart + Wishlist via Server Actions | ✅ | `e232892` |
+| 23 | Stripe Hosted Checkout + Resend Mail | ⬜ blocked (Prerequisites ausstehend) | — |
+| 24 | Rechtstexte final | 🟡 Platzhalter im Code | — |
+| 25 | Stripe-Key-Rotation + Force-Dynamic → ISR | ⬜ (nach Step 23) | — |
+| 26 | Aufräumen: `apps/web`, `apps/api`, Worker | ⬜ (zuletzt) | — |
 
 ## Ausgangslage
 

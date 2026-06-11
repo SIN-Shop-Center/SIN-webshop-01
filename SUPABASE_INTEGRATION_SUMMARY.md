@@ -139,12 +139,18 @@ const { data, error } = await supabase
 - [x] Seed script for initial product data
 - [x] Error handling and loading states
 
-### Phase 2 - Upcoming
-- [ ] Supabase Auth integration (Issue #2)
-- [ ] Real Stripe checkout integration (Issue #3)
-- [ ] Frontend architecture refactoring (Issue #4)
-- [ ] Mobile layout fixes (Issue #5)
-- [ ] Additional Supabase operations (see issues #6-8)
+### Phase 2 - Completed ✅ (Issues #2–#8 done, archived)
+
+> Diese Roadmap wurde durch den neuen Migrationsplan ersetzt
+> (Next.js 16 statt Vite SPA, siehe `docs/PLAN-VERKAUFSFAEHIG.md`).
+
+- [x] Supabase Auth integration (Issue #2)
+- [x] Real Stripe checkout integration (Issue #3)
+- [x] Frontend architecture refactoring (Issue #4)
+- [x] Mobile layout fixes (Issue #5)
+- [x] Additional Supabase operations (Issue #6)
+- [x] Cart + Wishlist features (Issue #7)
+- [x] Worker/Edge storefront script fix (Issue #8)
 
 ## Benefits
 
@@ -210,15 +216,14 @@ This implementation addresses **Issue #1: Supabase Integration - Loading Product
 
 ## Future Work
 
-The following related issues will build on this foundation:
+> Diese Roadmap ist **abgelöst** durch den aktiven Migrationsplan
+> in `docs/PLAN-VERKAUFSFAEHIG.md` (Issues #20–#26, Next.js 16 Stack).
+> Der gesamte Vite-SPA-Code in `apps/web/` wird in Step 26 entfernt.
 
-- **Issue #2**: Supabase Auth integration for user authentication
-- **Issue #3**: Stripe checkout integration for payments
-- **Issue #4**: Frontend architecture refactoring for maintainability
-- **Issue #5**: Mobile layout fixes for responsive design
-- **Issue #6**: Additional Supabase operations and utilities
-- **Issue #7**: Category and product filtering
-- **Issue #8**: Advanced Supabase features
+- **Issue #23**: Stripe Hosted Checkout + Resend Bestellbestätigung
+- **Issue #24**: Rechtstexte final (Impressum, AGB, Datenschutz, etc.)
+- **Issue #25**: Stripe-Key-Rotation + `force-dynamic` → ISR-Migration
+- **Issue #26**: `apps/web`, `apps/api`, Cloudflare-Worker entfernen
 
 ## Conclusion
 
