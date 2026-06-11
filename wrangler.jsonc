@@ -4,13 +4,18 @@
 //
 // DEPLOYMENT TARGET: shopsin.delqhi.com (neuer Next.js 16 Storefront)
 // ALTE DOMAIN delqhi.com: bleibt unangetastet (alter Vite-Worker bleibt live)
+//
+// HINWEIS: Wir nutzen Workers KV fuer ISR-Cache (Binding: NEXT_INC_CACHE_KV)
+// anstelle von R2, weil der Cloudflare-Account aktuell R2 nicht aktiviert hat.
+// Sobald R2 uebers Dashboard aktiviert ist, kann optional auf R2-Cache
+// migriert werden (siehe docs/DEPLOY-CLOUDFLARE.md, Sektion "R2-Migration").
 
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "shopsin-storefront",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": ["nodejs_compat"],
 
   "assets": {
     "directory": ".open-next/assets",
@@ -21,28 +26,44 @@
     "enabled": true
   },
 
-  // R2 für ISR-Cache (wird von OpenNext automatisch erstellt/provisioniert)
-  "r2_buckets": [
+  // Workers KV fuer ISR-Cache und Tag-Cache (Next.js 16 SWR)
+  // KV Namespaces werden von wrangler automatisch angelegt falls nicht existent.
+  // Erstellt via:
+  //   wrangler kv namespace create shopsin-cache
+  //   wrangler kv namespace create shopsin-tag-cache
+  // IDs siehe unten (per `wrangler kv namespace list`).
+  "kv_namespaces": [
     {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "shopsin-storefront-cache"
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "2814f891c4ad4c8ba0a6acfa5c1e5f72"
+    },
+    {
+      "binding": "NEXT_TAG_CACHE_KV",
+      "id": "a3a86ddb28b541be855e9c8c23084999"
     }
   ],
 
   // Environment variables (Secrets via `wrangler secret put` oder
   // Cloudflare Dashboard → Workers → Settings → Variables)
-  // KEINE echten Werte hier — nur Keys als Dokumentation
+  //
+  // NEXT_PUBLIC_* Vars sind im Browser sichtbar — wir setzen sie als `vars`
+  // (nicht als Secrets), weil sie im Next.js-Client gebraucht werden und
+  // per Definition öffentlich sein duerfen.
   "vars": {
-    "NEXT_PUBLIC_APP_URL": "https://shopsin.delqhi.com"
+    "NEXT_PUBLIC_APP_URL": "https://shopsin.delqhi.com",
+    "NEXT_PUBLIC_SUPABASE_URL": "http://92.5.60.87:8006",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY5Mjc5NTAyLCJleHAiOjE5MjY5NTk1MDJ9.HCam8-Pv3vAN8lthCwOpQuels9LkGKK8hVRJQCPEYWE"
   },
 
-  // Custom Domain (in Cloudflare Dashboard unter Workers → Settings → Triggers
-  // hinzufügen ODER via `wrangler triggers deploy`)
-  // Wir definieren es hier als Kommentar, damit es im File sichtbar ist:
-  //
-  //   routes: [
-  //     { pattern: "shopsin.delqhi.com/*", custom_domain: true }
-  //   ]
+  // Custom Domain — wir binden shopsin.delqhi.com an den Worker.
+  // Cloudflare erstellt automatisch das DNS-Record (CNAME) in der Zone delqhi.com
+  // und stellt ein TLS-Zertifikat aus.
+  "routes": [
+    {
+      "pattern": "shopsin.delqhi.com",
+      "custom_domain": true
+    }
+  ],
 
   "placement": { "mode": "smart" }
 }

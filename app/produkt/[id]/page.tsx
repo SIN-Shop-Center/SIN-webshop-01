@@ -12,10 +12,12 @@ export const revalidate = 300
 export const dynamicParams = true // render unknown IDs on-demand
 
 // Pre-render known product IDs at build time (uses admin client — no cookies)
-export async function generateStaticParams() {
-  const ids = await getAllProductIdsForBuild()
-  return ids.map((id) => ({ id }))
-}
+// Disabled: build env cannot reach the private Supabase IP (92.5.60.87:8006)
+// from the build container. Pages render on-demand via dynamicParams.
+// export async function generateStaticParams() {
+//   const ids = await getAllProductIdsForBuild()
+//   return ids.map((id) => ({ id }))
+// }
 
 export default async function ProductPage({
   params,
