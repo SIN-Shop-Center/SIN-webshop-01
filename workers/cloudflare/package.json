@@ -1,0 +1,10 @@
+{
+  "name": "@simone/workers-cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev worker.mjs --compatibility-date 2026-02-26 --local --port 3000",
+    "deploy": "wrangler deploy --config wrangler.toml"
+  }
+}

@@ -1,0 +1,14 @@
+# Purpose: Cloudflare Worker configuration for simone-worldbest-shop storefront
+# Docs: wrangler.doc.md
+
+name = "simone-worldbest-shop"
+main = "worker.mjs"
+compatibility_date = "2026-02-26"
+
+[vars]
+API_BASE_URL = "https://api.delqhi.com"
+
+# NOTE: Workers Sites configuration for serving static files from apps/web/dist
+# Uncomment after building the web app:
+# [site]
+# bucket = "../../apps/web/dist"
