@@ -1,0 +1,48 @@
+// Purpose: Cloudflare Workers config for OpenNext deployment
+// Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
+//       https://opennext.js.org/cloudflare/get-started
+//
+// DEPLOYMENT TARGET: shopsin.delqhi.com (neuer Next.js 16 Storefront)
+// ALTE DOMAIN delqhi.com: bleibt unangetastet (alter Vite-Worker bleibt live)
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "shopsin-storefront",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  "observability": {
+    "enabled": true
+  },
+
+  // R2 für ISR-Cache (wird von OpenNext automatisch erstellt/provisioniert)
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "shopsin-storefront-cache"
+    }
+  ],
+
+  // Environment variables (Secrets via `wrangler secret put` oder
+  // Cloudflare Dashboard → Workers → Settings → Variables)
+  // KEINE echten Werte hier — nur Keys als Dokumentation
+  "vars": {
+    "NEXT_PUBLIC_APP_URL": "https://shopsin.delqhi.com"
+  },
+
+  // Custom Domain (in Cloudflare Dashboard unter Workers → Settings → Triggers
+  // hinzufügen ODER via `wrangler triggers deploy`)
+  // Wir definieren es hier als Kommentar, damit es im File sichtbar ist:
+  //
+  //   routes: [
+  //     { pattern: "shopsin.delqhi.com/*", custom_domain: true }
+  //   ]
+
+  "placement": { "mode": "smart" }
+}
