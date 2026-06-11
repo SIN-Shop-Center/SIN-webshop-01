@@ -15,6 +15,7 @@ apps/*/dist/
 apps/*/build/
 packages/*/dist/
 workers/*/dist/
+.open-next/
 
 # Environment
 .env

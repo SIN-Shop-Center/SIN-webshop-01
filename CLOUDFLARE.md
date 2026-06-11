@@ -1,43 +1,97 @@
 # Cloudflare Deployment Record
 
-Stand: **26.05.2026**
+Stand: **11.06.2026** (Next.js 16 + OpenNext Stack)
 
-## Canonical Production Target
+## Production Targets
 
-- Platform: `Cloudflare Workers`
-- Worker name: `simone-worldbest-shop`
-- Account subdomain: `aquawild-station.workers.dev` (technical endpoint, currently not primary)
-- Production route: `delqhi.com/*` -> `simone-worldbest-shop`
-- Live URL: `https://delqhi.com`
+| Domain | Stack | Status |
+|--------|-------|--------|
+| `delqhi.com` | Alter Vite-Worker (`simone-worldbest-shop`) | 🔵 Live (unverändert) |
+| `shopsin.delqhi.com` | **Neuer Next.js 16 + OpenNext Cloudflare** | 🟡 Ready to deploy |
 
-## Deploy Command
+## Neues Deployment-Target: `shopsin.delqhi.com`
 
-```bash
-cd /Users/jeremy/dev/projects/family-projects/simone-webshop-01
-pnpm deploy:cloudflare
+- **Stack:** Next.js 16 (App Router) + OpenNext 1.19 → Cloudflare Workers
+- **Worker-Name:** `shopsin-storefront`
+- **R2-Cache:** `shopsin-storefront-cache` (für ISR, wird von OpenNext auto-provisioniert beim ersten Deploy)
+- **Route:** `shopsin.delqhi.com/*` → Worker
+
+## Was du im Cloudflare-Dashboard machen musst (einmalig)
+
+### 1. Worker erstellen
+Cloudflare Dashboard → Workers & Pages → Create Worker → Name: `shopsin-storefront` → Deploy (leer reicht vorerst).
+
+### 2. Custom Domain hinzufügen
+Worker → Settings → Triggers → Custom Domains → `shopsin.delqhi.com` hinzufügen.
+Cloudflare legt automatisch den DNS-Record (CNAME) an, da `delqhi.com` in deinem Cloudflare-Account ist.
+
+### 3. Environment Variables setzen
+Worker → Settings → Variables → folgende Secrets hinzufügen (aus Infisical kopieren):
+
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+DATABASE_URL
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+RESEND_API_KEY
+RESEND_FROM_EMAIL
+CJ_EMAIL
+CJ_API_KEY
+CJ_PRICE_MULTIPLIER
+CRON_SECRET
 ```
 
-## Runtime Endpoints
+`NEXT_PUBLIC_APP_URL` ist bereits in `wrangler.jsonc` als `https://shopsin.delqhi.com` gesetzt (kein Secret nötig).
 
-- `/` -> storefront home (hero, promo cards, featured products, sections)
-- `/products` -> full product catalog with search and category filters
-- `/products/:slug` -> product detail page with gallery and add-to-cart
-- `/cart` -> interactive cart with quantity controls
-- `/checkout` -> checkout form + order summary (Stripe: Card, SEPA, Klarna)
-- `/order-success` -> purchase confirmation summary
-- `/impressum` -> Impressum (legal)
-- `/agb` -> AGB / Terms (legal, dropshipping)
-- `/datenschutz` -> Datenschutz / Privacy (legal)
-- `/widerrufsrecht` -> Widerrufsrecht / Right of withdrawal (legal)
-- `/versand` -> Versand / Shipping policy (legal)
-- `/health` -> runtime status JSON
-- `/api/products` -> product payload JSON
+### 4. Live-Deploy per CLI (einmalig oder bei jedem Update)
+```bash
+# Auth einmalig (öffnet Browser)
+pnpm exec wrangler login
 
-## Auth Strategy
+# Build + Deploy
+pnpm deploy:cloudflare
+# (= pnpm build:cf && pnpm exec wrangler deploy)
+```
 
-- Primary: `CLOUDFLARE_API_TOKEN` environment variable
-- Fallback: Wrangler OAuth token from `~/Library/Preferences/.wrangler/config/default.toml`
+### 5. Auto-Deploy via GitHub (optional, empfohlen)
+- Cloudflare Dashboard → Workers → `shopsin-storefront` → Settings → Builds
+- Connect to GitHub → Repo `SIN-Shop-Center/SIN-webshop-01` auswählen
+- Build command: `pnpm install && pnpm build:cf`
+- Deploy command: `pnpm exec wrangler deploy`
+- Branch: `main`
+
+## DNS-Records (automatisch durch Cloudflare)
+
+| Type | Name | Content | Proxy |
+|------|------|---------|-------|
+| CNAME | `shopsin` | `shopsin-storefront.<account>.workers.dev` | Proxied (orange) |
+
+## Routes (Next.js 16 App Router)
+
+24 Routen: `/`, `/produkt/[id]`, `/warenkorb`, `/kasse/erfolg`, `/wunschliste`,
+`/auth/*`, `/impressum`, `/datenschutz`, `/agb`, `/widerrufsrecht`, `/versand`,
+`/kontakt`, `/konto/bestellungen`, `/admin/*`, `/api/cron/*`, `/api/stripe/webhook`.
+
+## Alte Domain `delqhi.com` (NICHT anfassen)
+
+Der bisherige `simone-worldbest-shop` Worker bleibt unverändert online.
+Migration auf `shopsin.delqhi.com` ist VOR dem Switch — der alte Worker
+wird erst dann abgeschaltet, wenn alles stabil läuft.
+
+## Auth Strategy (Cloudflare)
+
+- **Primary:** `~/.config/.wrangler/config/default.toml` (Wrangler OAuth) für lokales Deploy
+- **For CI/GitHub:** Cloudflare API Token in GitHub Secrets → `CLOUDFLARE_API_TOKEN`
+- **Token-Scope:** `Edit Cloudflare Workers` (reicht für Deploy)
 
 ## Notes
 
-- `workers.dev` can return account-level `1042` on this setup; deploy script falls back to zone route deployment and validates `https://delqhi.com/health`.
+- OpenNext baut automatisch R2-Bucket `shopsin-storefront-cache` beim ersten
+  Deploy, falls `--new-remote` benutzt wird
+- Drizzle + pg funktionieren auf Cloudflare (Workerd hat `nodejs_compat` Flag)
+- `better-auth` nicht in Verwendung (wir nutzen Supabase SSR direkt)
+- Stripe-Webhook-URL nach Deploy updaten: `https://shopsin.delqhi.com/api/stripe/webhook`
+- CJ-Webhook-URLs aktualisieren (falls in CJ konfiguriert)
+- Resend-Domain `delqhi.com` muss VOR Live verifiziert sein, sonst Mails fail
