@@ -55,11 +55,9 @@ export default function ProductCard({ product, isWished, onToggleWishlist, onAdd
   return (
     <motion.div
       id={`product-card-${product.id}`}
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10px' }}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
