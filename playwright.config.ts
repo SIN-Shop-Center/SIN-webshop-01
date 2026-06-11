@@ -28,6 +28,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testMatch: /^(?!.*mobile).*\.spec\.ts$/, // nicht-mobile Tests
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome', // nutze System-Chrome
