@@ -110,3 +110,7 @@ docs/infisical-secrets.env
 /*.jpg
 /*.jpeg
 /*.png
+
+# Local agent state files
+sin_goal_mode.db
+.sin/
