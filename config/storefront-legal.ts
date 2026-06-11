@@ -3,7 +3,11 @@ export const STOREFRONT_LEGAL_CONTACT = {
   ownerName: 'Jeremy Schulze',
   address: 'Kurfürstenstraße 124, 10785 Berlin, Deutschland',
   legalEmail: 'opensin@gmx.com',
+  contactEmail: 'kontakt@delqhi.com', // primärer Kundenkontakt (Resend-verifizierte Domain)
+  shopDomain: 'delqhi.com',
   legalPhone: '', // KI-Telefonassistent folgt — vorerst keine Nummer
+  // Zweiter schneller Kontaktweg gem. § 5 DDG: /kontakt-Formular
+  contactFormUrl: '/kontakt',
 }
 
 export const STOREFRONT_LEGAL_LINKS = [
@@ -43,7 +47,7 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
       },
       {
         title: 'Kontakt',
-        body: `E-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
+        body: `E-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nKontaktformular: ${STOREFRONT_LEGAL_CONTACT.shopDomain}${STOREFRONT_LEGAL_CONTACT.contactFormUrl}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
       },
       {
         title: 'Umsatzsteuer-ID',
@@ -63,7 +67,7 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
     sections: [
       {
         title: '1. Verantwortlicher',
-        body: `Verantwortlicher fuer die Datenverarbeitung ist:\n\n${STOREFRONT_LEGAL_CONTACT.companyName}\n${STOREFRONT_LEGAL_CONTACT.ownerName}\n${STOREFRONT_LEGAL_CONTACT.address}\nE-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
+        body: `Verantwortlicher fuer die Datenverarbeitung ist:\n\n${STOREFRONT_LEGAL_CONTACT.companyName}\n${STOREFRONT_LEGAL_CONTACT.ownerName}\n${STOREFRONT_LEGAL_CONTACT.address}\nE-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nKontaktformular: ${STOREFRONT_LEGAL_CONTACT.shopDomain}${STOREFRONT_LEGAL_CONTACT.contactFormUrl}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
       },
       {
         title: '2. Erhebung und Speicherung personenbezogener Daten',
