@@ -101,6 +101,10 @@ export default function CartPage({
     "Verschlüsselte Verbindung aufbauen...",
   );
 
+  // Stripe Checkout states
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.product.price * item.quantity,
     0,
@@ -213,9 +217,166 @@ export default function CartPage({
     }
   };
 
-  // Secure connection simulation
+  // Stripe Checkout handler
+  const handleStripeCheckout = async () => {
+    if (!email || !customerName || !address || !city || !zipCode) {
+      setCheckoutError("Bitte füllen Sie zuerst die Versandadresse aus.");
+      setStep(2);
+      return;
+    }
+
+    setIsProcessingCheckout(true);
+    setCheckoutError("");
+    setStep(4);
+    setLoadingText("Stripe Checkout Session wird erstellt...");
+
+    try {
+      // API URL - use environment variable or default
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      
+      // First, sync cart items to API session
+      const sessionRes = await fetch(`${apiUrl}/api/storefront/cart`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!sessionRes.ok) {
+        throw new Error('Failed to initialize session');
+      }
+
+      // Add cart items to API session
+      for (const item of cartItems) {
+        await fetch(`${apiUrl}/api/storefront/cart/items`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sku: item.product.id,
+            quantity: item.quantity,
+            variant_name: item.selectedColor || item.selectedSize || undefined
+          })
+        });
+      }
+
+      // Create checkout session
+      const checkoutRes = await fetch(`${apiUrl}/api/storefront/checkout/session`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          first_name: customerName.split(' ')[0] || customerName,
+          last_name: customerName.split(' ').slice(1).join(' ') || '',
+          street1: address,
+          city: city,
+          zip: zipCode,
+          country: 'DE',
+          phone: '',
+          payment_method: 'stripe'
+        })
+      });
+
+      if (!checkoutRes.ok) {
+        const errorData = await checkoutRes.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Checkout session creation failed');
+      }
+
+      const checkoutData = await checkoutRes.json();
+      
+      if (checkoutData.checkout_url) {
+        setLoadingText("Weiterleitung zu Stripe...");
+        // Save order info for after return
+        const generatedId = checkoutData.order_id || `SIN-${Date.now()}`;
+        setOrderId(generatedId);
+        setOrderDate(new Date().toLocaleDateString("de-DE", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }));
+        
+        // Store in localStorage for retrieval after Stripe redirect
+        localStorage.setItem('sin_pending_checkout', JSON.stringify({
+          orderId: generatedId,
+          items: cartItems,
+          customerName,
+          email,
+          address,
+          city,
+          zipCode,
+          total,
+          subtotal,
+          shipping: shippingCost
+        }));
+        
+        // Redirect to Stripe Checkout
+        window.location.href = checkoutData.checkout_url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error: any) {
+      console.error('Stripe checkout error:', error);
+      setCheckoutError(error.message || 'Fehler beim Erstellen der Checkout Session. Bitte versuchen Sie es erneut.');
+      setIsProcessingCheckout(false);
+      setStep(3);
+    }
+  };
+
+  // Check for returning from Stripe checkout
   useEffect(() => {
-    if (step === 4) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      // User returned from Stripe
+      const pendingCheckout = localStorage.getItem('sin_pending_checkout');
+      if (pendingCheckout) {
+        const checkoutData = JSON.parse(pendingCheckout);
+        setOrderId(checkoutData.orderId);
+        setOrderDate(new Date().toLocaleDateString("de-DE", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }));
+        
+        const completedOrder: Order = {
+          id: checkoutData.orderId,
+          items: checkoutData.items,
+          subtotal: checkoutData.subtotal,
+          shipping: checkoutData.shipping,
+          total: checkoutData.total,
+          customerName: checkoutData.customerName,
+          email: checkoutData.email,
+          address: checkoutData.address,
+          city: checkoutData.city,
+          zipCode: checkoutData.zipCode,
+          paymentMethod: 'Stripe Checkout',
+          date: new Date().toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        
+        setStep(5);
+        onOrderCompleted(completedOrder);
+        onClearCart();
+        localStorage.removeItem('sin_pending_checkout');
+        
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [onOrderCompleted, onClearCart]);
+
+  // Secure connection simulation (fallback for non-Stripe)
+  useEffect(() => {
+    if (step === 4 && !isProcessingCheckout) {
       const phrases = [
         "Verschlüsselte Verbindung mit Bankdienst aufbauen...",
         "Sicherheitszertifikate prüfen und validieren...",
@@ -266,7 +427,7 @@ export default function CartPage({
 
       return () => clearInterval(interval);
     }
-  }, [step, onOrderCompleted, onClearCart]);
+  }, [step, onOrderCompleted, onClearCart, isProcessingCheckout]);
 
   // Printable document
   const handlePrint = () => {
@@ -897,10 +1058,22 @@ export default function CartPage({
                         Zurück zum Versand
                       </button>
                       <button
-                        type="submit"
-                        className="rounded-xl bg-orange-500 px-6 py-3 text-sm font-black text-white hover:bg-orange-660 active:scale-95 transition-all shadow-md shadow-orange-500/10 cursor-pointer"
+                        type="button"
+                        onClick={handleStripeCheckout}
+                        disabled={isProcessingCheckout}
+                        className="rounded-xl bg-orange-500 px-6 py-3 text-sm font-black text-white hover:bg-orange-600 active:scale-95 transition-all shadow-md shadow-orange-500/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
-                        Kauf abschließen ({total.toFixed(2)} €)
+                        {isProcessingCheckout ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Wird vorbereitet...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="h-4 w-4" />
+                            Mit Stripe bezahlen ({total.toFixed(2)} €)
+                          </>
+                        )}
                       </button>
                     </div>
                   </form>
