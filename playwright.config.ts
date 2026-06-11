@@ -34,7 +34,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'mobile-safari',
+      name: 'mobile',
       testMatch: /.*mobile.*\.spec\.ts/,
       use: { ...devices['iPhone 14'] },
     },
