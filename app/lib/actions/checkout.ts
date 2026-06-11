@@ -52,6 +52,8 @@ export async function startCheckout() {
     shipping_address_collection: {
       allowed_countries: ['DE', 'AT', 'CH'],
     },
+    // CJ Dropshipping verlangt eine Telefonnummer für den Versand
+    phone_number_collection: { enabled: true },
   })
 
   redirect(session.url!)
