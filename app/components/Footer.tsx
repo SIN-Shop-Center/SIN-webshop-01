@@ -20,14 +20,17 @@ export function Footer() {
             </ul>
           </div>
           <div className="md:col-span-3">
-            <h3 className="mb-4 text-sm font-semibold">SIN Shop Center</h3>
+            <h3 className="mb-4 text-sm font-semibold">ShopSIN</h3>
             <p className="text-sm text-muted-foreground text-pretty">
               {STOREFRONT_FOOTER_LEGAL_NOTE}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Inh. Jeremy Schulze · Kurfürstenstraße 124, 10785 Berlin · opensin@gmx.com
             </p>
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} SIN Shop Center. Alle Rechte vorbehalten.
+          © {new Date().getFullYear()} ShopSIN. Alle Rechte vorbehalten.
         </div>
       </div>
     </footer>

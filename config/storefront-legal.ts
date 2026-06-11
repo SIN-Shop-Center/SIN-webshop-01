@@ -1,8 +1,9 @@
 export const STOREFRONT_LEGAL_CONTACT = {
-  ownerName: 'Simone Schulze',
-  address: 'Hochwaldpromenade 38, 15834 Rangsdorf, Deutschland',
-  legalEmail: 'schulze8234@gmail.com',
-  legalPhone: '+49 152 13525956',
+  companyName: 'ShopSIN',
+  ownerName: 'Jeremy Schulze',
+  address: 'Kurfürstenstraße 124, 10785 Berlin, Deutschland',
+  legalEmail: 'opensin@gmx.com',
+  legalPhone: '', // KI-Telefonassistent folgt — vorerst keine Nummer
 }
 
 export const STOREFRONT_LEGAL_LINKS = [
@@ -33,18 +34,36 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
   impressum: {
     path: '/impressum',
     title: 'Impressum',
-    description: 'Anbieterkennzeichnung gemaess § 5 TMG fuer Delqhi.',
+    description: 'Anbieterkennzeichnung gemaess § 5 TMG fuer ShopSIN.',
     intro: 'Angaben gemaess § 5 Telemediengesetz (TMG).',
+    sections: [
+      {
+        title: 'Angaben gemäß § 5 TMG',
+        body: `${STOREFRONT_LEGAL_CONTACT.companyName}\n${STOREFRONT_LEGAL_CONTACT.ownerName}\n${STOREFRONT_LEGAL_CONTACT.address}`,
+      },
+      {
+        title: 'Kontakt',
+        body: `E-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
+      },
+      {
+        title: 'Umsatzsteuer-ID',
+        body: 'USt-IdNr. wird beantragt — gilt als Kleinunternehmer gem. § 19 UStG, sofern nicht abweichend vermerkt.',
+      },
+      {
+        title: 'Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV',
+        body: `${STOREFRONT_LEGAL_CONTACT.ownerName}, Anschrift wie oben.`,
+      },
+    ],
   },
   datenschutz: {
     path: '/datenschutz',
     title: 'Datenschutzerklaerung',
-    description: 'Informationen zur Verarbeitung personenbezogener Daten gemaess DSGVO bei Delqhi.',
+    description: 'Informationen zur Verarbeitung personenbezogener Daten gemaess DSGVO bei ShopSIN.',
     intro: 'Wir nehmen den Schutz deiner personenbezogenen Daten ernst. Nachfolgend erlaeutern wir, welche Daten wir erheben, wie wir sie verwenden und welche Rechte du hast.',
     sections: [
       {
         title: '1. Verantwortlicher',
-        body: 'Verantwortlicher fuer die Datenverarbeitung ist:\n\nSimone Schulze\nHochwaldpromenade 38\n15834 Rangsdorf\nE-Mail: schulze8234@gmail.com\nTelefon: +49 152 13525956',
+        body: `Verantwortlicher fuer die Datenverarbeitung ist:\n\n${STOREFRONT_LEGAL_CONTACT.companyName}\n${STOREFRONT_LEGAL_CONTACT.ownerName}\n${STOREFRONT_LEGAL_CONTACT.address}\nE-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\nTelefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}`,
       },
       {
         title: '2. Erhebung und Speicherung personenbezogener Daten',
@@ -68,7 +87,7 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
       },
       {
         title: '7. Deine Rechte',
-        body: 'Du hast jederzeit das Recht auf:\n- Auskunft ueber deine bei uns gespeicherten Daten (Art. 15 DSGVO)\n- Berichtigung unrichtiger Daten (Art. 16 DSGVO)\n- Loeschung deiner Daten (Art. 17 DSGVO)\n- Einschraenkung der Verarbeitung (Art. 18 DSGVO)\n- Datenuebertragbarkeit (Art. 20 DSGVO)\n- Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)\n\nAnfragen richte bitte an: schulze8234@gmail.com',
+        body: `Du hast jederzeit das Recht auf:\n- Auskunft ueber deine bei uns gespeicherten Daten (Art. 15 DSGVO)\n- Berichtigung unrichtiger Daten (Art. 16 DSGVO)\n- Loeschung deiner Daten (Art. 17 DSGVO)\n- Einschraenkung der Verarbeitung (Art. 18 DSGVO)\n- Datenuebertragbarkeit (Art. 20 DSGVO)\n- Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)\n\nAnfragen richte bitte an: ${STOREFRONT_LEGAL_CONTACT.legalEmail}`,
       },
       {
         title: '8. Beschwerderecht',
@@ -79,12 +98,12 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
   agb: {
     path: '/agb',
     title: 'Allgemeine Geschaeftsbedingungen (AGB)',
-    description: 'AGB fuer Bestellungen bei Delqhi, inklusive Dropshipping-Hinweis.',
+    description: 'AGB fuer Bestellungen bei ShopSIN, inklusive Dropshipping-Hinweis.',
     intro: 'Die nachfolgenden AGB gelten fuer alle Bestellungen ueber unseren Online-Shop delqhi.com. Mit der Bestellung erklaerst du dich mit diesen Bedingungen einverstanden.',
     sections: [
       {
         title: '1. Geltungsbereich',
-        body: 'Diese Allgemeinen Geschaeftsbedingungen gelten fuer alle Verkaeufe von Waren durch Simone Schulze (nachfolgend "Anbieterin") an Verbraucher ueber den Online-Shop delqhi.com. Abweichende Bedingungen des Kunden werden nicht anerkannt.',
+        body: `Diese Allgemeinen Geschaeftsbedingungen gelten fuer alle Verkaeufe von Waren durch ${STOREFRONT_LEGAL_CONTACT.companyName}, Inh. ${STOREFRONT_LEGAL_CONTACT.ownerName} (nachfolgend "Anbieter") an Verbraucher ueber den Online-Shop delqhi.com. Abweichende Bedingungen des Kunden werden nicht anerkannt.`,
       },
       {
         title: '2. Vertragsschluss',
@@ -127,12 +146,12 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
   widerrufsrecht: {
     path: '/widerrufsrecht',
     title: 'Widerrufsrecht',
-    description: 'Gesetzliches Widerrufsrecht fuer Verbraucher bei Delqhi.',
+    description: 'Gesetzliches Widerrufsrecht fuer Verbraucher bei ShopSIN.',
     intro: 'Verbraucher haben bei Fernabsatzvertraegen ein gesetzliches Widerrufsrecht. Nachfolgend erhaeltst du die Widerrufsbelehrung.',
     sections: [
       {
         title: 'Widerrufsbelehrung',
-        body: 'Widerrufsrecht\n\nDu hast das Recht, diesen Vertrag innerhalb von vierzehn Tagen ohne Angabe von Gruenden zu widerrufen.\n\nDie Widerrufsfrist betraegt vierzehn Tage ab dem Tag, an dem du oder ein von dir benannter Dritter, der nicht der Befoerderer ist, die letzte Ware in Besitz genommen hat.\n\nUm dein Widerrufsrecht auszueben, musst du uns (Simone Schulze, Hochwaldpromenade 38, 15834 Rangsdorf, E-Mail: schulze8234@gmail.com, Telefon: +49 152 13525956) mittels einer eindeutigen Erklaerung (z.B. ein mit der Post versandter Brief oder eine E-Mail) ueber deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du kannst dafuer das beigefuegte Muster-Widerrufsformular verwenden, das jedoch nicht zwingend ist.\n\nZur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung ueber die Ausuebung des Widerrufsrechts vor Ablauf der Widerrufsfrist absendest.',
+        body: `Widerrufsrecht\n\nDu hast das Recht, diesen Vertrag innerhalb von vierzehn Tagen ohne Angabe von Gruenden zu widerrufen.\n\nDie Widerrufsfrist betraegt vierzehn Tage ab dem Tag, an dem du oder ein von dir benannter Dritter, der nicht der Befoerderer ist, die letzte Ware in Besitz genommen hat.\n\nUm dein Widerrufsrecht auszueben, musst du uns (${STOREFRONT_LEGAL_CONTACT.companyName}, ${STOREFRONT_LEGAL_CONTACT.ownerName}, ${STOREFRONT_LEGAL_CONTACT.address}, E-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}, Telefon: ${STOREFRONT_LEGAL_CONTACT.legalPhone || 'wird derzeit eingerichtet (KI-Telefonassistent in Vorbereitung)'}) mittels einer eindeutigen Erklaerung (z.B. ein mit der Post versandter Brief oder eine E-Mail) ueber deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du kannst dafuer das beigefuegte Muster-Widerrufsformular verwenden, das jedoch nicht zwingend ist.\n\nZur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung ueber die Ausuebung des Widerrufsrechts vor Ablauf der Widerrufsfrist absendest.`,
       },
       {
         title: 'Folgen des Widerrufs',
@@ -144,7 +163,7 @@ export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {
       },
       {
         title: 'Muster-Widerrufsformular',
-        body: '(Wenn du den Vertrag widerrufen willst, fuelle dieses Formular aus und sende es zurueck.)\n\nAn:\nSimone Schulze\nHochwaldpromenade 38\n15834 Rangsdorf\nE-Mail: schulze8234@gmail.com\n\nHiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag ueber den Kauf der folgenden Waren (*)/die Erbringung der folgenden Dienstleistung (*)\n\nBestellt am (*) / erhalten am (*)\n\nName des/der Verbraucher(s)\n\nAnschrift des/der Verbraucher(s)\n\nUnterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier)\n\nDatum\n\n(*) Unzutreffendes streichen.',
+        body: `(Wenn du den Vertrag widerrufen willst, fuelle dieses Formular aus und sende es zurueck.)\n\nAn:\n${STOREFRONT_LEGAL_CONTACT.companyName}\n${STOREFRONT_LEGAL_CONTACT.ownerName}\n${STOREFRONT_LEGAL_CONTACT.address}\nE-Mail: ${STOREFRONT_LEGAL_CONTACT.legalEmail}\n\nHiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag ueber den Kauf der folgenden Waren (*)/die Erbringung der folgenden Dienstleistung (*)\n\nBestellt am (*) / erhalten am (*)\n\nName des/der Verbraucher(s)\n\nAnschrift des/der Verbraucher(s)\n\nUnterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier)\n\nDatum\n\n(*) Unzutreffendes streichen.`,
       },
     ],
   },
