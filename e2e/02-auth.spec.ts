@@ -70,8 +70,8 @@ test.describe('Auth Flow', () => {
 
     expect(errorText).toBeTruthy()
     expect(errorText).not.toMatch(/^Invalid/)
-    expect(errorText?.toLowerCase()).toContain(
-      /e-?mail|passwort|falsch|fehler|anmelden|versuche/i,
+    expect(errorText?.toLowerCase()).toMatch(
+      /e-?mail|passwort|falsch|fehler|anmelden|versuche/,
     )
   })
 
