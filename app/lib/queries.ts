@@ -103,26 +103,46 @@ export async function getProductById(id: string): Promise<Product | null> {
     .eq('id', id)
     .maybeSingle()
 
-  if (error) throw error
-  return data ? transformProduct(data as DbProductRow) : null
+  console.log('[QUERY-DEBUG] getProductById', id, '-> error:', error?.message, 'code:', error?.code, 'data keys:', data ? Object.keys(data).length : 0)
+  if (error) {
+    console.log('[QUERY-DEBUG] error details:', JSON.stringify(error, null, 2))
+    throw error
+  }
+  if (!data) return null
+  const transformed = transformProduct(data as DbProductRow)
+  console.log('[QUERY-DEBUG] transformed:', JSON.stringify(transformed, null, 2).slice(0, 200))
+  return transformed
 }
 
 /**
  * Build-time product list using the admin client (no cookies needed).
  * Used by generateStaticParams at build time.
- * Returns [] if Supabase env vars are not configured (e.g. CI without secrets),
- * in which case pages render on-demand via dynamicParams.
+ * Returns [] if Supabase env vars are not configured (e.g. CI without secrets)
+ * OR if the database is unreachable from the build environment (e.g. when
+ * SUPABASE_URL points to a private IP that the build container cannot resolve).
+ * In that case pages render on-demand via dynamicParams.
  */
 export async function getAllProductIdsForBuild(): Promise<string[]> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return []
   }
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('products')
-    .select('id')
-    .eq('is_active', true)
+  try {
+    const supabase = createAdminClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('is_active', true)
+      .limit(100)
 
-  if (error) throw error
-  return (data ?? []).map((row) => row.id)
+    if (error) {
+      console.warn('[build] getAllProductIdsForBuild failed:', error.message)
+      return []
+    }
+    return (data ?? []).map((row) => row.id)
+  } catch (e) {
+    // Build must not fail if the build-time DB is unreachable.
+    // Pages will still render on-demand via dynamicParams=true.
+    console.warn('[build] getAllProductIdsForBuild unreachable:', e instanceof Error ? e.message : e)
+    return []
+  }
 }
