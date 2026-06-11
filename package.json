@@ -65,7 +65,7 @@
     "ci": "node scripts/ensure-supported-node.mjs && pnpm run check:governance && pnpm lint && node scripts/with-web-production-env.mjs pnpm build && pnpm check:fallbacks && pnpm check:web:runtime && pnpm typecheck && pnpm guard:lines && pnpm guard:baseline && pnpm guard:complexity && pnpm check:env:template && pnpm check:migrations && pnpm check:routes && pnpm check:browser-automator && pnpm test"
   },
   "engines": {
-    "node": ">=20.0.0 <23"
+    "node": ">=20.9.0 <25"
   },
   "devDependencies": {}
 }
