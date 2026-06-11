@@ -18,39 +18,16 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Monolith line guard
         run: node scripts/guard-lines.mjs
 
-      - name: Baseline exceptions must be empty
-        run: node scripts/guard-baseline-empty.mjs
-
       - name: Complexity guard
         run: node scripts/guard-complexity.mjs
 
-  api:
+  nextjs:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24.x'
-
-      - name: Go test
-        run: go test ./...
-
-  web:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,36 +35,22 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@10
 
       - name: Install deps
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm typecheck
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
 
-  contracts:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/contracts
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Build
+        run: pnpm build
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install deps
-        run: npm install
-
-      - name: Build contracts package
-        run: npm run build
+      - name: Test
+        run: node scripts/ensure-supported-node.mjs && node --experimental-strip-types --no-warnings --test scripts/lib/cli-env.test.mjs scripts/lib/google-api.test.mjs scripts/lib/web-production-env.test.mjs scripts/governance-doc-sync.test.mjs scripts/project-ssot-doc-sync.test.mjs scripts/google-secret-sync.test.mjs scripts/sin-a2a-doc-sync.test.mjs scripts/check-governance-preflight.test.mjs scripts/storefront-legal-sync.test.mjs scripts/guard-baseline-validate.test.mjs
