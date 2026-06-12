@@ -143,8 +143,14 @@ async function importProduct(pid) {
 
   // Spaltennamen = echtes shop.products-Schema ('name', 'images' jsonb).
   // Die View products_v mappt sie auf 'title' / 'image_url' für den App-Code.
+  // FIX: id ist UUID-Spalte → deterministische UUID v5 aus pid ableiten.
+  //     UUID-namespace: cj-dropshipping (selbst definiert).
+  const CJ_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  const crypto = await import('node:crypto')
+  const id = crypto.createHash('sha1').update(`cj:${detail.pid}`).digest('hex')
+  const idUuid = `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20, 32)}`
   const row = {
-    id: `cj-${detail.pid}`,
+    id: idUuid,
     name: detail.productNameEn,
     slug: `cj-${detail.pid}`,
     description:
