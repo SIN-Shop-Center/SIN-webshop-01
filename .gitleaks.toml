@@ -1,0 +1,15 @@
+title = "ShopSIN gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "jwt"
+[rules.allowlist]
+regexes = [
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY5Mjc5NTAyLCJleHAiOjE5MjY5NTk1MDJ9\.HCam8-Pv3vAN8lthCwOpQuels9LkGKK8hVRJQCPEYWE'
+]
+paths = [
+  'wrangler.jsonc'
+]
