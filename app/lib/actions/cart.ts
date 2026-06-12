@@ -66,13 +66,14 @@ export async function addToCart(productId: string, quantity = 1, variantId?: str
 
   const { data: product, error: productError } = await supabase
     .from('products')
-    .select('id, stock, variants')
+    .select('id, stock, variants, allow_backorder')
     .eq('id', productId)
     .maybeSingle()
 
   if (productError) throw productError
   // Fast-Path-Check (UX). Autorität ist die atomare DB-Funktion unten.
-  if (!product || product.stock <= 0) {
+  // Issue #53: Backorder-Produkte (allow_backorder=true) dürfen auch bei stock=0 reserviert werden.
+  if (!product || (product.stock <= 0 && !product.allow_backorder)) {
     throw new Error('Produkt nicht verfügbar')
   }
 
