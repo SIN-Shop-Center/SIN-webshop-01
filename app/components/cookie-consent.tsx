@@ -1,3 +1,4 @@
+// app/components/cookie-consent.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -14,6 +15,8 @@ function getConsent(): string | null {
 function setConsent(value: 'all' | 'essential') {
   const oneYear = 60 * 60 * 24 * 365
   document.cookie = `${CONSENT_COOKIE}=${value}; max-age=${oneYear}; path=/; SameSite=Lax; Secure`
+  // Andere Komponenten informieren
+  window.dispatchEvent(new CustomEvent('sin:consent', { detail: value }))
 }
 
 export function CookieConsent() {
@@ -25,12 +28,17 @@ export function CookieConsent() {
 
   if (!visible) return null
 
+  function choose(value: 'all' | 'essential') {
+    setConsent(value)
+    setVisible(false)
+  }
+
   return (
     <div
       role="dialog"
       aria-label="Cookie-Einwilligung"
       aria-live="polite"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card p-3 shadow-lg md:inset-x-auto md:bottom-4 md:right-4 md:max-w-sm md:rounded-lg md:border md:shadow-xl"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-card p-3 shadow-lg md:inset-x-auto md:bottom-4 md:right-4 md:max-w-sm md:rounded-lg md:border md:shadow-xl"
     >
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3">
         <p className="flex-1 text-xs leading-snug text-card-foreground text-pretty">
@@ -44,14 +52,14 @@ export function CookieConsent() {
         <div className="flex shrink-0 gap-2">
           <button
             type="button"
-            onClick={() => setConsent('essential')}
+            onClick={() => choose('essential')}
             className="rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             Nur notwendige
           </button>
           <button
             type="button"
-            onClick={() => setConsent('all')}
+            onClick={() => choose('all')}
             className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
           >
             Alle akzeptieren

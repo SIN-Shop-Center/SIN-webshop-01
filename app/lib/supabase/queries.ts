@@ -143,6 +143,8 @@ export async function getRelatedProducts(
   limit = 4,
 ): Promise<Product[]> {
   const supabase = createDataClient()
+
+  // 1. Zuerst Produkte aus derselben Kategorie
   let query = supabase
     .from('products_v')
     .select('*')
@@ -153,7 +155,26 @@ export async function getRelatedProducts(
   if (categoryId) query = query.eq('category_id', categoryId)
 
   const { data, error } = await query
-
   if (error) return []
-  return (data ?? []).map((r) => transformProduct(r as DbProductRow))
+
+  const related = (data ?? []).map((r) => transformProduct(r as DbProductRow))
+
+  // 2. FIX: Zu wenig Treffer in der Kategorie? → mit beliebten Produkten
+  //    aus dem Gesamtsortiment auffüllen, damit immer `limit` Karten stehen.
+  if (related.length < limit) {
+    const excludeIds = [productId, ...related.map((p) => p.id)]
+    const { data: fill, error: fillError } = await supabase
+      .from('products_v')
+      .select('*')
+      .eq('is_active', true)
+      .not('id', 'in', `(${excludeIds.map((id) => `"${id}"`).join(',')})`)
+      .order('rating_count', { ascending: false })
+      .limit(limit - related.length)
+
+    if (!fillError && fill) {
+      related.push(...fill.map((r) => transformProduct(r as DbProductRow)))
+    }
+  }
+
+  return related
 }

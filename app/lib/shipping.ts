@@ -80,7 +80,7 @@ export async function getShippingQuoteAsync(params: {
   }
 }
 
-function fallback(subtotalCents: number) {
+function fallback(subtotalCents: number): { costCents: number; agingMin: number; agingMax: number } {
   return {
     costCents: subtotalCents >= SHIPPING.freeAboveCents ? 0 : SHIPPING.standardCents,
     agingMin: SHIPPING.deliveryDaysMin,

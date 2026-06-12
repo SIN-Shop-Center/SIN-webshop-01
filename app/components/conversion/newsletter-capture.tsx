@@ -1,11 +1,19 @@
-// Purpose: Time-based newsletter popup with discount code
-// Docs: AGENTS.md
+// app/components/conversion/newsletter-capture.tsx
+// Purpose: Zeitgesteuertes Newsletter-Popup — erscheint erst NACH dem
+// Cookie-Consent, nie gleichzeitig mit anderen Overlays.
 
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
 import { X, Gift } from 'lucide-react'
 import { subscribeNewsletter } from '@/app/actions/newsletter'
+
+const SEEN_KEY = 'newsletter-popup-seen'
+const DELAY_MS = 25_000
+
+function hasConsent(): boolean {
+  return /(?:^|; )sin-cookie-consent=/.test(document.cookie)
+}
 
 export function NewsletterCapture() {
   const [show, setShow] = useState(false)
@@ -14,15 +22,44 @@ export function NewsletterCapture() {
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (localStorage.getItem('newsletter-popup-seen')) return
+    if (localStorage.getItem(SEEN_KEY)) return
     if (sessionStorage.getItem('exit-offer-shown')) return
-    const timer = setTimeout(() => {
-      setShow(true)
-      localStorage.setItem('newsletter-popup-seen', '1')
-    }, 25_000)
-    return () => clearTimeout(timer)
+
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const arm = () => {
+      timer = setTimeout(() => setShow(true), DELAY_MS)
+    }
+
+    if (hasConsent()) {
+      arm()
+    } else {
+      const onConsent = () => arm()
+      window.addEventListener('sin:consent', onConsent, { once: true })
+      return () => {
+        window.removeEventListener('sin:consent', onConsent)
+        if (timer) clearTimeout(timer)
+      }
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
   }, [])
+
+  useEffect(() => {
+    if (!show) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dismiss()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [show])
+
+  function dismiss() {
+    localStorage.setItem(SEEN_KEY, '1')
+    setShow(false)
+  }
 
   if (!show) return null
 
@@ -32,14 +69,14 @@ export function NewsletterCapture() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="nl-title"
-      onClick={() => setShow(false)}
+      onClick={dismiss}
     >
       <div
         className="relative w-full max-w-sm rounded-xl bg-background p-6 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={() => setShow(false)}
+          onClick={dismiss}
           aria-label="Schließen"
           className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
@@ -51,8 +88,9 @@ export function NewsletterCapture() {
         {done ? (
           <>
             <h2 id="nl-title" className="mb-2 text-xl font-bold">Willkommen an Bord!</h2>
-            <p className="text-sm text-muted-foreground text-pretty">
-              Dein Code: <span className="font-mono font-bold text-primary">WILLKOMMEN10</span> — löse ihn an der Kasse ein.
+            <p className="text-sm text-muted-foreground">
+              Dein Code: <span className="font-mono font-bold text-primary">WILLKOMMEN10</span> —
+              löse ihn an der Kasse ein.
             </p>
           </>
         ) : (
@@ -61,7 +99,8 @@ export function NewsletterCapture() {
               10 % Rabatt für Neukunden
             </h2>
             <p className="mb-4 text-sm text-muted-foreground text-pretty">
-              Trag dich ein und erhalte sofort deinen Gutscheincode plus exklusive Deals vor allen anderen.
+              Trag dich ein und erhalte sofort deinen Gutscheincode plus exklusive Deals
+              vor allen anderen.
             </p>
             <form
               onSubmit={(e) => {
@@ -70,6 +109,7 @@ export function NewsletterCapture() {
                   const fd = new FormData()
                   fd.append('email', email)
                   await subscribeNewsletter({ ok: false, message: '' }, fd)
+                  localStorage.setItem(SEEN_KEY, '1')
                   setDone(true)
                 })
               }}

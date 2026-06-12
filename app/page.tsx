@@ -6,8 +6,9 @@ import { getFeaturedProducts, getDealProducts } from '@/lib/queries'
 import { HomeHero } from '@/components/home-hero'
 import { ProductCard } from '@/components/ProductCard'
 import { CategoryTiles } from '@/components/home-sections'
-import { NewsletterSignup } from '@/components/newsletter-signup'
 import { RecentlyViewed } from '@/components/product/recently-viewed'
+import { TrustStats } from '@/components/trust-stats'
+import { HowItWorks } from '@/components/how-it-works'
 import { SHIPPING } from '@/lib/shipping'
 import { formatEuro } from '@/lib/format'
 import {
@@ -130,7 +131,8 @@ export default async function HomePage() {
         )}
       </section>
 
-      <NewsletterSignup />
+      <TrustStats />
+      <HowItWorks />
       <RecentlyViewed />
     </>
   )

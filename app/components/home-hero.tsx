@@ -1,9 +1,10 @@
-// Purpose: Sales-oriented hero with deal products teaser
+// Purpose: Sales-oriented hero — doktorabc-Pattern: große Typografie mit
+// farbigem Schlüsselwort + Suchfeld direkt im Hero, Deal-Teaser rechts.
 // Docs: AGENTS.md
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
+import { ArrowRight, Search, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
 import { getDealProducts } from '@/lib/queries'
 
 function formatEur(value: number) {
@@ -15,17 +16,46 @@ export async function HomeHero() {
 
   return (
     <section className="border-b border-border bg-muted/30">
-      <div className="container mx-auto flex flex-col gap-6 px-4 py-8 md:flex-row md:items-center md:gap-10 md:py-12">
-        <div className="flex flex-1 flex-col items-start gap-4">
+      <div className="container mx-auto flex flex-col gap-8 px-4 py-10 md:flex-row md:items-center md:gap-10 md:py-16">
+        <div className="flex flex-1 flex-col items-start gap-5">
           <span className="rounded-full bg-sale px-3 py-1 text-xs font-bold uppercase tracking-wide text-sale-foreground">
             Bis zu 50 % sparen
           </span>
-          <h1 className="text-3xl font-bold leading-tight text-balance md:text-4xl">
-            Alles, was du brauchst. Zu Preisen, die du liebst.
+
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-balance md:text-5xl">
+            Alles, was du brauchst.{' '}
+            <span className="text-primary">Zu Preisen, die du liebst.</span>
           </h1>
-          <p className="text-sm leading-relaxed text-muted-foreground text-pretty md:text-base">
-            Über 50 Produkte aus Mode, Beauty, Haushalt und mehr — täglich neue Deals, gratis Versand ab 49 €.
+
+          <p className="text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
+            Über 50 Produkte aus Mode, Beauty, Haushalt und mehr &mdash; täglich
+            neue Deals, gratis Versand ab 49&nbsp;&euro;.
           </p>
+
+          {/* Suchfeld direkt im Hero (doktorabc-Pattern) */}
+          <form
+            action="/suche"
+            method="GET"
+            role="search"
+            className="flex w-full max-w-md items-center gap-2 rounded-lg border border-border bg-background p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-ring"
+          >
+            <Search className="ml-2 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <input
+              type="search"
+              name="q"
+              required
+              placeholder="Wonach suchst du?"
+              aria-label="Produkte durchsuchen"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Suchen
+            </button>
+          </form>
+
           <div className="flex flex-wrap gap-3">
             <Link
               href="/sale"
@@ -41,10 +71,11 @@ export async function HomeHero() {
               Alle Produkte
             </Link>
           </div>
-          <ul className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
+
+          <ul className="mt-1 flex flex-wrap gap-4 text-xs text-muted-foreground">
             <li className="flex items-center gap-1.5">
               <Truck className="size-3.5 text-primary" aria-hidden="true" />
-              Gratis ab 49 €
+              Gratis ab 49 &euro;
             </li>
             <li className="flex items-center gap-1.5">
               <RotateCcw className="size-3.5 text-primary" aria-hidden="true" />

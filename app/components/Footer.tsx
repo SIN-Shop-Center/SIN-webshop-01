@@ -3,6 +3,7 @@
 
 import Link from 'next/link'
 import { NewsletterSignup } from '@/components/newsletter-signup'
+import { PaymentMethods } from '@/components/payment-methods'
 
 const SHOP_LINKS = [
   { href: '/produkte', label: 'Alle Produkte' },
@@ -94,6 +95,7 @@ export function Footer() {
               ))}
             </ul>
           </nav>
+          <PaymentMethods />
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} SIN Shop &middot; Jeremy Schulze &middot;
             Kurf&uuml;rstenstra&szlig;e 124, 10785 Berlin
