@@ -1,0 +1,43 @@
+# Purpose: Release pipeline — tag push triggers changelog + GitHub release
+# Docs: AGENTS.md
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run (no GitHub release)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: read
+
+jobs:
+  release:
+    name: Draft GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish release
+        if: github.event.inputs.dry_run != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: false
