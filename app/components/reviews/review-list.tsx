@@ -1,7 +1,7 @@
 // Purpose: Display customer reviews with star ratings
 // Docs: AGENTS.md
 
-import { Star } from 'lucide-react'
+import { Star, BadgeCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 
 type Review = {
@@ -10,6 +10,8 @@ type Review = {
   comment: string | null
   created_at: string
   user_name: string | null
+  source: string
+  is_verified: boolean
 }
 
 function StarRow({ rating, size = 'size-4' }: { rating: number; size?: string }) {
@@ -26,7 +28,7 @@ export async function ReviewList({ productId }: { productId: string }) {
   const supabase = await createClient()
   const { data: reviews } = await supabase
     .from('reviews')
-    .select('id, rating, comment, created_at, user_name')
+    .select('id, rating, comment, created_at, user_name, source, is_verified')
     .eq('product_id', productId)
     .order('created_at', { ascending: false })
     .limit(20)
@@ -60,9 +62,14 @@ export async function ReviewList({ productId }: { productId: string }) {
             {list.map((review) => (
               <li key={review.id} className="rounded-lg border border-border bg-card p-4">
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <StarRow rating={review.rating} size="size-3.5" />
                     <span className="text-sm font-medium">{review.user_name ?? 'Anonym'}</span>
+                    {review.is_verified && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+                        <BadgeCheck className="size-3" aria-hidden /> Verifiziert
+                      </span>
+                    )}
                   </div>
                   <time dateTime={review.created_at} className="text-xs text-muted-foreground">
                     {new Date(review.created_at).toLocaleDateString('de-DE')}

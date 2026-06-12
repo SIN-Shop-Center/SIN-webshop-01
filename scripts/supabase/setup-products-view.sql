@@ -24,16 +24,20 @@ SELECT
   p.description,
   p.price,
   p.original_price,
+  p.compare_at_price,                                 -- sale strikethrough
   p.category_id,                                      -- für Kategorie-Filter
   COALESCE(p.images->>0, '') AS image_url,            -- images[0] → image_url
   COALESCE(
+    p.image_gallery,                                  -- real text[] column (cj-sync)
     ARRAY(SELECT jsonb_array_elements_text(p.images)),
     ARRAY[]::text[]
   ) AS image_gallery,                                  -- images[] → text[]
   p.stock,
   p.is_active,
-  p.variants,
+  COALESCE(p.variants, '[]'::jsonb) AS variants,      -- variant selector JSONB
   p.metadata,
+  p.badge,                                            -- bestseller | neu | sale
+  p.sold_count,                                       -- social proof
   p.created_at,
   p.updated_at,
   p.cj_product_id,
@@ -41,8 +45,8 @@ SELECT
   p.cj_sku,
   p.cj_cost_price,
   p.cj_last_synced_at,
-  COALESCE((p.metadata->>'rating')::numeric, 0) AS rating,
-  COALESCE((p.metadata->>'ratingCount')::integer, 0) AS rating_count,
+  COALESCE(p.rating, (p.metadata->>'rating')::numeric, 0) AS rating,
+  COALESCE(p.rating_count, (p.metadata->>'ratingCount')::integer, 0) AS rating_count,
   COALESCE((p.metadata->>'is_featured')::boolean, false) AS is_featured
 FROM shop.products p;
 

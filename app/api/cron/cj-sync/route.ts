@@ -1,4 +1,4 @@
-// Purpose: Cron endpoint — price/stock sync (Step 7)
+// Purpose: Cron endpoint — price/stock/media sync (Step 7 + Step 11)
 // Docs: PLAN-VERKAUFSFAEHIG.md (Step 7 — CJ Dropshipping integration)
 //
 // Schedule: Vercel Cron "0 3 * * *" (täglich um 3 Uhr).
@@ -21,6 +21,24 @@ function calcPrice(costUsd: number): string {
   return (Math.ceil(raw) - 0.01).toFixed(2)
 }
 
+interface CjVariant {
+  vid: string
+  variantSellPrice?: number
+  variantSku?: string
+  variantKey?: string
+  variantStock?: number
+  variantImage?: string
+}
+
+interface CjProductDetail {
+  pid?: string
+  productImage?: string
+  productImageSet?: string[]
+  variants?: CjVariant[]
+  sellPrice?: number
+  suggestSellPrice?: number
+}
+
 export async function GET(request: Request) {
   if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -41,16 +59,13 @@ export async function GET(request: Request) {
 
   for (const product of products ?? []) {
     try {
-      const detail = await cjRequest<{
-        variants?: Array<{
-          vid: string
-          variantSellPrice?: number
-        }>
-        sellPrice?: number
-      }>('/product/query', { query: { pid: product.cj_product_id! } })
+      const detail = await cjRequest<CjProductDetail>('/product/query', {
+        query: { pid: product.cj_product_id! },
+      })
 
       const variant = detail.variants?.find((v) => v.vid === product.cj_variant_id)
       const cost = Number(variant?.variantSellPrice ?? detail.sellPrice ?? 0)
+      const sellPrice = Number(detail.sellPrice ?? cost)
 
       // Bestand je Variante abfragen
       let stock = 0
@@ -64,12 +79,47 @@ export async function GET(request: Request) {
         // Bestandsabfrage optional — Preis-Update trotzdem durchführen
       }
 
+      // ── Image gallery (PDP) ────────────────────────────────────────────
+      const imageGallery: string[] = [
+        detail.productImage,
+        ...(Array.isArray(detail.productImageSet) ? detail.productImageSet : []),
+      ].filter((url, i, arr): url is string => Boolean(url) && arr.indexOf(url) === i)
+
+      // ── Variants (variant selector) ────────────────────────────────────
+      const variants = (detail.variants ?? []).map((v) => ({
+        cj_variant_id: v.vid,
+        sku: v.variantSku ?? null,
+        name: v.variantKey ?? null,
+        price:
+          Number(v.variantSellPrice ?? detail.sellPrice ?? 0) > 0
+            ? calcPrice(Number(v.variantSellPrice ?? detail.sellPrice ?? 0))
+            : null,
+        stock: Number(v.variantStock ?? 0),
+        image_url: v.variantImage || detail.productImage || null,
+      }))
+
+      // ── Compare-at price (sale page strikethrough) ─────────────────────
+      // CJ suggestSellPrice ist die unverbindliche Preisempfehlung des
+      // Herstellers — meist höher als der CJ-Verkaufspreis. Wenn vorhanden
+      // und höher als unser Verkaufspreis, nehmen wir den höheren Wert,
+      // multipliziert mit dem Faktor. Sonst fällt compare_at_price auf
+      // 1.3× unseren Verkaufspreis zurück.
+      const ourPrice = cost > 0 ? Number(calcPrice(cost)) : sellPrice * MULTIPLIER
+      const suggestUsd = Number(detail.suggestSellPrice ?? 0)
+      const compareAtPrice =
+        suggestUsd > 0 && suggestUsd * MULTIPLIER > ourPrice
+          ? Number((Math.ceil(suggestUsd * MULTIPLIER) - 0.01).toFixed(2))
+          : Number((Math.ceil(ourPrice * 1.3) - 0.01).toFixed(2))
+
       await supabase
         .from('products')
         .update({
           ...(cost > 0 ? { price: calcPrice(cost), cj_cost_price: cost } : {}),
           stock,
           cj_last_synced_at: new Date().toISOString(),
+          compare_at_price: compareAtPrice,
+          image_gallery: imageGallery,
+          variants: variants,
         })
         .eq('id', product.id)
 

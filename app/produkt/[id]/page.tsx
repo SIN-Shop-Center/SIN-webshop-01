@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
+import { canUserReview } from '@/app/actions/reviews'
 import { PriceTag } from '@/components/PriceTag'
 import { AddToCartButton } from '@/components/AddToCartButton'
 import { toCents } from '@/lib/format'
@@ -83,6 +84,8 @@ export default async function ProductPage({
   const product = await getProductById(id)
 
   if (!product) notFound()
+
+  const reviewStatus = await canUserReview(product.id)
 
   const priceCents = toCents(product.price)
   const originalPriceCents =
@@ -220,7 +223,12 @@ export default async function ProductPage({
 
         {/* Customer Reviews */}
         <ReviewList productId={product.id} />
-        <ReviewForm productId={product.id} isLoggedIn={true} />
+        <ReviewForm
+          productId={product.id}
+          isLoggedIn={reviewStatus.isLoggedIn}
+          hasPurchased={reviewStatus.hasPurchased}
+          hasReviewed={reviewStatus.hasReviewed}
+        />
 
         {/* Recently Viewed */}
         <RecentlyViewed excludeId={product.id} />

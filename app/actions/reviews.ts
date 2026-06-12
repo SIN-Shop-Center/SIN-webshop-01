@@ -1,10 +1,39 @@
-// Purpose: Server action for review submission
+// Purpose: Review server actions — only verified buyers may review
 // Docs: AGENTS.md
 
 'use server'
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+
+export async function canUserReview(productId: string): Promise<{
+  isLoggedIn: boolean
+  hasPurchased: boolean
+  hasReviewed: boolean
+}> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { isLoggedIn: false, hasPurchased: false, hasReviewed: false }
+
+  const [{ data: purchased }, { data: existing }] = await Promise.all([
+    supabase.rpc('has_purchased', { p_product: productId }),
+    supabase
+      .from('reviews')
+      .select('id')
+      .eq('product_id', productId)
+      .eq('user_id', user.id)
+      .maybeSingle(),
+  ])
+
+  return {
+    isLoggedIn: true,
+    hasPurchased: purchased === true,
+    hasReviewed: Boolean(existing),
+  }
+}
 
 export async function submitReview({
   productId,
@@ -28,7 +57,21 @@ export async function submitReview({
     return { error: 'Bitte melde dich an, um eine Bewertung zu schreiben.' }
   }
 
-  const userName = (user.user_metadata?.name as string | undefined) ?? user.email?.split('@')[0] ?? 'Anonym'
+  // Server-side purchase verification
+  const { data: purchased } = await supabase.rpc('has_purchased', {
+    p_product: productId,
+  })
+  if (purchased !== true) {
+    return {
+      error:
+        'Nur verifizierte Käufer können dieses Produkt bewerten. Du kannst eine Bewertung abgeben, sobald du es bei uns gekauft hast.',
+    }
+  }
+
+  const userName =
+    (user.user_metadata?.name as string | undefined) ??
+    user.email?.split('@')[0] ??
+    'Anonym'
 
   const { error } = await supabase.from('reviews').upsert(
     {
@@ -37,6 +80,8 @@ export async function submitReview({
       rating,
       comment: comment.trim().slice(0, 1000) || null,
       user_name: userName,
+      source: 'shop',
+      is_verified: true,
     },
     { onConflict: 'product_id,user_id' },
   )
