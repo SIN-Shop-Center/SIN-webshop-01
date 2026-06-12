@@ -23,7 +23,12 @@ function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry)
     const rel = relative(ROOT, full)
-    const st = statSync(full)
+    let st
+    try {
+      st = statSync(full)
+    } catch {
+      continue
+    }
     if (st.isDirectory()) {
       if (IGNORE_DIRS.has(entry)) continue
       walk(full, out)
