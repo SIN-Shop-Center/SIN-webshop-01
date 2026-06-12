@@ -1,10 +1,12 @@
-// Purpose: Admin access guard (server-only, Step 8 of migration)
-// Docs: PLAN-VERKAUFSFAEHIG.md (Step 8 — Admin Dashboard)
+// Purpose: Admin access guard with MFA (AAL2) enforcement (Issue #50)
+// Docs: https://supabase.com/docs/guides/auth/auth-mfa
 //
-// SECURITY: Wirft nicht-eingeloggte User auf /auth/login und Nicht-Admins
-// auf /. In JEDER Admin-Page und JEDER Admin-Action aufrufen — die Proxy
-// prüft nur Login, nicht die Admin-Rolle (User-Metadata ist im Edge-Kontext
-// nicht verlässlich frisch genug).
+// SECURITY:
+// - Unauthenticated → /auth/login
+// - Not admin → /
+// - No TOTP enrolled → /admin/2fa/enroll
+// - TOTP enrolled but session is aal1 → /admin/2fa/verify
+// - Only aal2 + is_admin → grant access
 
 import 'server-only'
 
@@ -19,6 +21,18 @@ export async function requireAdmin() {
 
   if (!user) redirect('/auth/login')
   if (user.user_metadata?.is_admin !== true) redirect('/')
+
+  // Issue #50: 2FA-Pflicht für Admins.
+  // currentLevel 'aal1' + nextLevel 'aal2' => TOTP enrolled, aber nicht verifiziert
+  // currentLevel 'aal1' + nextLevel 'aal1' => noch kein TOTP enrolled
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+
+  if (aal?.currentLevel !== 'aal2') {
+    if (aal?.nextLevel === 'aal2') {
+      redirect('/admin/2fa/verify')
+    }
+    redirect('/admin/2fa/enroll')
+  }
 
   return user
 }
