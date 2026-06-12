@@ -10,7 +10,11 @@ import { CartItemControls } from '@/components/CartItemControls'
 import { CheckoutButton } from '@/components/CheckoutButton'
 import { SHIPPING, getShippingCents } from '@/lib/shipping'
 import { formatEuro, toCents } from '@/lib/format'
-import { CartIcon, ArrowRightIcon, ShieldCheckIcon } from '@/components/icons'
+import { CartIcon, ArrowRightIcon } from '@/components/icons'
+import { RelatedProducts } from '@/components/related-products'
+import { CartUrgency } from '@/components/conversion/cart-urgency'
+import { CheckoutSteps } from '@/components/conversion/checkout-steps'
+import { TrustBadges } from '@/components/conversion/trust-badges'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,6 +76,8 @@ export default async function CartPage() {
   return (
     <div className="container mx-auto px-4 py-8 pb-28 md:py-12 lg:pb-12">
       <h1 className="mb-2 text-3xl font-bold tracking-tight">Warenkorb</h1>
+      <CheckoutSteps current={0} />
+      <CartUrgency itemCount={totalQuantity} />
       <p className="mb-8 text-muted-foreground">
         {totalQuantity} Artikel · {formatEuro(subtotalCents)}
       </p>
@@ -189,10 +195,9 @@ export default async function CartPage() {
           </p>
           <div className="hidden lg:block">
             <CheckoutButton />
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-              <ShieldCheckIcon className="size-3.5" aria-hidden />
-              Sichere Zahlung über Stripe
-            </p>
+            <div className="mt-3">
+              <TrustBadges />
+            </div>
           </div>
         </aside>
       </div>
@@ -212,6 +217,7 @@ export default async function CartPage() {
           </div>
         </div>
       </div>
+      <RelatedProducts productId="" categoryId={null} />
     </div>
   )
 }
