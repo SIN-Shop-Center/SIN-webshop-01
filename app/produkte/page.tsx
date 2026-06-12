@@ -1,9 +1,13 @@
+// Purpose: Product listing page with filters, sidebar, and pagination
+// Docs: page.doc.md
+
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getProductsPage, type SortOption } from '@/lib/supabase/queries'
+import { getProductsPage, getCategories, type SortOption } from '@/lib/supabase/queries'
 import { ProductGrid } from '@/components/product-grid'
 import { Pagination } from '@/components/pagination'
 import { SortSelect } from '@/components/sort-select'
+import { FilterSidebar } from '@/components/filter-sidebar'
 
 export const metadata: Metadata = {
   title: 'Alle Produkte | ShopSIN',
@@ -11,15 +15,21 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: Promise<{ seite?: string; sortierung?: string }>
+  searchParams: Promise<{ seite?: string; sortierung?: string; kategorie?: string; preis_max?: string }>
 }
 
 export default async function ProduktePage({ searchParams }: PageProps) {
   const params = await searchParams
   const page = Math.max(1, Number(params.seite) || 1)
   const sort = (params.sortierung as SortOption) ?? 'neueste'
+  const categories = await getCategories()
 
-  const { products, total } = await getProductsPage({ page, sort })
+  const { products, total } = await getProductsPage({
+    page,
+    sort,
+    categoryId: params.kategorie,
+    maxPrice: params.preis_max ? Number(params.preis_max) : undefined,
+  })
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -33,14 +43,36 @@ export default async function ProduktePage({ searchParams }: PageProps) {
         </Suspense>
       </div>
 
-      <ProductGrid products={products} />
+      <div className="flex flex-col gap-8 md:flex-row">
+        <div className="hidden md:block">
+          <FilterSidebar
+            categories={categories}
+            activeCategory={params.kategorie}
+          />
+        </div>
+        <div className="flex-1">
+          <ProductGrid products={products} />
+          <Pagination
+            currentPage={page}
+            total={total}
+            basePath="/produkte"
+            searchParams={{ sortierung: sort, kategorie: params.kategorie ?? '', preis_max: params.preis_max ?? '' }}
+          />
+        </div>
+      </div>
 
-      <Pagination
-        currentPage={page}
-        total={total}
-        basePath="/produkte"
-        searchParams={{ sortierung: sort }}
-      />
+      {/* Mobile filter button */}
+      <details className="mt-4 md:hidden">
+        <summary className="cursor-pointer rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
+          Filter
+        </summary>
+        <div className="pt-4">
+          <FilterSidebar
+            categories={categories}
+            activeCategory={params.kategorie}
+          />
+        </div>
+      </details>
     </main>
   )
 }

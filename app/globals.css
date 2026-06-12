@@ -29,6 +29,11 @@
   --input: #e4e4e7;
   --ring: #1a1a1a;
   --radius: 0.5rem;
+  --accent-orange: oklch(0.65 0.19 41);
+  --accent-orange-foreground: oklch(0.99 0 0);
+  --sale: oklch(0.55 0.22 27);
+  --sale-foreground: oklch(0.99 0 0);
+  --rating: oklch(0.8 0.16 85);
 }
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -56,6 +61,11 @@
     --border: #27272a;
     --input: #27272a;
     --ring: #fafafa;
+    --accent-orange: oklch(0.65 0.19 41);
+    --accent-orange-foreground: oklch(0.99 0 0);
+    --sale: oklch(0.58 0.22 27);
+    --sale-foreground: oklch(0.99 0 0);
+    --rating: oklch(0.8 0.16 85);
   }
 }
 
@@ -85,6 +95,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-orange-foreground: var(--accent-orange-foreground);
+  --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
+  --color-rating: var(--rating);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);

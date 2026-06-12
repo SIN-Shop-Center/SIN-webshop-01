@@ -27,8 +27,8 @@ export function PriceTag({
         <span
           className={
             size === 'lg'
-              ? 'text-3xl font-bold tracking-tight'
-              : 'text-lg font-bold tracking-tight'
+              ? 'text-3xl font-bold tracking-tight' + (hasDiscount ? ' text-sale' : '')
+              : 'text-lg font-bold tracking-tight' + (hasDiscount ? ' text-sale' : '')
           }
         >
           {formatEuro(priceCents)}

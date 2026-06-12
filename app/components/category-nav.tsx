@@ -5,7 +5,7 @@ export async function CategoryNav() {
   const categories = await getCategories()
   if (categories.length === 0) return null
 
-  const visible = categories.slice(0, 6)
+  const visible = categories
 
   return (
     <nav aria-label="Kategorien" className="border-b border-border bg-background">

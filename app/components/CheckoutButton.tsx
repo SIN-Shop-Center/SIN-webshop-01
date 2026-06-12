@@ -14,14 +14,12 @@ export function CheckoutButton() {
   function handleCheckout() {
     setError(null)
     startTransition(async () => {
-      try {
-        await startCheckout()
-      } catch (err) {
-        if (err instanceof Error && err.message.includes('NEXT_REDIRECT')) {
-          throw err
-        }
-        setError('Die Kasse konnte nicht geöffnet werden. Bitte versuche es erneut.')
+      const result = await startCheckout()
+      if (result.error || !result.url) {
+        setError(result.error ?? 'Unbekannter Fehler.')
+        return
       }
+      window.location.href = result.url
     })
   }
 

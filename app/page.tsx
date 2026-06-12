@@ -4,6 +4,7 @@
 import Link from 'next/link'
 import { getFeaturedProducts } from '@/lib/queries'
 import { ProductCard } from '@/components/ProductCard'
+import { CategoryTiles } from '@/components/home-sections'
 import { NewsletterSignup } from '@/components/newsletter-signup'
 import { SHIPPING } from '@/lib/shipping'
 import { formatEuro } from '@/lib/format'
@@ -90,6 +91,8 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      <CategoryTiles />
 
       {/* Featured products */}
       <section id="featured" className="container mx-auto scroll-mt-20 px-4 py-16">
