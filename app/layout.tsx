@@ -8,6 +8,10 @@ import { Navbar } from './components/Navbar'
 import { CategoryNav } from './components/category-nav'
 import { CookieConsent } from './components/cookie-consent'
 import { Footer } from './components/Footer'
+import { AnnouncementBar } from '@/components/conversion/announcement-bar'
+import { ExitIntentOffer } from '@/components/conversion/exit-intent-offer'
+import { MobileTabBar } from '@/components/mobile-tab-bar'
+import { NewsletterCapture } from '@/components/conversion/newsletter-capture'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -76,6 +80,7 @@ export default function RootLayout({
         >
           Zum Hauptinhalt springen
         </a>
+        <AnnouncementBar />
         <Navbar />
         <CategoryNav />
         <main id="main-content" className="flex-1">
@@ -83,6 +88,9 @@ export default function RootLayout({
         </main>
         <Footer />
         <CookieConsent />
+        <ExitIntentOffer />
+        <NewsletterCapture />
+        <MobileTabBar />
       </body>
     </html>
   )

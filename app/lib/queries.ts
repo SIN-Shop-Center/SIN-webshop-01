@@ -149,3 +149,22 @@ export async function getAllProductIdsForBuild(): Promise<string[]> {
     return []
   }
 }
+
+export async function getDealProducts(limit = 8): Promise<Product[]> {
+  const supabase = createDataClient()
+  const { data, error } = await supabase
+    .from('products_v')
+    .select('*')
+    .eq('is_active', true)
+    .not('original_price', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('getDealProducts error:', error.message)
+    return []
+  }
+  return (data ?? [])
+    .map((row) => transformProduct(row as DbProductViewRow))
+    .filter((p) => p.originalPrice != null && p.originalPrice > p.price)
+}

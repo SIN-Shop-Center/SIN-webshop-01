@@ -12,6 +12,13 @@ import { ImageGallery } from '@/components/image-gallery'
 import { VariantSelector } from '@/components/variant-selector'
 import { RelatedProducts } from '@/components/related-products'
 import { WishlistButton } from '@/components/WishlistButton'
+import { StockIndicator } from '@/components/conversion/stock-indicator'
+import { LiveViewers } from '@/components/conversion/live-viewers'
+import { FreeShippingNudge } from '@/components/conversion/free-shipping-nudge'
+import { BoughtTogether } from '@/components/conversion/bought-together'
+import { ReviewList } from '@/components/reviews/review-list'
+import { ReviewForm } from '@/components/reviews/review-form'
+import { RecentlyViewed } from '@/components/conversion/recently-viewed'
 import { ProductTabs } from '@/components/product-tabs'
 import { ProductJsonLd } from '@/components/ProductJsonLd'
 import {
@@ -127,6 +134,9 @@ export default async function ProductPage({
             <div className="mb-8">
               <VariantSelector product={product} />
             </div>
+            {product.stock > 0 && <StockIndicator stock={product.stock} />}
+            <LiveViewers productId={product.id} />
+            <FreeShippingNudge />
 
             {/* Product Tabs */}
             <ProductTabs description={product.description} />
@@ -201,6 +211,19 @@ export default async function ProductPage({
 
         {/* Related Products */}
         <RelatedProducts productId={product.id} categoryId={null} />
+
+        {/* Bundle upsell */}
+        <BoughtTogether
+          mainProduct={{ id: product.id, name: product.title, price: product.price, image: product.imageUrl }}
+          suggestions={[]}
+        />
+
+        {/* Customer Reviews */}
+        <ReviewList productId={product.id} />
+        <ReviewForm productId={product.id} isLoggedIn={true} />
+
+        {/* Recently Viewed */}
+        <RecentlyViewed excludeId={product.id} />
 
         {product.stock > 0 && (
           <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden">

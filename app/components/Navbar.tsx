@@ -3,7 +3,7 @@
 
 import Link from 'next/link'
 import { getCartCount } from '@/lib/actions/cart'
-import { SearchBar } from '@/components/search-bar'
+import { SearchAutocomplete } from '@/components/conversion/search-autocomplete'
 import { CartIcon, HeartIcon, PackageIcon, UserIcon } from './icons'
 
 export async function Navbar() {
@@ -21,7 +21,7 @@ export async function Navbar() {
         </Link>
 
         <div className="hidden sm:flex sm:flex-1 sm:justify-center">
-          <SearchBar />
+          <SearchAutocomplete />
         </div>
 
         <nav aria-label="Hauptnavigation" className="flex shrink-0 items-center gap-1 sm:gap-2">
@@ -66,7 +66,7 @@ export async function Navbar() {
       </div>
       <div className="border-t border-border sm:hidden">
         <div className="mx-auto flex max-w-7xl px-4 py-2">
-          <SearchBar />
+          <SearchAutocomplete />
         </div>
       </div>
     </header>

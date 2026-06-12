@@ -3,9 +3,11 @@
 
 import Link from 'next/link'
 import { getFeaturedProducts } from '@/lib/queries'
+import { HomeHero } from '@/components/home-hero'
 import { ProductCard } from '@/components/ProductCard'
 import { CategoryTiles } from '@/components/home-sections'
 import { NewsletterSignup } from '@/components/newsletter-signup'
+import { RecentlyViewed } from '@/components/conversion/recently-viewed'
 import { SHIPPING } from '@/lib/shipping'
 import { formatEuro } from '@/lib/format'
 import {
@@ -45,30 +47,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero — kompakteres Padding auf Mobile, full-width CTAs */}
-      <section className="border-b border-border bg-gradient-to-b from-muted/40 to-background">
-        <div className="container mx-auto flex flex-col items-center px-4 py-14 text-center sm:py-20 md:py-28">
-          <span className="mb-4 inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            Handverlesen. Geprüft. Geliefert.
-          </span>
-          <h1 className="mb-4 max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-6xl">
-            Dein Alltag. Unser Sortiment.
-          </h1>
-          <p className="mb-8 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-            Entdecke Mode, Wohnaccessoires, Elektronik und mehr für deinen
-            Alltag — handverlesen und schnell geliefert.
-          </p>
-          <div className="flex w-full max-w-sm flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
-            <Link href="/produkte" className="btn btn-primary btn-lg w-full sm:w-auto">
-              Alle Produkte
-              <ArrowRightIcon className="size-5" aria-hidden />
-            </Link>
-            <Link href="/versand" className="btn btn-outline btn-lg w-full sm:w-auto">
-              Versandinfos
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HomeHero />
 
       {/* Trust strip */}
       <section
@@ -122,6 +101,7 @@ export default async function HomePage() {
       </section>
 
       <NewsletterSignup />
+      <RecentlyViewed />
     </>
   )
 }

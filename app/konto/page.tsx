@@ -1,11 +1,11 @@
-// Purpose: Account overview hub — links to orders, wishlist, logout
+// Purpose: Account overview hub — links to orders, wishlist, password change, contact, logout
 // Docs: AGENTS.md
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { PackageIcon, HeartIcon, LogOutIcon, UserIcon } from '@/components/icons'
+import { PackageIcon, HeartIcon, LogOutIcon, KeyRoundIcon, MapPinIcon, MailIcon, UserIcon } from '@/components/icons'
 
 export const metadata: Metadata = {
   title: 'Mein Konto',
@@ -20,6 +20,13 @@ export default async function KontoPage() {
 
   if (!user) redirect('/auth/login?weiter=/konto')
 
+  const tiles = [
+    { href: '/konto/bestellungen', icon: PackageIcon, title: 'Meine Bestellungen', desc: 'Bestellstatus und Historie ansehen' },
+    { href: '/wunschliste', icon: HeartIcon, title: 'Wunschliste', desc: 'Gemerkte Produkte ansehen' },
+    { href: '/auth/passwort-aktualisieren', icon: KeyRoundIcon, title: 'Passwort ändern', desc: 'Neues Passwort festlegen' },
+    { href: '/kontakt', icon: MailIcon, title: 'Hilfe & Kontakt', desc: 'Fragen zu deiner Bestellung?' },
+  ]
+
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8 md:py-12">
       <div className="mb-8 flex items-center gap-4">
@@ -33,26 +40,19 @@ export default async function KontoPage() {
       </div>
 
       <nav aria-label="Konto-Bereiche" className="grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/konto/bestellungen"
-          className="flex items-center gap-4 rounded-lg border border-border bg-card p-5 transition-colors hover:bg-muted"
-        >
-          <PackageIcon aria-hidden className="size-6 text-primary" />
-          <div>
-            <p className="font-semibold text-card-foreground">Bestellungen</p>
-            <p className="text-sm text-muted-foreground">Status und Historie ansehen</p>
-          </div>
-        </Link>
-        <Link
-          href="/wunschliste"
-          className="flex items-center gap-4 rounded-lg border border-border bg-card p-5 transition-colors hover:bg-muted"
-        >
-          <HeartIcon aria-hidden className="size-6 text-primary" />
-          <div>
-            <p className="font-semibold text-card-foreground">Wunschliste</p>
-            <p className="text-sm text-muted-foreground">Gemerkte Produkte</p>
-          </div>
-        </Link>
+        {tiles.map((tile) => (
+          <Link
+            key={tile.href}
+            href={tile.href}
+            className="flex items-center gap-4 rounded-lg border border-border bg-card p-5 transition-colors hover:bg-muted"
+          >
+            <tile.icon aria-hidden className="size-6 text-primary shrink-0" />
+            <div>
+              <p className="font-semibold text-card-foreground">{tile.title}</p>
+              <p className="text-sm text-muted-foreground">{tile.desc}</p>
+            </div>
+          </Link>
+        ))}
       </nav>
 
       <form action="/auth/logout" method="post" className="mt-8">
