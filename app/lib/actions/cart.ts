@@ -1,5 +1,6 @@
 // Purpose: Cart server actions — guest-capable via httpOnly cookie (Step 3)
-// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26)
+// Issue #37: Stock wird atomar via reserve_stock/release_stock RPC reserviert.
+// Docs: PLAN-VERKAUFSFAEHIG.md (issues #20-#26), scripts/supabase/setup-reserve-stock.sql
 
 'use server'
 
@@ -9,6 +10,7 @@ import { randomUUID } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const CART_COOKIE = 'sin_cart_id'
+const MAX_QTY = 99
 
 async function getCartId(): Promise<string | null> {
   const cookieStore = await cookies()
@@ -69,6 +71,7 @@ export async function addToCart(productId: string, quantity = 1, variantId?: str
     .maybeSingle()
 
   if (productError) throw productError
+  // Fast-Path-Check (UX). Autorität ist die atomare DB-Funktion unten.
   if (!product || product.stock <= 0) {
     throw new Error('Produkt nicht verfügbar')
   }
@@ -81,8 +84,7 @@ export async function addToCart(productId: string, quantity = 1, variantId?: str
     }
   }
 
-  const maxQty = Math.min(product.stock, 99)
-
+  // Vorhandene Menge laden, um das Cap (99) VOR der Reservierung zu berechnen
   const { data: existing } = await supabase
     .from('cart_items')
     .select('id, quantity')
@@ -90,22 +92,53 @@ export async function addToCart(productId: string, quantity = 1, variantId?: str
     .eq('product_id', productId)
     .maybeSingle()
 
+  const currentQty = existing?.quantity ?? 0
+  const requested = Math.max(0, Math.min(quantity, MAX_QTY - currentQty))
+  if (requested === 0) {
+    // Cart-Limit erreicht — nichts reservieren
+    return
+  }
+
+  // Issue #37: Atomare Reservierung. Senkt Stock oder wirft P0001.
+  const { error: reserveError } = await supabase.rpc('reserve_stock', {
+    p_product_id: productId,
+    p_qty: requested,
+  })
+  if (reserveError) {
+    if (reserveError.code === 'P0001') {
+      throw new Error('Produkt nicht mehr auf Lager')
+    }
+    throw new Error(reserveError.message)
+  }
+
+  let writeError: { message: string } | null = null
   if (existing) {
-    await supabase
+    const { error } = await supabase
       .from('cart_items')
       .update({
-        quantity: Math.min(existing.quantity + quantity, maxQty),
+        quantity: currentQty + requested,
         updated_at: new Date().toISOString(),
       })
       .eq('id', existing.id)
+    writeError = error
   } else {
     const insert: Record<string, any> = {
       cart_id: cartId,
       product_id: productId,
-      quantity: Math.min(quantity, maxQty),
+      quantity: requested,
     }
     if (variantId) insert.variant_id = variantId
-    await supabase.from('cart_items').insert(insert)
+    const { error } = await supabase.from('cart_items').insert(insert)
+    writeError = error
+  }
+
+  if (writeError) {
+    // Kompensation: Reservierung zurückgeben, sonst Stock-Leck
+    await supabase.rpc('release_stock', {
+      p_product_id: productId,
+      p_qty: requested,
+    })
+    throw new Error(writeError.message)
   }
 
   revalidatePath('/warenkorb')
@@ -118,14 +151,50 @@ export async function updateCartQuantity(itemId: string, quantity: number) {
 
   const supabase = createAdminClient()
 
-  if (quantity <= 0) {
+  // Issue #37: Item laden, um das Delta zu reservieren/freizugeben
+  const { data: item } = await supabase
+    .from('cart_items')
+    .select('id, product_id, quantity')
+    .eq('id', itemId)
+    .eq('cart_id', cartId)
+    .maybeSingle()
+  if (!item) return
+
+  const newQty = Math.max(0, Math.min(quantity, MAX_QTY))
+  const delta = newQty - item.quantity
+
+  if (delta > 0) {
+    const { error } = await supabase.rpc('reserve_stock', {
+      p_product_id: item.product_id,
+      p_qty: delta,
+    })
+    if (error) {
+      if (error.code === 'P0001') throw new Error('Nicht genug auf Lager')
+      throw new Error(error.message)
+    }
+  } else if (delta < 0) {
+    await supabase.rpc('release_stock', {
+      p_product_id: item.product_id,
+      p_qty: -delta,
+    })
+  }
+
+  if (newQty === 0) {
     await supabase.from('cart_items').delete().eq('id', itemId).eq('cart_id', cartId)
   } else {
-    await supabase
+    const { error } = await supabase
       .from('cart_items')
-      .update({ quantity: Math.min(quantity, 99), updated_at: new Date().toISOString() })
+      .update({ quantity: newQty, updated_at: new Date().toISOString() })
       .eq('id', itemId)
       .eq('cart_id', cartId)
+
+    if (error) {
+      // Kompensation nur für gerade reservierte Menge
+      if (delta > 0) {
+        await supabase.rpc('release_stock', { p_product_id: item.product_id, p_qty: delta })
+      }
+      throw new Error(error.message)
+    }
   }
 
   revalidatePath('/warenkorb')

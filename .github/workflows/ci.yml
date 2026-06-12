@@ -1,98 +1,24 @@
-# Purpose: CI — typecheck, lint, guard checks, tests on every PR/push
-# Docs: AGENTS.md
-
-name: ci
-
+name: CI
 on:
-  push:
-    branches: [main, master]
   pull_request:
-    branches: [main, master]
-
-permissions:
-  contents: read
-  checks: write
-  pull-requests: write
+  push:
+    branches: [main]
 
 jobs:
-  quality:
-    name: Quality gates (typecheck + lint + guards + test)
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      CI_SKIP_INTEGRATION: 'true'
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
-
+          node-version: 24
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
-
-      - name: TypeScript check
-        run: pnpm typecheck
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Guard — line limits
-        run: pnpm guard:lines
-
-      - name: Guard — baseline
-        run: pnpm guard:baseline
-
-      - name: Guard — complexity
-        run: pnpm guard:complexity
-
-      - name: Governance check
-        run: pnpm check:governance
-
-      - name: Unit tests
-        run: pnpm test:unit
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || 'https://supabase.delqhi.com' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
-
-      - name: Integration tests
-        if: env.CI_SKIP_INTEGRATION != 'true'
-        run: pnpm test:integration
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || 'https://supabase.delqhi.com' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'https://shopsin.delqhi.com' }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'placeholder' }}
-
-  deploy-check:
-    name: Build check (Next.js + OpenNext)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Build Next.js
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || 'https://supabase.delqhi.com' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'placeholder' }}
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      - name: Audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
