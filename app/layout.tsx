@@ -13,6 +13,8 @@ import { ExitIntentOffer } from '@/components/conversion/exit-intent-offer'
 import { MobileTabBar } from '@/components/mobile-tab-bar'
 import { NewsletterCapture } from '@/components/conversion/newsletter-capture'
 import { FloatingRatingBadge } from '@/components/floating-rating-badge'
+import { UspTopbar } from '@/components/usp-topbar'
+import { FloatingTrustBadge } from '@/components/floating-trust-badge'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -81,6 +83,7 @@ export default function RootLayout({
         >
           Zum Hauptinhalt springen
         </a>
+        <UspTopbar />
         <AnnouncementBar />
         <Navbar />
         <CategoryNav />
@@ -93,6 +96,7 @@ export default function RootLayout({
         <NewsletterCapture />
         <MobileTabBar />
         <FloatingRatingBadge />
+        <FloatingTrustBadge count={0} />
       </body>
     </html>
   )

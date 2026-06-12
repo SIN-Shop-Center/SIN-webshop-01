@@ -1,9 +1,10 @@
 // Purpose: Popular categories with real product images instead of grey letter circles
 // Docs: AGENTS.md
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { createDataClient } from '@/lib/supabase/data-client'
+import { translateCategory } from '@/lib/category-labels'
+import { ImageWithFallback } from '@/components/image-with-fallback'
 
 export async function PopularCategories() {
   const supabase = createDataClient()
@@ -56,8 +57,8 @@ export async function PopularCategories() {
             className="group flex flex-col items-center gap-2"
           >
             <div className="relative aspect-square w-full overflow-hidden rounded-full border border-border bg-muted">
-              <Image
-                src={cat.image || '/placeholder.svg'}
+              <ImageWithFallback
+                src={cat.image || "/placeholder.svg"}
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 12vw, (min-width: 640px) 25vw, 50vw"
@@ -65,7 +66,7 @@ export async function PopularCategories() {
               />
             </div>
             <span className="line-clamp-2 text-center text-xs font-medium leading-snug text-foreground">
-              {cat.name}
+              {translateCategory(cat.name)}
             </span>
           </Link>
         ))}

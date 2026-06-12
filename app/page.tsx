@@ -6,6 +6,7 @@ import { getFeaturedProducts, getDealProducts } from '@/lib/queries'
 import { HomeHero } from '@/components/home-hero'
 import { ProductCard } from '@/components/ProductCard'
 import { CategoryTiles } from '@/components/home-sections'
+import { PopularCategories } from '@/components/popular-categories'
 import { RecentlyViewed } from '@/components/product/recently-viewed'
 import { TrustStats } from '@/components/trust-stats'
 import { HowItWorks } from '@/components/how-it-works'
@@ -78,6 +79,7 @@ export default async function HomePage() {
       </section>
 
       <CategoryTiles />
+      <PopularCategories />
 
       {/* Sale products — biggest incentive */}
       {dealProducts.length > 0 && (
