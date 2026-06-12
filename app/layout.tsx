@@ -12,6 +12,7 @@ import { AnnouncementBar } from '@/components/conversion/announcement-bar'
 import { ExitIntentOffer } from '@/components/conversion/exit-intent-offer'
 import { MobileTabBar } from '@/components/mobile-tab-bar'
 import { NewsletterCapture } from '@/components/conversion/newsletter-capture'
+import { FloatingRatingBadge } from '@/components/floating-rating-badge'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -72,7 +73,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de" className={inter.className}>
+    <html lang="de" className={`${inter.className} bg-background`}>
       <body className="flex min-h-svh flex-col bg-background text-foreground antialiased">
         <a
           href="#main-content"
@@ -91,6 +92,7 @@ export default function RootLayout({
         <ExitIntentOffer />
         <NewsletterCapture />
         <MobileTabBar />
+        <FloatingRatingBadge />
       </body>
     </html>
   )

@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 /**
- * Importiert CJ-Produkte nach Supabase.
+ * Importiert CJ-Produkte nach Supabase — inkl. ALLER Varianten und Bilder.
  * Usage:
  *   node scripts/cj/import-products.mjs --keyword "wireless earbuds" --limit 20
  *   node scripts/cj/import-products.mjs --pid <CJ_PRODUCT_ID>
  *
- * NOTE: CJ-API-Feldnamen (variants, variantSellPrice, productImageSet) müssen
- * gegen die echte API-Response verifiziert werden — CJ-Doku und Realität
- * weichen gelegentlich ab. Beim ersten Test --limit 1 verwenden.
+ * FIX (PDP-Daten): Vorher wurde nur die erste Varianten-ID gespeichert —
+ * dadurch blieben VariantSelector und ImageGallery auf der Produktseite leer.
+ * Jetzt: vollständiges variants-JSONB-Array + image_gallery text[].
+ *
+ * NOTE: CJ-Feldnamen (variants, variantSellPrice, productImageSet) gegen die
+ * echte API-Response verifizieren. Beim ersten Test --limit 1 verwenden.
  */
 import { createClient } from '@supabase/supabase-js'
 
 const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1'
 const MULTIPLIER = Number(process.env.CJ_PRICE_MULTIPLIER ?? '2.5')
 
-// EU/DE-Lager-Codes — TikTok-DE-Versandfristen (siehe docs/SIN_TIKTOK_MASTER_PIPELINE.md).
-// Produkte ohne EU-Lagerbestand werden übersprungen, wenn --eu-only gesetzt ist.
 const EU_WAREHOUSES = new Set(['DE', 'EU', 'GB', 'FR', 'ES', 'IT', 'PL', 'CZ'])
 
 const args = process.argv.slice(2)
@@ -27,7 +28,7 @@ function arg(name) {
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { persistSession: false } },
+  { auth: { persistSession: false }, db: { schema: 'shop' } },
 )
 
 async function getToken() {
@@ -87,24 +88,47 @@ async function hasEuStock(vid) {
 }
 
 function calcPrice(costUsd) {
-  // CJ-Preise sind USD. Vereinfachung: 1:1 als EUR-Basis behandeln und
-  // Marge draufschlagen. Bei Bedarf hier echten Wechselkurs einbauen.
   const raw = Number(costUsd) * MULTIPLIER
-  return (Math.ceil(raw) - 0.01).toFixed(2) // psychologischer Preis x.99
+  return (Math.ceil(raw) - 0.01).toFixed(2)
+}
+
+/**
+ * CJ-Variante → JSONB-Format, das parseVariants() in app/lib/queries.ts liest:
+ * { cj_variant_id, sku, name, price, stock, image_url }
+ */
+function mapVariant(v) {
+  const cost = Number(v.variantSellPrice ?? 0)
+  return {
+    cj_variant_id: String(v.vid),
+    sku: v.variantSku ?? null,
+    name: v.variantKey ?? v.variantNameEn ?? null,
+    price: cost > 0 ? Number(calcPrice(cost)) : null,
+    stock: Number(v.variantStock ?? 0) || 25, // Fallback bis Sync-Cron läuft
+    image_url: v.variantImage ?? null,
+  }
+}
+
+/** Bilder einsammeln: productImageSet + Varianten-Bilder, dedupliziert */
+function collectImages(detail, variants) {
+  const set = Array.isArray(detail.productImageSet)
+    ? detail.productImageSet
+    : typeof detail.productImageSet === 'string'
+      ? (() => { try { return JSON.parse(detail.productImageSet) } catch { return [] } })()
+      : []
+  const variantImages = variants.map((v) => v.variantImage).filter(Boolean)
+  return [...new Set([detail.productImage, ...set, ...variantImages].filter(Boolean))]
 }
 
 async function importProduct(pid) {
-  // Produktdetails inkl. Varianten
   const detail = await cj('/product/query', { pid })
 
-  const variants = detail.variants ?? []
-  const firstVariant = variants[0]
+  const cjVariants = detail.variants ?? []
+  const firstVariant = cjVariants[0]
   if (!firstVariant) {
     console.warn(`Übersprungen (keine Varianten): ${detail.productNameEn}`)
     return
   }
 
-  // EU-Warehouse-Filter (TikTok-DE-Versandfristen)
   if (args.includes('--eu-only')) {
     const ok = await hasEuStock(firstVariant.vid)
     if (!ok) {
@@ -114,18 +138,24 @@ async function importProduct(pid) {
   }
 
   const cost = Number(firstVariant.variantSellPrice ?? detail.sellPrice)
-  const images = Array.isArray(detail.productImageSet) ? detail.productImageSet : [detail.productImage]
+  const variants = cjVariants.map(mapVariant)
+  const images = collectImages(detail, cjVariants)
 
+  // Spaltennamen = echtes shop.products-Schema ('name', 'images' jsonb).
+  // Die View products_v mappt sie auf 'title' / 'image_url' für den App-Code.
   const row = {
     id: `cj-${detail.pid}`,
-    title: detail.productNameEn,
-    description: (detail.description ?? '').replace(/<[^>]*>/g, ' ').trim().slice(0, 2000) || detail.productNameEn,
+    name: detail.productNameEn,
+    slug: `cj-${detail.pid}`,
+    description:
+      (detail.description ?? '').replace(/<[^>]*>/g, ' ').trim().slice(0, 2000) ||
+      detail.productNameEn,
     price: calcPrice(cost),
-    category: detail.categoryName?.split('/')[0]?.trim() ?? 'Allgemein',
-    image_url: images[0],
-    image_gallery: images,
-    stock: 50, // wird vom Sync-Cron mit echtem CJ-Bestand überschrieben
-    is_featured: false,
+    images: images, // jsonb-Array
+    image_gallery: images, // text[] — von der View bevorzugt gelesen
+    variants: variants, // jsonb — FIX: vorher nie gespeichert!
+    stock: variants.reduce((sum, v) => sum + v.stock, 0) || 50,
+    is_active: true,
     cj_product_id: detail.pid,
     cj_variant_id: firstVariant.vid,
     cj_sku: firstVariant.variantSku ?? detail.productSku,
@@ -135,7 +165,9 @@ async function importProduct(pid) {
 
   const { error } = await supabase.from('products').upsert(row, { onConflict: 'id' })
   if (error) throw error
-  console.log(`Importiert: ${row.title} (${cost} USD Einkauf → ${row.price} EUR Verkauf)`)
+  console.log(
+    `Importiert: ${row.name} — ${variants.length} Varianten, ${images.length} Bilder (${cost} USD → ${row.price} EUR)`,
+  )
 }
 
 const pid = arg('pid')
@@ -159,7 +191,7 @@ if (pid) {
   for (const p of data.list) {
     try {
       await importProduct(p.pid)
-      await new Promise((r) => setTimeout(r, 1100)) // CJ Rate-Limit schonen
+      await new Promise((r) => setTimeout(r, 1100))
     } catch (e) {
       console.error(`Fehler bei ${p.pid}: ${e.message}`)
     }
