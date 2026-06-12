@@ -20,6 +20,7 @@ interface DbProductViewRow {
   description: string | null
   price: number | string
   original_price: number | string | null
+  compare_at_price: number | string | null
   image_url: string           // = products.images->>0 (in der View berechnet)
   image_gallery: string[]
   stock: number
@@ -156,7 +157,7 @@ export async function getDealProducts(limit = 8): Promise<Product[]> {
     .from('products_v')
     .select('*')
     .eq('is_active', true)
-    .not('original_price', 'is', null)
+    .not('compare_at_price', 'is', null)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -164,7 +165,17 @@ export async function getDealProducts(limit = 8): Promise<Product[]> {
     console.error('getDealProducts error:', error.message)
     return []
   }
+  // For the sale page, treat compare_at_price as the "original" / strikethrough price.
+  // We do NOT mutate originalPrice from the view row's original_price (that field has
+  // different semantics — see scripts/supabase/setup-reviews.sql).
   return (data ?? [])
-    .map((row) => transformProduct(row as DbProductViewRow))
+    .map((row) => {
+      const product = transformProduct(row as DbProductViewRow)
+      const compareAtPrice = Number((row as DbProductViewRow).compare_at_price)
+      if (Number.isFinite(compareAtPrice) && compareAtPrice > product.price) {
+        return { ...product, originalPrice: compareAtPrice }
+      }
+      return product
+    })
     .filter((p) => p.originalPrice != null && p.originalPrice > p.price)
 }

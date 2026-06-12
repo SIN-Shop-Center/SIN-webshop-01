@@ -1,13 +1,20 @@
-// Purpose: Client-side review submission form with star rating
+// Purpose: Review form — only visible to verified buyers
 // Docs: AGENTS.md
 
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Star } from 'lucide-react'
+import { Star, BadgeCheck } from 'lucide-react'
 import { submitReview } from '@/app/actions/reviews'
 
-export function ReviewForm({ productId, isLoggedIn }: { productId: string; isLoggedIn: boolean }) {
+type Props = {
+  productId: string
+  isLoggedIn: boolean
+  hasPurchased: boolean
+  hasReviewed: boolean
+}
+
+export function ReviewForm({ productId, isLoggedIn, hasPurchased, hasReviewed }: Props) {
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
   const [comment, setComment] = useState('')
@@ -17,10 +24,30 @@ export function ReviewForm({ productId, isLoggedIn }: { productId: string; isLog
   if (!isLoggedIn) {
     return (
       <p className="mt-6 rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+        Bewertungen können nur von Kunden abgegeben werden, die dieses Produkt bei uns
+        gekauft haben.{' '}
         <a href="/auth/login" className="font-medium text-foreground underline underline-offset-4">
           Melde dich an
         </a>
-        , um eine Bewertung zu schreiben.
+        , wenn du es bereits gekauft hast.
+      </p>
+    )
+  }
+
+  if (!hasPurchased) {
+    return (
+      <p className="mt-6 rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+        Nur verifizierte Käufer können dieses Produkt bewerten. Nach deinem Kauf kannst du
+        hier deine Erfahrung teilen.
+      </p>
+    )
+  }
+
+  if (hasReviewed) {
+    return (
+      <p className="mt-6 flex items-center gap-2 rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+        <BadgeCheck className="size-4 text-success" aria-hidden />
+        Du hast dieses Produkt bereits bewertet. Danke für dein Feedback!
       </p>
     )
   }
@@ -46,7 +73,12 @@ export function ReviewForm({ productId, isLoggedIn }: { productId: string; isLog
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
-      <h3 className="text-sm font-semibold">Deine Bewertung</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold">Deine Bewertung</h3>
+        <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+          <BadgeCheck className="size-3" aria-hidden /> Verifizierter Kauf
+        </span>
+      </div>
 
       <div className="flex gap-1" role="radiogroup" aria-label="Sternebewertung">
         {[1, 2, 3, 4, 5].map((i) => (
@@ -79,7 +111,10 @@ export function ReviewForm({ productId, isLoggedIn }: { productId: string; isLog
       />
 
       {message && (
-        <p role={message.type === 'error' ? 'alert' : 'status'} className={`text-sm ${message.type === 'error' ? 'text-destructive' : 'text-primary'}`}>
+        <p
+          role={message.type === 'error' ? 'alert' : 'status'}
+          className={`text-sm ${message.type === 'error' ? 'text-destructive' : 'text-primary'}`}
+        >
           {message.text}
         </p>
       )}

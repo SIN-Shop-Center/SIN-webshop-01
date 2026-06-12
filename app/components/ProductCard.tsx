@@ -1,12 +1,14 @@
-// Purpose: Product card with discount badge, sold-out overlay, 5-star rating (Step 10)
-// Docs: PLAN-VERKAUFSFAEHIG.md
+// Purpose: Product card with discount, sold-out, rating, free-shipping, quick-add
+// Docs: AGENTS.md
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { ShoppingCart } from 'lucide-react'
 import type { Product } from '@/lib/data'
 import { toCents } from '@/lib/format'
 import { PriceTag } from './PriceTag'
-import { StarIcon } from './icons'
+import { StarIcon, TruckIcon } from './icons'
+import { CardQuickAdd } from './card-quick-add'
 
 function StarRating({ rating }: { rating: number }) {
   const percentage = Math.max(0, Math.min(100, (rating / 5) * 100))
@@ -14,7 +16,7 @@ function StarRating({ rating }: { rating: number }) {
     <div className="relative inline-flex shrink-0" aria-hidden>
       <div className="flex">
         {Array.from({ length: 5 }).map((_, i) => (
-          <StarIcon key={i} className="size-4 text-border" />
+          <StarIcon key={i} className="size-3.5 text-border" />
         ))}
       </div>
       <div
@@ -24,7 +26,7 @@ function StarRating({ rating }: { rating: number }) {
         {Array.from({ length: 5 }).map((_, i) => (
           <StarIcon
             key={i}
-            className="size-4 shrink-0 fill-yellow-500 text-yellow-500"
+            className="size-3.5 shrink-0 fill-rating text-rating"
           />
         ))}
       </div>
@@ -34,36 +36,48 @@ function StarRating({ rating }: { rating: number }) {
 
 export function ProductCard({ product }: { product: Product }) {
   const discount = product.originalPrice
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100,
-      )
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0
   const soldOut = product.stock <= 0
   const lowStock = product.stock > 0 && product.stock <= 5
+  const freeShipping = product.price >= 49
 
   return (
-    <Link
-      href={`/produkt/${product.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-lg">
+      <Link
+        href={`/produkt/${product.id}`}
+        className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={product.title}
+      />
+
       <div className="relative aspect-square overflow-hidden bg-muted">
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl || '/placeholder.svg'}
           alt={product.title}
           fill
           sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        {discount > 0 && !soldOut && (
-          <div className="absolute right-2 top-2 rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground">
-            -{discount}%
-          </div>
-        )}
-        {lowStock && !soldOut && (
-          <div className="absolute left-2 top-2 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-            Nur noch {product.stock} verfügbar
-          </div>
-        )}
+
+        {/* Top-left badges */}
+        <div className="absolute left-2 top-2 flex flex-col gap-1.5">
+          {discount > 0 && !soldOut && (
+            <span className="rounded-md bg-sale px-2 py-0.5 text-xs font-bold text-sale-foreground">
+              -{discount}%
+            </span>
+          )}
+          {product.isFeatured && !soldOut && (
+            <span className="rounded-md bg-foreground px-2 py-0.5 text-xs font-semibold text-background">
+              Bestseller
+            </span>
+          )}
+          {lowStock && !soldOut && (
+            <span className="rounded-md bg-background/90 px-2 py-0.5 text-xs font-medium backdrop-blur-sm">
+              Nur noch {product.stock}
+            </span>
+          )}
+        </div>
+
         {soldOut && (
           <div
             aria-hidden
@@ -74,38 +88,48 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         )}
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="line-clamp-2 font-semibold text-balance text-foreground">
-          {product.title}
-        </h3>
-        <p className="line-clamp-2 text-sm text-muted-foreground">
-          {product.description}
-        </p>
-        {product.rating > 0 && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <StarRating rating={product.rating} />
-            <span className="font-medium">{product.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">
-              ({product.ratingCount})
-            </span>
-            <span className="sr-only">
-              {product.rating.toFixed(1)} von 5 Sternen bei{' '}
-              {product.ratingCount} Bewertungen
-            </span>
+
+        {/* Quick-add on hover (desktop) */}
+        {!soldOut && (
+          <div className="absolute inset-x-2 bottom-2 z-20 translate-y-2 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+            <CardQuickAdd productId={product.id} />
           </div>
         )}
-        <div className="mt-auto pt-2">
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
+          {product.title}
+        </h3>
+
+        {product.rating > 0 ? (
+          <div className="flex items-center gap-1 text-xs">
+            <StarRating rating={product.rating} />
+            <span className="font-medium">{product.rating.toFixed(1)}</span>
+            <span className="text-muted-foreground">({product.ratingCount})</span>
+            <span className="sr-only">
+              {product.rating.toFixed(1)} von 5 Sternen bei {product.ratingCount} Bewertungen
+            </span>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">Neu im Sortiment</span>
+        )}
+
+        <div className="mt-auto flex flex-col gap-1 pt-1">
           <PriceTag
             priceCents={toCents(product.price)}
             originalPriceCents={
-              product.originalPrice != null
-                ? toCents(product.originalPrice)
-                : null
+              product.originalPrice != null ? toCents(product.originalPrice) : null
             }
           />
+          {freeShipping && (
+            <span className="flex items-center gap-1 text-xs font-medium text-success">
+              <TruckIcon className="size-3.5" aria-hidden />
+              Gratisversand
+            </span>
+          )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
