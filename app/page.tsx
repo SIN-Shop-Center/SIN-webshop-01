@@ -4,6 +4,7 @@
 import Link from 'next/link'
 import { getFeaturedProducts } from '@/lib/queries'
 import { ProductCard } from '@/components/ProductCard'
+import { NewsletterSignup } from '@/components/newsletter-signup'
 import { SHIPPING } from '@/lib/shipping'
 import { formatEuro } from '@/lib/format'
 import {
@@ -50,16 +51,15 @@ export default async function HomePage() {
             Handverlesen. Geprüft. Geliefert.
           </span>
           <h1 className="mb-4 max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-6xl">
-            Premium Tech &amp; Lifestyle für deinen Alltag
+            Dein Alltag. Unser Sortiment.
           </h1>
           <p className="mb-8 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-            Entdecke handverlesene Produkte für deinen digitalen Alltag — von
-            High-Fidelity-Audio über taktile Tastaturen bis zu zeitlosen
-            Accessoires.
+            Entdecke Mode, Wohnaccessoires, Elektronik und mehr für deinen
+            Alltag — handverlesen und schnell geliefert.
           </p>
           <div className="flex w-full max-w-sm flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
-            <Link href="#featured" className="btn btn-primary btn-lg w-full sm:w-auto">
-              Jetzt entdecken
+            <Link href="/produkte" className="btn btn-primary btn-lg w-full sm:w-auto">
+              Alle Produkte
               <ArrowRightIcon className="size-5" aria-hidden />
             </Link>
             <Link href="/versand" className="btn btn-outline btn-lg w-full sm:w-auto">
@@ -117,6 +117,8 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      <NewsletterSignup />
     </>
   )
 }

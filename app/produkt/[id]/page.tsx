@@ -1,15 +1,18 @@
-// Purpose: Product detail page with metadata, JSON-LD, trust badges (Step 10)
-// Docs: PLAN-VERKAUFSFAEHIG.md
+// Purpose: Product detail page with gallery, variants, related products
+// Docs: AGENTS.md
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
-import { AddToCartButton } from '@/components/AddToCartButton'
 import { PriceTag } from '@/components/PriceTag'
+import { AddToCartButton } from '@/components/AddToCartButton'
 import { toCents } from '@/lib/format'
-import { ProductGallery } from '@/components/ProductGallery'
+import { ImageGallery } from '@/components/image-gallery'
+import { VariantSelector } from '@/components/variant-selector'
+import { RelatedProducts } from '@/components/related-products'
 import { WishlistButton } from '@/components/WishlistButton'
+import { ProductTabs } from '@/components/product-tabs'
 import { ProductJsonLd } from '@/components/ProductJsonLd'
 import {
   TruckIcon,
@@ -79,25 +82,29 @@ export default async function ProductPage({
     product.originalPrice != null
       ? toCents(product.originalPrice)
       : null
-  const lowStock = product.stock > 0 && product.stock <= 5
+
+  const galleryImages = product.imageGallery?.length
+    ? product.imageGallery
+    : product.imageUrl
+      ? [product.imageUrl]
+      : []
 
   return (
     <>
       <ProductJsonLd product={product} />
       <div className="container mx-auto px-4 py-8 pb-28 md:py-12 lg:pb-12">
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" aria-hidden />
-          Zurück zur Übersicht
-        </Link>
+        <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground">Start</Link>
+          {' / '}
+          <Link href="/produkte" className="hover:text-foreground">Produkte</Link>
+          {' / '}
+          <span className="text-foreground">{product.title}</span>
+        </nav>
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          <ProductGallery
-            title={product.title}
-            imageUrl={product.imageUrl}
-            imageGallery={product.imageGallery}
+          <ImageGallery
+            images={galleryImages}
+            alt={product.title}
           />
 
           <div>
@@ -116,42 +123,16 @@ export default async function ProductPage({
               {product.description}
             </p>
 
-            <div className="mb-6">
-              <PriceTag
-                priceCents={priceCents}
-                originalPriceCents={originalPriceCents}
-                size="lg"
-              />
+            {/* Variants + Price + Add to Cart */}
+            <div className="mb-8">
+              <VariantSelector product={product} />
             </div>
 
-            {/* Stock indicator */}
-            <div className="mb-6">
-              {product.stock <= 0 ? (
-                <p className="inline-flex items-center gap-2 rounded-full bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive">
-                  Ausverkauft
-                </p>
-              ) : lowStock ? (
-                <p className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1.5 text-sm font-medium text-accent-foreground">
-                  <span
-                    aria-hidden
-                    className="inline-block size-2 rounded-full bg-accent"
-                  />
-                  Nur noch {product.stock} verfügbar
-                </p>
-              ) : (
-                <p className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1.5 text-sm font-medium text-success">
-                  <CheckIcon className="size-4" aria-hidden />
-                  Auf Lager — versandbereit
-                </p>
-              )}
-            </div>
+            {/* Product Tabs */}
+            <ProductTabs description={product.description} />
 
-            {/* Actions */}
-            <div className="mb-8 flex flex-col gap-3">
-              <AddToCartButton
-                productId={product.id}
-                stock={product.stock}
-              />
+            {/* Wishlist */}
+            <div className="mb-6">
               <WishlistButton productId={product.id} />
             </div>
 
@@ -217,6 +198,9 @@ export default async function ProductPage({
               )}
           </div>
         </div>
+
+        {/* Related Products */}
+        <RelatedProducts productId={product.id} categoryId={null} />
 
         {product.stock > 0 && (
           <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden">

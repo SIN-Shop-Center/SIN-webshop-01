@@ -6,6 +6,7 @@
 
 import Link from 'next/link'
 import { searchProducts, type SearchSort } from '@/app/lib/search'
+import { getCategories } from '@/lib/supabase/queries'
 import { SearchFilters } from './search-filters'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,7 @@ export default async function SearchPage({
   const sp = await searchParams
   const query = sp.q ?? ''
   const page = Math.max(1, Number(sp.seite ?? '1'))
+  const allCategories = await getCategories()
 
   const { products, total, pageSize } = await searchProducts(
     query,
@@ -61,7 +63,7 @@ export default async function SearchPage({
 
       <div className="flex flex-col gap-8 md:flex-row">
         <aside className="md:w-56 md:shrink-0">
-          <SearchFilters />
+          <SearchFilters categories={allCategories} />
         </aside>
 
         <div className="flex-1">

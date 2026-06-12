@@ -12,7 +12,7 @@
 //
 // Sortierung: 'relevance' (ts_rank) als Default, alternativ Preis/Neuste.
 
-import { createClient } from '@/app/lib/supabase/server'
+import { createDataClient } from '@/app/lib/supabase/data-client'
 
 export type SearchFilters = {
   category?: string
@@ -46,7 +46,7 @@ export async function searchProducts(
   sort: SearchSort = 'relevance',
   page = 1,
 ): Promise<SearchResult> {
-  const supabase = await createClient()
+  const supabase = createDataClient()
   // Selektives Select — `*` wäre zu breit
   let q = supabase
     .from('products')
