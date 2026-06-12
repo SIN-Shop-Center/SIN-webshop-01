@@ -79,10 +79,16 @@ export async function GET(request: Request) {
         // Bestandsabfrage optional — Preis-Update trotzdem durchführen
       }
 
-      // ── Image gallery (PDP) ────────────────────────────────────────────
+      // ── Image gallery (PDP) — productImageSet kann Array ODER JSON-String sein
+      const rawSet = detail.productImageSet
+      const imageSet: string[] = Array.isArray(rawSet)
+        ? rawSet
+        : typeof rawSet === 'string'
+          ? (() => { try { return JSON.parse(rawSet) } catch { return [] } })()
+          : []
       const imageGallery: string[] = [
         detail.productImage,
-        ...(Array.isArray(detail.productImageSet) ? detail.productImageSet : []),
+        ...imageSet,
       ].filter((url, i, arr): url is string => Boolean(url) && arr.indexOf(url) === i)
 
       // ── Variants (variant selector) ────────────────────────────────────
@@ -98,18 +104,15 @@ export async function GET(request: Request) {
         image_url: v.variantImage || detail.productImage || null,
       }))
 
-      // ── Compare-at price (sale page strikethrough) ─────────────────────
-      // CJ suggestSellPrice ist die unverbindliche Preisempfehlung des
-      // Herstellers — meist höher als der CJ-Verkaufspreis. Wenn vorhanden
-      // und höher als unser Verkaufspreis, nehmen wir den höheren Wert,
-      // multipliziert mit dem Faktor. Sonst fällt compare_at_price auf
-      // 1.3× unseren Verkaufspreis zurück.
+      // ── Compare-at price (sale strikethrough) ──────────────────────────
+      // NUR setzen wenn CJ echte suggestSellPrice (Hersteller-UVP) liefert.
+      // KEIN künstlicher 1.3×-Fallback — das wäre irreführend (PAngV §11).
       const ourPrice = cost > 0 ? Number(calcPrice(cost)) : sellPrice * MULTIPLIER
       const suggestUsd = Number(detail.suggestSellPrice ?? 0)
       const compareAtPrice =
         suggestUsd > 0 && suggestUsd * MULTIPLIER > ourPrice
           ? Number((Math.ceil(suggestUsd * MULTIPLIER) - 0.01).toFixed(2))
-          : Number((Math.ceil(ourPrice * 1.3) - 0.01).toFixed(2))
+          : null
 
       await supabase
         .from('products')

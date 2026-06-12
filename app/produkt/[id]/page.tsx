@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
+import { getProductBadges } from '@/lib/product-badges'
 import { canUserReview } from '@/app/actions/reviews'
 import { PriceTag } from '@/components/PriceTag'
 import { AddToCartButton } from '@/components/AddToCartButton'
@@ -19,7 +20,11 @@ import { FreeShippingNudge } from '@/components/conversion/free-shipping-nudge'
 import { BoughtTogether } from '@/components/conversion/bought-together'
 import { ReviewList } from '@/components/reviews/review-list'
 import { ReviewForm } from '@/components/reviews/review-form'
-import { RecentlyViewed } from '@/components/conversion/recently-viewed'
+import { RecentlyViewed } from '@/components/product/recently-viewed'
+import { TrackView } from '@/components/product/track-view'
+import { DeliveryEstimate } from '@/components/product/delivery-estimate'
+import { RatingSummary } from '@/components/product/rating-summary'
+import { Breadcrumbs } from '@/components/breadcrumbs'
 import { ProductTabs } from '@/components/product-tabs'
 import { ProductJsonLd } from '@/components/ProductJsonLd'
 import {
@@ -99,36 +104,44 @@ export default async function ProductPage({
       ? [product.imageUrl]
       : []
 
+  const badges = getProductBadges({
+    price: product.price,
+    originalPrice: product.originalPrice ?? null,
+    stock: product.stock,
+    rating: product.rating,
+    ratingCount: product.ratingCount,
+    soldCount: product.soldCount,
+    isFeatured: product.isFeatured,
+    createdAt: product.createdAt ?? null,
+  })
+
   return (
     <>
       <ProductJsonLd product={product} />
       <div className="container mx-auto px-4 py-8 pb-28 md:py-12 lg:pb-12">
-        <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">Start</Link>
-          {' / '}
-          <Link href="/produkte" className="hover:text-foreground">Produkte</Link>
-          {' / '}
-          <span className="text-foreground">{product.title}</span>
-        </nav>
+        <Breadcrumbs
+          items={[
+            { label: 'Produkte', href: '/produkte' },
+            { label: product.title },
+          ]}
+        />
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           <ImageGallery
             images={galleryImages}
             alt={product.title}
+            badges={badges}
           />
 
           <div>
             <h1 className="mb-3 text-3xl font-bold tracking-tight text-balance md:text-4xl">
               {product.title}
             </h1>
-            {product.rating > 0 && (
-              <div className="mb-4 flex items-center gap-2 text-sm">
-                <span className="font-medium">{product.rating.toFixed(1)}</span>
-                <span className="text-muted-foreground">
-                  ({product.ratingCount} Bewertungen)
-                </span>
-              </div>
-            )}
+            <RatingSummary
+              rating={product.rating}
+              ratingCount={product.ratingCount}
+              soldCount={product.soldCount}
+            />
             <p className="mb-6 text-pretty text-muted-foreground">
               {product.description}
             </p>
@@ -150,7 +163,7 @@ export default async function ProductPage({
             </div>
 
             {/* Trust badges */}
-            <ul className="mb-8 grid grid-cols-1 gap-3 rounded-lg border border-border bg-muted/30 p-4 text-sm sm:grid-cols-3">
+            <ul className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-border bg-muted/30 p-4 text-sm sm:grid-cols-3">
               <li className="flex items-center gap-2">
                 <TruckIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                 <span>Kostenloser Versand ab 49 €</span>
@@ -164,6 +177,10 @@ export default async function ProductPage({
                 <span>14 Tage Widerrufsrecht</span>
               </li>
             </ul>
+
+            <div className="mb-8">
+              <DeliveryEstimate />
+            </div>
 
             {/* Features */}
             {product.features && product.features.length > 0 && (
@@ -213,7 +230,7 @@ export default async function ProductPage({
         </div>
 
         {/* Related Products */}
-        <RelatedProducts productId={product.id} categoryId={null} />
+        <RelatedProducts productId={product.id} categoryId={product.categoryId ?? null} />
 
         {/* Bundle upsell */}
         <BoughtTogether
@@ -232,6 +249,7 @@ export default async function ProductPage({
 
         {/* Recently Viewed */}
         <RecentlyViewed excludeId={product.id} />
+        <TrackView productId={product.id} />
 
         {product.stock > 0 && (
           <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden">

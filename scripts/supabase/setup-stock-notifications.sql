@@ -1,7 +1,7 @@
 -- Stock notification subscriptions for back-in-stock emails
 CREATE TABLE IF NOT EXISTS public.stock_notifications (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  product_id uuid NOT NULL REFERENCES shop.products(id) ON DELETE CASCADE,
   email text NOT NULL,
   notified boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),

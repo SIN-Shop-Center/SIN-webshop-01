@@ -10,7 +10,7 @@ import type Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderConfirmation } from '@/lib/email'
-import { createCjOrder } from '@/lib/cj/orders'
+import { submitOrderToCj } from '@/lib/fulfillment/submit-order'
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -121,15 +121,10 @@ export async function POST(request: Request) {
         }
       }
 
-      // 2) Order an CJ weiterleiten
-      try {
-        await forwardOrderToCj(supabase, order.id, items, shipping, email)
-      } catch (e) {
-        console.error('CJ order forwarding failed:', e)
-        await supabase
-          .from('orders')
-          .update({ fulfillment_status: 'failed' })
-          .eq('id', order.id)
+      // 2) Order an CJ weiterleiten (Fehler blockieren Checkout nicht)
+      const result = await submitOrderToCj(order.id)
+      if (!result.ok) {
+        console.error('CJ order forwarding failed:', result.error)
       }
     }
   }
@@ -137,74 +132,4 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true })
 }
 
-interface OrderItem {
-  product_id: string
-  title: string
-  quantity: number
-  unit_amount: number
-}
 
-interface MinimalShipping {
-  name: string | null
-  address: Stripe.Address | null
-  phone: string | null
-}
-
-async function forwardOrderToCj(
-  supabase: ReturnType<typeof createAdminClient>,
-  orderId: string,
-  items: OrderItem[],
-  shipping: MinimalShipping | null,
-  email: string,
-) {
-  if (!shipping?.address) {
-    throw new Error('No shipping address on session')
-  }
-
-  const productIds = items.map((i) => i.product_id).filter((x): x is string => !!x)
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, cj_variant_id')
-    .in('id', productIds)
-
-  const cjProducts = items
-    .map((item) => {
-      const match = products?.find((p) => p.id === item.product_id)
-      return match?.cj_variant_id
-        ? { vid: match.cj_variant_id, quantity: item.quantity }
-        : null
-    })
-    .filter((x): x is { vid: string; quantity: number } => x !== null)
-
-  if (cjProducts.length === 0) {
-    throw new Error('No CJ variants found for order items')
-  }
-
-  const addr = shipping.address
-  const { cjOrderId } = await createCjOrder({
-    orderNumber: orderId,
-    shipping: {
-      name: shipping.name ?? 'Kunde',
-      phone:
-        shipping.phone ??
-        '0000000000',
-      email,
-      country: addr.country ?? 'DE',
-      province: addr.state ?? addr.city ?? '',
-      city: addr.city ?? '',
-      address: addr.line1 ?? '',
-      address2: addr.line2 ?? undefined,
-      zip: addr.postal_code ?? '',
-    },
-    products: cjProducts,
-  })
-
-  await supabase
-    .from('orders')
-    .update({
-      cj_order_id: cjOrderId,
-      cj_order_status: 'CREATED',
-      fulfillment_status: 'forwarded',
-    })
-    .eq('id', orderId)
-}

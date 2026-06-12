@@ -119,7 +119,10 @@ export async function getCategories(): Promise<Category[]> {
     console.error('getCategories error:', error.message)
     return []
   }
-  return (data as Category[]) ?? []
+  return ((data ?? []) as Category[]).map((c) => ({
+    ...c,
+    name: c.name ?? c.name,
+  }))
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -139,15 +142,17 @@ export async function getRelatedProducts(
   categoryId: string | null,
   limit = 4,
 ): Promise<Product[]> {
-  if (!categoryId) return []
   const supabase = createDataClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('products_v')
     .select('*')
     .eq('is_active', true)
-    .eq('category_id', categoryId)
     .neq('id', productId)
     .limit(limit)
+
+  if (categoryId) query = query.eq('category_id', categoryId)
+
+  const { data, error } = await query
 
   if (error) return []
   return (data ?? []).map((r) => transformProduct(r as DbProductRow))

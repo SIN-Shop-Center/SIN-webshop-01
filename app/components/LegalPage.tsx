@@ -21,6 +21,13 @@ export function LegalPage({ page }: LegalPageProps) {
       <p className="mb-6 text-muted-foreground text-pretty">{page.description}</p>
       <p className="mb-8 text-pretty">{page.intro}</p>
 
+      {page.disclaimer && (
+        <div className="mb-8 rounded-lg border-2 border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-semibold">⚠️ Vorlage — kein rechtsverbindliches Dokument</p>
+          <p className="mt-1">{page.disclaimer}</p>
+        </div>
+      )}
+
       {page.sections?.map((section) => (
         <section key={section.title} className="mb-8">
           <h2 className="mb-3 text-xl font-semibold">{section.title}</h2>

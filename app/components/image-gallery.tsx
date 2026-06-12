@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { ProductImageOverlay } from '@/components/product-image-overlay'
+import type { ProductBadge } from '@/lib/product-badges'
 
-export function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
+export function ImageGallery({ images, alt, badges }: { images: string[]; alt: string; badges?: ProductBadge[] }) {
   const validImages = images.filter(Boolean)
   const [active, setActive] = useState(0)
 
@@ -26,6 +28,7 @@ export function ImageGallery({ images, alt }: { images: string[]; alt: string })
           className="object-cover"
           priority={active === 0}
         />
+        {badges && <ProductImageOverlay badges={badges} size="lg" />}
       </div>
       {validImages.length > 1 && (
         <div className="flex gap-2 overflow-x-auto">
