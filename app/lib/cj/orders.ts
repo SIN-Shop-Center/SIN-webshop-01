@@ -4,6 +4,7 @@
 import 'server-only'
 
 import { cjRequest } from '@/lib/cj/client'
+import { getCheapestFreight } from '@/lib/cj/freight'
 
 export interface CjOrderProduct {
   vid: string // CJ variant id
@@ -23,11 +24,27 @@ export interface CjShippingAddress {
 }
 
 export async function createCjOrder(params: {
-  orderNumber: string // eindeutige Order-ID (Idempotenz bei CJ)
+  orderNumber: string
   shipping: CjShippingAddress
   products: CjOrderProduct[]
   logisticName?: string
-}): Promise<{ cjOrderId: string }> {
+}): Promise<{ cjOrderId: string; logisticName: string; freightUsd: number }> {
+  let logisticName = params.logisticName ?? 'CJPacket Ordinary'
+  let freightUsd = 0
+
+  try {
+    const freight = await getCheapestFreight({
+      items: params.products.map((p) => ({ cj_variant_id: p.vid, quantity: p.quantity })),
+      countryCode: params.shipping.country,
+    })
+    if (freight) {
+      logisticName = freight.logisticName
+      freightUsd = freight.priceUsd
+    }
+  } catch {
+    // Fallback to default logistic — freight failure not fatal
+  }
+
   const data = await cjRequest<{ orderId: string }>(
     '/shopping/order/createOrderV2',
     {
@@ -44,15 +61,15 @@ export async function createCjOrder(params: {
         shippingCustomerName: params.shipping.name,
         shippingPhone: params.shipping.phone,
         email: params.shipping.email,
-        logisticName: params.logisticName ?? 'CJPacket Ordinary',
+        logisticName,
         fromCountryCode: 'CN',
-        payType: 2, // 2 = Pay from CJ wallet balance
+        payType: 2,
         products: params.products,
       },
     },
   )
 
-  return { cjOrderId: data.orderId }
+  return { cjOrderId: data.orderId, logisticName, freightUsd }
 }
 
 export async function getCjOrderDetail(cjOrderId: string): Promise<{

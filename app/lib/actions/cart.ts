@@ -35,6 +35,7 @@ export interface CartItem {
   id: string
   product_id: string
   quantity: number
+  variant_id?: string
 }
 
 export async function getCartItems(): Promise<CartItem[]> {
@@ -57,20 +58,27 @@ export async function getCartCount(): Promise<number> {
   return items.reduce((sum, item) => sum + item.quantity, 0)
 }
 
-export async function addToCart(productId: string, quantity = 1) {
+export async function addToCart(productId: string, quantity = 1, variantId?: string) {
   const cartId = await getOrCreateCartId()
   const supabase = createAdminClient()
 
-  // Serverseitige Validierung: Produkt muss existieren und auf Lager sein.
   const { data: product, error: productError } = await supabase
     .from('products')
-    .select('id, stock')
+    .select('id, stock, variants')
     .eq('id', productId)
     .maybeSingle()
 
   if (productError) throw productError
   if (!product || product.stock <= 0) {
     throw new Error('Produkt nicht verfügbar')
+  }
+
+  if (variantId) {
+    const cjVariants = Array.isArray(product.variants) ? product.variants : []
+    const matched = cjVariants.find((v: any) => v.cj_variant_id === variantId || v.vid === variantId)
+    if (matched && (matched.stock ?? matched.variantStock ?? 0) <= 0) {
+      throw new Error('Variante nicht verfügbar')
+    }
   }
 
   const maxQty = Math.min(product.stock, 99)
@@ -91,11 +99,13 @@ export async function addToCart(productId: string, quantity = 1) {
       })
       .eq('id', existing.id)
   } else {
-    await supabase.from('cart_items').insert({
+    const insert: Record<string, any> = {
       cart_id: cartId,
       product_id: productId,
       quantity: Math.min(quantity, maxQty),
-    })
+    }
+    if (variantId) insert.variant_id = variantId
+    await supabase.from('cart_items').insert(insert)
   }
 
   revalidatePath('/warenkorb')

@@ -8,7 +8,7 @@ import { getStripe } from '@/lib/stripe'
 import { getCartItems } from '@/lib/actions/cart'
 import { getProductsByIds } from '@/lib/queries'
 import { createClient } from '@/lib/supabase/server'
-import { SHIPPING, getShippingCents } from '@/lib/shipping'
+import { SHIPPING, getShippingQuoteAsync, getShippingCents } from '@/lib/shipping'
 import { toCents } from '@/lib/format'
 
 export async function startCheckout(): Promise<{ url?: string; error?: string }> {
@@ -63,7 +63,19 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
     const cartId = cookieStore.get('sin_cart_id')?.value ?? ''
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://shopsin.delqhi.com'
-    const shippingCents = getShippingCents(subtotalCents)
+
+    // Dynamische Versandkosten via CJ-Fracht (Fallback auf Flat 4,99 €)
+    const cjItems = items
+      .map((i) => {
+        const p = productMap.get(i.product_id)
+        if (!p?.variants?.length) return null
+        const v = i.variant_id ? p.variants.find((v) => v.cj_variant_id === i.variant_id) : p.variants[0]
+        return v?.cj_variant_id ? { cj_variant_id: v.cj_variant_id, quantity: i.quantity } : null
+      })
+      .filter((x): x is { cj_variant_id: string; quantity: number } => x !== null)
+    const shipping = cjItems.length > 0
+      ? await getShippingQuoteAsync({ items: cjItems, subtotalCents })
+      : { costCents: getShippingCents(subtotalCents), agingMin: SHIPPING.deliveryDaysMin, agingMax: SHIPPING.deliveryDaysMax }
 
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',
@@ -85,12 +97,12 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
         {
           shipping_rate_data: {
             type: 'fixed_amount',
-            display_name:
-              shippingCents === 0 ? 'Kostenloser Versand' : 'Standardversand',
-            fixed_amount: { amount: shippingCents, currency: 'eur' },
+          display_name:
+            shipping.costCents === 0 ? 'Kostenloser Versand' : 'Standardversand',
+            fixed_amount: { amount: shipping.costCents, currency: 'eur' },
             delivery_estimate: {
-              minimum: { unit: 'business_day', value: SHIPPING.deliveryDaysMin },
-              maximum: { unit: 'business_day', value: SHIPPING.deliveryDaysMax },
+              minimum: { unit: 'business_day', value: shipping.agingMin },
+              maximum: { unit: 'business_day', value: shipping.agingMax },
             },
           },
         },

@@ -2,12 +2,12 @@
 // Docs: PLAN-VERKAUFSFAEHIG.md
 
 import Link from 'next/link'
-import { getFeaturedProducts } from '@/lib/queries'
+import { getFeaturedProducts, getDealProducts } from '@/lib/queries'
 import { HomeHero } from '@/components/home-hero'
 import { ProductCard } from '@/components/ProductCard'
 import { CategoryTiles } from '@/components/home-sections'
 import { NewsletterSignup } from '@/components/newsletter-signup'
-import { RecentlyViewed } from '@/components/conversion/recently-viewed'
+import { RecentlyViewed } from '@/components/product/recently-viewed'
 import { SHIPPING } from '@/lib/shipping'
 import { formatEuro } from '@/lib/format'
 import {
@@ -39,10 +39,15 @@ const TRUST_ITEMS = [
 
 export default async function HomePage() {
   let featuredProducts: Awaited<ReturnType<typeof getFeaturedProducts>> = []
+  let dealProducts: Awaited<ReturnType<typeof getDealProducts>> = []
   try {
-    featuredProducts = await getFeaturedProducts()
+    [featuredProducts, dealProducts] = await Promise.all([
+      getFeaturedProducts(),
+      getDealProducts(8),
+    ])
   } catch {
     featuredProducts = []
+    dealProducts = []
   }
 
   return (
@@ -73,15 +78,40 @@ export default async function HomePage() {
 
       <CategoryTiles />
 
+      {/* Sale products — biggest incentive */}
+      {dealProducts.length > 0 && (
+        <section className="container mx-auto px-4 py-12">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+              <span className="text-sale">Blitzangebote</span>
+            </h2>
+            <Link
+              href="/sale"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              Alle Angebote <ArrowRightIcon className="size-4" />
+            </Link>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {dealProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Featured products */}
-      <section id="featured" className="container mx-auto scroll-mt-20 px-4 py-16">
-        <div className="mb-8 flex flex-col gap-1">
+      <section id="featured" className="container mx-auto scroll-mt-20 px-4 py-12">
+        <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
             Unsere Empfehlungen
           </h2>
-          <p className="text-muted-foreground">
-            Eine kuratierte Auswahl unserer beliebtesten Produkte.
-          </p>
+          <Link
+            href="/produkte"
+            className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            Alle Produkte <ArrowRightIcon className="size-4" />
+          </Link>
         </div>
 
         {featuredProducts.length === 0 ? (

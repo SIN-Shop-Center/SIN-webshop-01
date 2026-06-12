@@ -10,25 +10,27 @@
 
 import { createDataClient } from '@/lib/supabase/data-client'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Product } from './data'
+import type { Product, ProductVariant } from './data'
 
 // ── Raw row type from products_v View (bereits schema-gemappt) ─────────────
 interface DbProductViewRow {
   id: string
-  title: string               // = products.name (in der View aliased)
+  title: string
   slug: string
   description: string | null
   price: number | string
   original_price: number | string | null
   compare_at_price: number | string | null
-  image_url: string           // = products.images->>0 (in der View berechnet)
+  category_id: string | null
+  image_url: string
   image_gallery: string[]
   stock: number
   is_active: boolean
-  variants: { colors?: string[]; sizes?: string[] } | null
+  variants: Record<string, any>[] | Record<string, any> | null
   metadata: Record<string, any> | null
   rating: number
   rating_count: number
+  sold_count: number | null
   is_featured: boolean
   created_at: string
   updated_at: string
@@ -37,11 +39,26 @@ interface DbProductViewRow {
 }
 
 // ── Transform View-row → Product (camelCase, used by ProductCard) ──────────
+function parseVariants(variants: unknown): ProductVariant[] {
+  if (Array.isArray(variants)) {
+    return variants.map((v: Record<string, any>) => ({
+      cj_variant_id: String(v.cj_variant_id ?? v.vid ?? ''),
+      sku: v.sku ?? v.variantSku ?? null,
+      name: v.name ?? v.variantKey ?? null,
+      price: v.price != null ? Number(v.price) : v.variantSellPrice != null ? Number(v.variantSellPrice) : null,
+      stock: Number(v.stock ?? v.variantStock ?? 0),
+      image_url: v.image_url ?? v.variantImage ?? null,
+    }))
+  }
+  return []
+}
+
 function transformProduct(row: DbProductViewRow): Product {
   const metadata = (row.metadata ?? {}) as {
     features?: string[]
     specifications?: Record<string, string>
   }
+  const variants = parseVariants(row.variants)
 
   return {
     id: row.id,
@@ -56,14 +73,18 @@ function transformProduct(row: DbProductViewRow): Product {
         : undefined,
     rating: row.rating,
     ratingCount: row.rating_count,
-    category: '', // TODO: join mit categories Tabelle
+    category: '',
+    categoryId: row.category_id ?? undefined,
     subcategory: undefined,
     imageUrl: row.image_url,
     imageGallery: row.image_gallery,
     stock: row.stock,
+    soldCount: row.sold_count ?? undefined,
+    createdAt: row.created_at,
     isFeatured: row.is_featured,
-    colors: row.variants?.colors,
-    sizes: row.variants?.sizes,
+    colors: row.variants && !Array.isArray(row.variants) ? (row.variants as Record<string, any>).colors : undefined,
+    sizes: row.variants && !Array.isArray(row.variants) ? (row.variants as Record<string, any>).sizes : undefined,
+    variants: variants.length > 0 ? variants : undefined,
     features: metadata.features,
     specifications: metadata.specifications,
   }
@@ -158,6 +179,7 @@ export async function getDealProducts(limit = 8): Promise<Product[]> {
     .select('*')
     .eq('is_active', true)
     .not('compare_at_price', 'is', null)
+    .gt('compare_at_price', 0)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -165,9 +187,6 @@ export async function getDealProducts(limit = 8): Promise<Product[]> {
     console.error('getDealProducts error:', error.message)
     return []
   }
-  // For the sale page, treat compare_at_price as the "original" / strikethrough price.
-  // We do NOT mutate originalPrice from the view row's original_price (that field has
-  // different semantics — see scripts/supabase/setup-reviews.sql).
   return (data ?? [])
     .map((row) => {
       const product = transformProduct(row as DbProductViewRow)

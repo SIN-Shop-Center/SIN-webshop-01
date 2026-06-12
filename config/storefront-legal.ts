@@ -32,6 +32,7 @@ export interface StorefrontLegalPage {
   description: string
   intro: string
   sections?: StorefrontLegalSection[]
+  disclaimer?: string
 }
 
 export const STOREFRONT_LEGAL_PAGES: Record<string, StorefrontLegalPage> = {

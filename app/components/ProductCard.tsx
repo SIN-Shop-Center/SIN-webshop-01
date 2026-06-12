@@ -1,14 +1,15 @@
-// Purpose: Product card with discount, sold-out, rating, free-shipping, quick-add
+// Purpose: Product card with badge overlays, rating, quick-add
 // Docs: AGENTS.md
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart } from 'lucide-react'
 import type { Product } from '@/lib/data'
 import { toCents } from '@/lib/format'
+import { getProductBadges } from '@/lib/product-badges'
 import { PriceTag } from './PriceTag'
-import { StarIcon, TruckIcon } from './icons'
+import { StarIcon } from './icons'
 import { CardQuickAdd } from './card-quick-add'
+import { ProductImageOverlay } from './product-image-overlay'
+import { ProductCardImage } from './product-card-image'
 
 function StarRating({ rating }: { rating: number }) {
   const percentage = Math.max(0, Math.min(100, (rating / 5) * 100))
@@ -35,12 +36,17 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0
   const soldOut = product.stock <= 0
-  const lowStock = product.stock > 0 && product.stock <= 5
-  const freeShipping = product.price >= 49
+  const badges = getProductBadges({
+    price: product.price,
+    originalPrice: product.originalPrice ?? null,
+    stock: product.stock,
+    rating: product.rating,
+    ratingCount: product.ratingCount,
+    soldCount: product.soldCount,
+    isFeatured: product.isFeatured,
+    createdAt: product.createdAt ?? null,
+  })
 
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-lg">
@@ -51,32 +57,12 @@ export function ProductCard({ product }: { product: Product }) {
       />
 
       <div className="relative aspect-square overflow-hidden bg-muted">
-        <Image
-          src={product.imageUrl || '/placeholder.svg'}
+        <ProductCardImage
+          images={product.imageGallery ?? [product.imageUrl]}
           alt={product.title}
-          fill
-          sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
-        {/* Top-left badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1.5">
-          {discount > 0 && !soldOut && (
-            <span className="rounded-md bg-sale px-2 py-0.5 text-xs font-bold text-sale-foreground">
-              -{discount}%
-            </span>
-          )}
-          {product.isFeatured && !soldOut && (
-            <span className="rounded-md bg-foreground px-2 py-0.5 text-xs font-semibold text-background">
-              Bestseller
-            </span>
-          )}
-          {lowStock && !soldOut && (
-            <span className="rounded-md bg-background/90 px-2 py-0.5 text-xs font-medium backdrop-blur-sm">
-              Nur noch {product.stock}
-            </span>
-          )}
-        </div>
+        <ProductImageOverlay badges={badges} size="sm" />
 
         {soldOut && (
           <div
@@ -89,7 +75,6 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Quick-add on hover (desktop) */}
         {!soldOut && (
           <div className="absolute inset-x-2 bottom-2 z-20 translate-y-2 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
             <CardQuickAdd productId={product.id} />
@@ -122,12 +107,6 @@ export function ProductCard({ product }: { product: Product }) {
               product.originalPrice != null ? toCents(product.originalPrice) : null
             }
           />
-          {freeShipping && (
-            <span className="flex items-center gap-1 text-xs font-medium text-success">
-              <TruckIcon className="size-3.5" aria-hidden />
-              Gratisversand
-            </span>
-          )}
         </div>
       </div>
     </div>
