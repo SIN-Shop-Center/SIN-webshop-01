@@ -66,7 +66,7 @@
     "@opennextjs/cloudflare": "^1.19.11",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
-    "better-auth": "^1.6.16",
+    "better-auth": "^1.6.17",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.17.0",
     "next": "^16.2.9",
@@ -93,6 +93,6 @@
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8",
-    "wrangler": "^4.99.0"
+    "wrangler": "^4.100.0"
   }
 }
