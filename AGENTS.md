@@ -3,6 +3,13 @@
 Anweisungen für KI-Agenten und Entwickler. Lies dies VOLLSTÄNDIG, bevor du
 Infrastruktur- oder Datenbank-Änderungen vornimmst.
 
+PROJECT_NOTEBOOK_ID=sin-webshop-01-main
+SOURCE_COUNT_REQUIRED=3
+
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "SIN-webshop-01 architecture overview" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Supabase self-hosted setup at 92.5.60.87" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Cloudflare Workers OpenNext deployment" --json
+
 ## Systemübersicht
 
 | Komponente | Wo | URL / Adresse |
