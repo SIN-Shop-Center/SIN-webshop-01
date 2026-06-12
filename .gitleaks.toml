@@ -3,6 +3,55 @@ title = "ShopSIN gitleaks config"
 [extend]
 useDefault = true
 
+[allowlist]
+paths = [
+  '.open-next',
+  'node_modules',
+  '.next',
+  'dist',
+  'build',
+  'coverage',
+  '.turbo',
+  '.npm-cache',
+  'output',
+  'tmp',
+  'pnpm-lock.yaml',
+  'package-lock.json',
+  'yarn.lock',
+  'bun.lockb',
+  'bun.lock',
+  'Gemfile.lock',
+  'composer.lock',
+  'Podfile.lock',
+  'Cargo.lock',
+  'flake.lock',
+  'renv.lock',
+  'packages.lock.json',
+  'go.sum',
+  'gradlew',
+  'gradlew.bat',
+  'mvnw',
+  'mvnw.cmd',
+  'settings.gradle',
+  'build.gradle',
+  'gradle.properties',
+  'pom.xml',
+  'vendor',
+  'vendor\',
+  'gitleaks.toml',
+  'gitleaksAllowlist.toml',
+  'gitleaks-baseline.json',
+  'test',
+  'tests',
+  'spec',
+  '__tests__',
+  '.git',
+  '.*\.min\..*',
+  '.*\.map$',
+  '.*\.sum$',
+  '.*\.lock$',
+]
+
 [[rules]]
 id = "jwt"
 [rules.allowlist]
