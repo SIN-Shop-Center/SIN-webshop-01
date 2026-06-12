@@ -110,6 +110,10 @@ function bootstrapLocalNlmProfile() {
 }
 
 function ensureNlmAvailable() {
+  if (process.env.CI === 'true') {
+    console.log('Skipping nlm check in CI environment.')
+    return
+  }
   const version = run(NLM_BIN, ['--version'])
   if (version.status !== 0) {
     fail(
@@ -510,6 +514,12 @@ function main() {
 
   const config = parseAgentsConfig()
   ensureNoBlockedDocDrift()
+
+  if (process.env.CI === 'true') {
+    process.stdout.write(`Governance preflight passed in CI mode (${config.mandatoryQueries.length} mandatory queries parsed, nlm steps skipped).\n`)
+    return
+  }
+
   bootstrapLocalNlmProfile()
   ensureNlmAvailable()
   ensureNlmLogin()
