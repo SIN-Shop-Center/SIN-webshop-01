@@ -4,6 +4,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { translateCategory } from '@/lib/category-labels'
 
 interface FilterSidebarProps {
   categories: Array<{ id: string; name: string }>
@@ -24,6 +25,11 @@ export function FilterSidebar({ categories, activeCategory }: FilterSidebarProps
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
+  // Deutsch übersetzt und alphabetisch sortiert
+  const sortedCategories = [...categories].sort((a, b) =>
+    translateCategory(a.name).localeCompare(translateCategory(b.name), 'de'),
+  )
+
   return (
     <aside aria-label="Produktfilter" className="flex w-full flex-col gap-6 md:w-56 md:shrink-0">
       <div>
@@ -37,13 +43,13 @@ export function FilterSidebar({ categories, activeCategory }: FilterSidebarProps
               Alle Kategorien
             </button>
           </li>
-          {categories.map((cat) => (
+          {sortedCategories.map((cat) => (
             <li key={cat.id}>
               <button
                 onClick={() => setParam('kategorie', cat.id)}
                 className={`text-left text-sm ${activeCategory === cat.id ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                {cat.name}
+                {translateCategory(cat.name)}
               </button>
             </li>
           ))}

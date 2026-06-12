@@ -12,8 +12,10 @@ export type SortOption = 'neueste' | 'preis-auf' | 'preis-ab' | 'name'
 interface DbProductRow {
   id: string
   title: string
+  title_de: string | null
   slug: string
   description: string | null
+  description_de: string | null
   price: number | string
   original_price: number | string | null
   category_id: string | null
@@ -32,8 +34,8 @@ interface DbProductRow {
 function transformProduct(row: DbProductRow): Product {
   return {
     id: row.id,
-    title: row.title,
-    description: row.description ?? '',
+    title: row.title_de ?? row.title,
+    description: row.description_de ?? row.description ?? '',
     price: typeof row.price === 'string' ? Number(row.price) : row.price,
     originalPrice:
       row.original_price != null
@@ -86,7 +88,7 @@ export async function getProductsPage(opts: {
     .eq('is_active', true)
 
   if (categoryId) builder = builder.eq('category_id', categoryId)
-  if (search) builder = builder.ilike('title', `%${search}%`)
+  if (search) builder = builder.or(`title.ilike.%${search}%,title_de.ilike.%${search}%`)
   if (maxPrice != null) builder = builder.lte('price', maxPrice)
 
   builder = applySorting(builder, sort).range(from, to)

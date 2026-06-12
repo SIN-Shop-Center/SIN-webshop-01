@@ -7,6 +7,7 @@ import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import type { GroupedCategory } from '@/lib/category-groups'
+import { translateCategory } from '@/lib/category-labels'
 
 export function MegaMenu({ groups }: { groups: GroupedCategory[] }) {
   const [open, setOpen] = useState<string | null>(null)
@@ -81,7 +82,7 @@ export function MegaMenu({ groups }: { groups: GroupedCategory[] }) {
                         onClick={() => setOpen(null)}
                         className="block rounded-md px-2 py-1.5 text-sm text-foreground/90 hover:bg-muted hover:text-foreground"
                       >
-                        {cat.name}
+                        {translateCategory(cat.name)}
                       </Link>
                     </li>
                   ))}

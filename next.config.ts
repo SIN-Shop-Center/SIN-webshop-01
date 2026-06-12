@@ -45,6 +45,19 @@ const nextConfig: NextConfig = {
       { source: '/(.*)', headers: securityHeaders },
     ]
   },
+  // NEU: Englische/falsche URLs auf deutsche Routen umleiten (kein 404 mehr)
+  async redirects() {
+    return [
+      { source: '/products', destination: '/produkte', permanent: true },
+      { source: '/product/:id', destination: '/produkt/:id', permanent: true },
+      { source: '/cart', destination: '/warenkorb', permanent: true },
+      { source: '/search', destination: '/suche', permanent: true },
+      { source: '/contact', destination: '/kontakt', permanent: true },
+      { source: '/wishlist', destination: '/wunschliste', permanent: true },
+      // Alte Hilfe-Kontaktseite auf das echte Kontaktformular
+      { source: '/hilfe/kontakt', destination: '/kontakt', permanent: false },
+    ]
+  },
 }
 
 export default nextConfig
