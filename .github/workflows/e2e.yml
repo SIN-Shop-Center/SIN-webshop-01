@@ -20,7 +20,7 @@ jobs:
         run: |
           pnpm exec playwright install chromium
           sudo apt-get update -qq
-          sudo apt-get install -y -qq libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libgbm1 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgconf-2-4 libpangocairo-1.0-0 libcairo2 libasound2
+          sudo apt-get install -y -qq libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libgbm1 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libpangocairo-1.0-0 libcairo2 libasound2t64
       - run: pnpm build
       - name: Run E2E
         run: pnpm test:e2e
