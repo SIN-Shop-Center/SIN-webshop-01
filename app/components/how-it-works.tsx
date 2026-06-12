@@ -23,7 +23,7 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section aria-label="So funktioniert es" className="py-16">
+    <section aria-label="So funktioniert es" className="bg-accent py-16">
       <div className="mx-auto w-full max-w-7xl px-4">
         <h2 className="text-center text-3xl font-extrabold tracking-tight text-balance">
           In 3 einfachen Schritten <span className="text-primary">zu deiner Bestellung</span>

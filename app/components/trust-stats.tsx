@@ -11,7 +11,7 @@ const STATS = [
 
 export function TrustStats() {
   return (
-    <section aria-label="Vertrauen in Zahlen" className="bg-secondary/50 py-12">
+    <section aria-label="Vertrauen in Zahlen" className="bg-accent py-12">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map((s) => (
           <div
