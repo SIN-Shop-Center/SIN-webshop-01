@@ -15,7 +15,7 @@
   "name": "shopsin-storefront",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 
   "assets": {
     "directory": ".open-next/assets",
@@ -51,7 +51,7 @@
   // per Definition öffentlich sein duerfen.
   "vars": {
     "NEXT_PUBLIC_APP_URL": "https://shopsin.delqhi.com",
-    "NEXT_PUBLIC_SUPABASE_URL": "http://supabase.delqhi.com:8006",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://supabase.delqhi.com",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY5Mjc5NTAyLCJleHAiOjE5MjY5NTk1MDJ9.HCam8-Pv3vAN8lthCwOpQuels9LkGKK8hVRJQCPEYWE"
   },
 
