@@ -24,6 +24,7 @@ SELECT
   p.description,
   p.price,
   p.original_price,
+  p.category_id,                                      -- für Kategorie-Filter
   COALESCE(p.images->>0, '') AS image_url,            -- images[0] → image_url
   COALESCE(
     ARRAY(SELECT jsonb_array_elements_text(p.images)),

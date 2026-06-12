@@ -64,7 +64,7 @@ export async function startCheckout() {
     mode: 'payment',
     line_items: lineItems,
     success_url: `${appUrl}/kasse/erfolg?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/warenkorb`,
+    cancel_url: `${appUrl}/kasse/abgebrochen`,
     customer_email: user?.email ?? undefined,
     metadata: {
       user_id: user?.id ?? '',

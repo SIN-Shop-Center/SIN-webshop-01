@@ -5,6 +5,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from './components/Navbar'
+import { CategoryNav } from './components/category-nav'
+import { CookieConsent } from './components/cookie-consent'
 import { Footer } from './components/Footer'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
@@ -14,20 +16,20 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: 'ShopSIN — Premium Tech & Lifestyle',
+    default: 'ShopSIN — Dein Alltag. Unser Sortiment.',
     template: '%s — ShopSIN',
   },
   description:
-    'Handverlesene Tech- und Lifestyle-Produkte mit kostenlosem Versand ab 49 €. Premium Tech & Lifestyle für deinen Alltag.',
+    'Handverlesene Produkte aus Mode, Wohnen, Elektronik und mehr — mit kostenlosem Versand ab 49 €.',
   applicationName: 'ShopSIN',
   keywords: [
     'ShopSIN',
-    'Premium Tech',
+    'Onlineshop',
+    'Mode',
+    'Wohnen',
+    'Elektronik',
     'Lifestyle',
-    'Kopfhörer',
-    'Tastatur',
-    'Leder',
-    'Smartwatch',
+    'Accessoires',
   ],
   authors: [{ name: 'Jeremy Schulze' }],
   creator: 'ShopSIN',
@@ -38,13 +40,13 @@ export const metadata: Metadata = {
     url: APP_URL,
     title: 'ShopSIN — Premium Tech & Lifestyle',
     description:
-      'Handverlesene Tech- und Lifestyle-Produkte mit kostenlosem Versand ab 49 €.',
+      'Handverlesene Produkte aus Mode, Wohnen, Elektronik und mehr — mit kostenlosem Versand ab 49 €.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ShopSIN — Premium Tech & Lifestyle',
+    title: 'ShopSIN — Dein Alltag. Unser Sortiment.',
     description:
-      'Handverlesene Tech- und Lifestyle-Produkte mit kostenlosem Versand ab 49 €.',
+      'Handverlesene Produkte aus Mode, Wohnen, Elektronik und mehr — mit kostenlosem Versand ab 49 €.',
   },
   alternates: {
     canonical: APP_URL,
@@ -75,10 +77,12 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
         <Navbar />
+        <CategoryNav />
         <main id="main-content" className="flex-1">
           {children}
         </main>
         <Footer />
+        <CookieConsent />
       </body>
     </html>
   )
