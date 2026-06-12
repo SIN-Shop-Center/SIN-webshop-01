@@ -73,8 +73,9 @@ export async function getProductsPage(opts: {
   sort?: SortOption
   categoryId?: string
   search?: string
+  maxPrice?: number
 }): Promise<{ products: Product[]; total: number }> {
-  const { page = 1, sort = 'neueste', categoryId, search } = opts
+  const { page = 1, sort = 'neueste', categoryId, search, maxPrice } = opts
   const supabase = createDataClient()
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -86,6 +87,7 @@ export async function getProductsPage(opts: {
 
   if (categoryId) builder = builder.eq('category_id', categoryId)
   if (search) builder = builder.ilike('title', `%${search}%`)
+  if (maxPrice != null) builder = builder.lte('price', maxPrice)
 
   builder = applySorting(builder, sort).range(from, to)
 
