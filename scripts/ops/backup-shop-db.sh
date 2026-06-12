@@ -1,66 +1,46 @@
 #!/usr/bin/env bash
-#
-# backup-shop-db.sh — Issue #38
-# Auf der OCI VM unter /etc/cron.daily/ installieren.
-# Tägliches pg_dump → OCI Object Storage, 30 Tage Retention, SHA256-Manifest,
-# Failure-Alert via Resend.
-#
-# Voraussetzungen (auf der VM):
-#   - aws-cli mit OCI-Endpoint konfiguriert
-#   - docker compose / docker ps zeigt supabase-db
-#   - ENV: OCI_S3_ENDPOINT, RESEND_API_KEY, RESEND_FROM_EMAIL, RESEND_ALERT_TO
-#
-# Installation:
-#   sudo install -m 755 backup-shop-db.sh /etc/cron.daily/backup-shop-db
-#   sudo install -m 600 -o root backup-shop-db.env /etc/backup-shop-db.env
-#   0 3 * * * root set -a; . /etc/backup-shop-db.env; set +a; /etc/cron.daily/backup-shop-db
-
+# /usr/local/bin/backup-shop-db.sh — daily pg_dump → OCI Object Storage
+# FIX #38: Automated backups
 set -euo pipefail
 
-BUCKET="${BACKUP_BUCKET:-s3://simone-backups/db}"
-STAMP="$(date +%Y%m%d-%H%M)"
-TMP="/tmp/shop-${STAMP}.sql.gz"
+BUCKET="s3://simone-backups"
+DATE=$(date +%Y%m%d)
+TMP="/tmp/shop-${DATE}.sql.gz"
+ALERT_EMAIL="opensin@gmx.com"
+RESEND_KEY_FILE="/etc/backup/resend.key"
 
-RESEND_FROM="${RESEND_FROM_EMAIL:-alerts@delqhi.com}"
-RESEND_TO="${RESEND_ALERT_TO:-opensin@gmx.com}"
-
-on_error() {
-  local exit_code=$?
-  echo "[backup] FAILED with exit ${exit_code}" >&2
-  if [ -n "${RESEND_API_KEY:-}" ]; then
-    curl -sf --max-time 10 \
-      -H "Authorization: Bearer ${RESEND_API_KEY}" \
+notify_failure() {
+  local msg="$1"
+  if [ -f "$RESEND_KEY_FILE" ]; then
+    curl -s -X POST https://api.resend.com/emails \
+      -H "Authorization: Bearer $(cat "$RESEND_KEY_FILE")" \
       -H "Content-Type: application/json" \
-      -X POST "https://api.resend.com/emails" \
-      -d "{\"from\":\"${RESEND_FROM}\",\"to\":\"${RESEND_TO}\",\"subject\":\"[ShopSIN] DB-Backup FAILED\",\"text\":\"DB-Backup fehlgeschlagen um ${STAMP}. Exit ${exit_code}. Check: /var/log/syslog\"}" \
-      || echo "[backup] alert email failed" >&2
+      -d "{\"from\":\"alerts@delqhi.com\",\"to\":[\"${ALERT_EMAIL}\"],\"subject\":\"[ALERT] DB-Backup failed ${DATE}\",\"text\":\"${msg}\"}" || true
   fi
-  exit "${exit_code}"
 }
-trap on_error ERR
+trap 'notify_failure "Backup-Script aborted at line $LINENO"' ERR
 
-echo "[backup] starting ${STAMP}"
+# 1. Dump (shop-Schema)
+docker exec supabase-db pg_dump -U postgres -d postgres -n shop | gzip > "$TMP"
 
-# Dump + Komprimierung
-docker exec supabase-db pg_dump \
-  -U postgres -d postgres -n shop --no-owner --clean --if-exists \
-  | gzip > "${TMP}"
+# 2. Integrity: Hash + minimum size
+[ "$(stat -c%s "$TMP")" -gt 1024 ] || { notify_failure "Dump suspiciously small"; exit 1; }
+sha256sum "$TMP" > "${TMP}.sha256"
 
-# Integritäts-Hash
-sha256sum "${TMP}" | awk '{print $1}' > "${TMP}.sha256"
+# 3. Upload OCI (S3-compatible)
+aws s3 cp "$TMP" "${BUCKET}/db/shop-${DATE}.sql.gz" \
+  --endpoint-url "$OCI_S3_ENDPOINT"
+aws s3 cp "${TMP}.sha256" "${BUCKET}/db/shop-${DATE}.sql.gz.sha256" \
+  --endpoint-url "$OCI_S3_ENDPOINT"
 
-# Upload zu OCI Object Storage
-aws s3 cp "${TMP}"     "${BUCKET}/shop-${STAMP}.sql.gz"      --endpoint-url "${OCI_S3_ENDPOINT}"
-aws s3 cp "${TMP}.sha256" "${BUCKET}/shop-${STAMP}.sql.gz.sha256" --endpoint-url "${OCI_S3_ENDPOINT}"
+# 4. Retention: 30 days
+CUTOFF=$(date -d '-30 days' +%Y%m%d)
+aws s3 ls "${BUCKET}/db/" --endpoint-url "$OCI_S3_ENDPOINT" | awk '{print $4}' | while read -r f; do
+  FDATE=$(echo "$f" | grep -oP '\d{8}' | head -1 || true)
+  if [ -n "$FDATE" ] && [ "$FDATE" -lt "$CUTOFF" ]; then
+    aws s3 rm "${BUCKET}/db/${f}" --endpoint-url "$OCI_S3_ENDPOINT"
+  fi
+done
 
-# Retention: 30 Tage — alle Keys älter als cutoff löschen
-CUTOFF="$(date -d '30 days ago' +%Y%m%d 2>/dev/null || date -v-30d +%Y%m%d)"
-aws s3 ls "${BUCKET}/" --endpoint-url "${OCI_S3_ENDPOINT}" \
-  | while read -r _ _ _ key; do
-      fdate="$(echo "${key}" | grep -oE '[0-9]{8}' | head -1 || true)"
-      [ -n "${fdate:-}" ] && [ "${fdate}" -lt "${CUTOFF}" ] && \
-        aws s3 rm "${BUCKET}/${key}" --endpoint-url "${OCI_S3_ENDPOINT}"
-    done
-
-rm -f "${TMP}" "${TMP}.sha256"
-echo "[backup] ok ${STAMP}"
+rm -f "$TMP" "${TMP}.sha256"
+echo "Backup OK: shop-${DATE}.sql.gz"

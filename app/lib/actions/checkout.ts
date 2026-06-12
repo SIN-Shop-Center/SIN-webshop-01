@@ -52,7 +52,9 @@ export async function startCheckout(): Promise<CheckoutResult> {
 
   for (const item of items) {
     const product = productMap.get(item.product_id)
-    if (!product || product.stock <= 0) continue
+    // Issue #37: Stock ist bereits via reserve_stock reserviert — nur Existenz prüfen.
+    // NICHT gegen product.stock prüfen: das letzte reservierte Stück hätte stock=0.
+    if (!product) continue
 
     const unitAmount = toCents(product.price)
     if (!Number.isInteger(unitAmount) || unitAmount < 50) {
@@ -62,7 +64,8 @@ export async function startCheckout(): Promise<CheckoutResult> {
       continue
     }
 
-    const quantity = Math.min(item.quantity, product.stock)
+    // Issue #37: Reservierung ist bereits im Warenkorb. Kein Clamp auf product.stock.
+    const quantity = item.quantity
     subtotalCents += unitAmount * quantity
 
     lineItems.push({
