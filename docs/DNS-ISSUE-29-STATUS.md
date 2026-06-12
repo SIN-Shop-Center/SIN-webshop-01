@@ -1,6 +1,10 @@
 # Issue #29 — DNS Fix Status
 
 **Status:** 🟡 Partially applied, 🟠 Edge routing still broken
+**⚠️ KORRIGIERT:** Die finale Ursache war NICHT "Cloudflare Edge blockiert".
+Siehe [AGENTS.md](../AGENTS.md) (Hinweis zu historischen Commits).
+Tatsächliche Ursache: Port 8006 in öffentlicher URL. Diese Dokumentation
+spiegelt den alten Kenntnisstand und dient nur der historischen Referenz.
 
 ## Was passiert ist
 

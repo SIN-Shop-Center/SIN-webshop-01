@@ -1,6 +1,10 @@
 # Issue #29 — FINALE Diagnose (nach 6+ Debug-Sessions)
 
 **Datum:** 2026-06-12
+**⚠️ KORRIGIERT:** Die finale Ursache war NICHT "Cloudflare Edge blockiert".
+Siehe [AGENTS.md](../AGENTS.md) (Hinweis zu historischen Commits).
+Tatsächliche Ursache: Port 8006 in öffentlicher URL. Die Diagnose unten ist
+daher teilweise falsch und dient nur der historischen Referenz.
 
 ## Was wir aus diesem Debug gelernt haben
 
