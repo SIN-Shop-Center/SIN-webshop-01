@@ -16,7 +16,8 @@ const SERVICE_LINKS = [
   { href: '/hilfe/versand', label: 'Versand & Lieferzeiten' },
   { href: '/hilfe/rueckgabe', label: 'Rückgabe & Umtausch' },
   { href: '/hilfe/zahlung', label: 'Zahlungsarten' },
-  { href: '/hilfe/kontakt', label: 'Kontakt' },
+  { href: '/kontakt', label: 'Kontakt' }, // FIX: war /hilfe/kontakt — jetzt echtes Kontaktformular
+  { href: '/bestellung-verfolgen', label: 'Bestellung verfolgen' }, // NEU
 ]
 
 const LEGAL_LINKS = [

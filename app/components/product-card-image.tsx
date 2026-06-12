@@ -1,7 +1,7 @@
 // Purpose: Product card image with hover swap to second gallery image
 // Docs: AGENTS.md
 
-import Image from 'next/image'
+import { ImageWithFallback } from '@/components/image-with-fallback'
 
 export function ProductCardImage({
   images,
@@ -15,8 +15,8 @@ export function ProductCardImage({
 
   return (
     <>
-      <Image
-        src={primary || '/placeholder.svg'}
+      <ImageWithFallback
+        src={primary || "/placeholder.svg"}
         alt={alt}
         fill
         sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -27,8 +27,8 @@ export function ProductCardImage({
         }`}
       />
       {secondary && (
-        <Image
-          src={secondary || '/placeholder.svg'}
+        <ImageWithFallback
+          src={secondary || "/placeholder.svg"}
           alt=""
           aria-hidden
           fill
