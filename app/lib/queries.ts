@@ -8,7 +8,7 @@
 // Spaltennamen via PostgREST column-aliasing. Diese Queries lesen
 // aus der View, schreiben weiter in die Tabelle direkt.
 
-import { createClient } from '@/lib/supabase/server'
+import { createDataClient } from '@/lib/supabase/data-client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Product } from './data'
 
@@ -71,7 +71,7 @@ function transformProduct(row: DbProductViewRow): Product {
 // ── Public query functions ────────────────────────────────────────────────────
 
 export async function getFeaturedProducts(): Promise<Product[]> {
-  const supabase = await createClient()
+  const supabase = createDataClient()
   const { data, error } = await supabase
     .from('products_v')
     .select('*')
@@ -85,7 +85,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export async function getAllProducts(): Promise<Product[]> {
-  const supabase = await createClient()
+  const supabase = createDataClient()
   const { data, error } = await supabase
     .from('products_v')
     .select('*')
@@ -97,7 +97,7 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-  const supabase = await createClient()
+  const supabase = createDataClient()
   const { data, error } = await supabase
     .from('products_v')
     .select('*')
@@ -114,7 +114,7 @@ export async function getProductById(id: string): Promise<Product | null> {
  */
 export async function getProductsByIds(ids: string[]): Promise<Product[]> {
   if (ids.length === 0) return []
-  const supabase = await createClient()
+  const supabase = createDataClient()
   const { data, error } = await supabase
     .from('products_v')
     .select('*')
