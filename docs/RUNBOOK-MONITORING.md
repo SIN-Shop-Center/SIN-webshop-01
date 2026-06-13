@@ -163,7 +163,7 @@ Data sources:
 | Hyperping | 10 monitors | EU-based |
 | ntfy.sh | Unlimited | Push notifications, no signup |
 
-### Option C: Uptime Kuma (self-hosted, deployed on VM)
+### Option C: Uptime Kuma (self-hosted, deployed on VM, DNS live)
 
 Uptime Kuma is deployed on the VM per Issue #39.
 
@@ -171,10 +171,10 @@ Uptime Kuma is deployed on the VM per Issue #39.
 |---|---|
 | Container | `uptime-kuma` |
 | Local URL | `http://localhost:3001` |
-| Intended public URL | `https://status.delqhi.com` |
-| Status | Running, first-setup wizard reachable at `http://localhost:3001` |
-
-**Required DNS record:** Add a CNAME in Cloudflare for `status.delqhi.com` → `simone-api.cfargotunnel.com` (or use the Cloudflare Tunnel dashboard to route `status.delqhi.com`). No port in the URL. Once DNS resolves, the tunnel will expose the dashboard.
+| Public URL | `https://status.delqhi.com` ✅ live (302 to setup page) |
+| DNS | `status.delqhi.com` → `fb25fb11-8840-41fd-8a85-518674c86725.cfargotunnel.com` (proxied) |
+| Tunnel config | Remote-managed; includes `status.delqhi.com → http://localhost:3001` |
+| Status | Running, first-setup wizard reachable at `https://status.delqhi.com` |
 
 Add HTTP monitors after first login:
 - `https://shopsin.delqhi.com/api/health` (no auth)

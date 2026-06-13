@@ -1,6 +1,8 @@
 # Fix #29 — DNS-Fix: supabase.delqhi.com auf Cloudflare-Tunnel umstellen
 
 > **Status:** RESOLVED ✅ · **Priority:** CRITICAL (P0) · **Closed:** 2026-06-13
+>
+> **Update 2026-06-13:** Tunnel-Config ist remote-managed. `status.delqhi.com` über API hinzugefügt.
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/29
 > **Owner:** Jeremy (Cloudflare-DNS-Klick) + Agent (cloudflared-Config)
 
@@ -35,7 +37,7 @@ ingress:
   - service: http_status:404
 ```
 
-> **Wichtig:** Um neue Hostnames (z.B. `status.delqhi.com`) aus dem Tunnel heraus öffentlich zu machen, muss im Cloudflare-Dashboard ein CNAME auf `simone-api.cfargotunnel.com` gesetzt werden. Das CLI-Kommando `cloudflared tunnel route dns` funktioniert auf der VM nicht, weil kein `cert.pem` (Origin-Cert) vorhanden ist.
+> **Wichtig:** Der Tunnel `simone-api` ist **remote-managed** (Quelle: Cloudflare-Dashboard/API). Die lokale `config.yml` auf der VM wird nicht als Quelle verwendet. Um neue Hostnames hinzuzufügen, muss die Tunnel-Konfiguration über die Cloudflare-API (`/cfd_tunnel/{id}/configurations`) oder das Dashboard aktualisiert werden. Der DNS-CNAME muss auf `fb25fb11-8840-41fd-8a85-518674c86725.cfargotunnel.com` zeigen (nicht `simone-api.cfargotunnel.com`).
 
 ## Diagnose: was ist aktuell konfiguriert?
 

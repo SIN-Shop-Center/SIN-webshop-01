@@ -1,6 +1,6 @@
 # Fix #39 — Monitoring-Stack: Sentry (Errors) + Uptime Kuma (Health) + Resend-Alerts
 
-> **Status:** OPEN · **Priority:** HIGH (P1) · **Uptime Kuma deployed — BLOCKED on public DNS + Sentry DSN**
+> **Status:** RESOLVED (Uptime Kuma DNS) · OPEN (Sentry DSN) · **Priority:** HIGH (P1)
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/39
 
 ## Context
@@ -12,21 +12,25 @@ A live shop with no monitoring is a time bomb. The 4 must-have signals:
 3. **Cron health** (Resend) — if cj-fulfillment or fx-update haven't run in 25h, send alert
 4. **Order funnel** (Plausible via #58) — add-to-cart / checkout / payment events
 
-## Step 1 — Uptime Kuma (self-hosted, deployed ✅)
+## Step 1 — Uptime Kuma (self-hosted, deployed ✅, DNS live ✅)
 
 ```sh
-# Auf der OCI-VM läuft bereits:
+# Auf der OCI-VM läuft:
 docker run -d --name uptime-kuma --restart=always \
   -p 127.0.0.1:3001:3001 \
   -v uptime-kuma-data:/app/data \
   louislam/uptime-kuma:1
 ```
 
-**Status:** Container läuft, Initial-Setup erreichbar unter `http://localhost:3001` auf der VM.
+**Status:**
+- Container läuft auf der VM (`http://localhost:3001`)
+- DNS: `status.delqhi.com` → `fb25fb11-8840-41fd-8a85-518674c86725.cfargotunnel.com` (proxied)
+- Öffentlich erreichbar: `https://status.delqhi.com` (liefert 302 zur Setup-Page)
+- Tunnel-Config (remote) enthält `status.delqhi.com → http://localhost:3001`
 
-**Fehlend:** Öffentliche DNS-Route. Im Tunnel-Config (`/home/ubuntu/.cloudflared/config.yml`) ist `status.delqhi.com → http://localhost:3001` hinterlegt. Du musst im Cloudflare-Dashboard einen CNAME für `status.delqhi.com` auf `simone-api.cfargotunnel.com` setzen (oder `cloudflared tunnel route dns` mit einem `cert.pem` ausführen).
+**Erstes Login:** Öffne `https://status.delqhi.com` im Browser und lege einen Admin-Account an.
 
-**Nach DNS-Setup:** Im Uptime-Kuma-UI unter `https://status.delqhi.com`:
+**Danach:** Im Uptime-Kuma-UI:
 1. Add Monitor → Type: HTTPS
 2. URL: https://shopsin.delqhi.com/
 3. Interval: 60s
