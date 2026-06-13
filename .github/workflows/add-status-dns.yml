@@ -1,0 +1,31 @@
+# Temporary workflow to add status.delqhi.com CNAME to Cloudflare Tunnel
+# Run once and delete after DNS is active
+name: Add status.delqhi.com DNS
+on:
+  workflow_dispatch:
+
+jobs:
+  add-dns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add CNAME for status.delqhi.com
+        run: |
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/3e7ca14550be834b017846ec7f960d16/dns_records" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"type":"CNAME","name":"status","content":"simone-api.cfargotunnel.com","ttl":1,"proxied":false}' \
+            | tee /tmp/cf-dns-response.json
+          if ! grep -q '"success":true' /tmp/cf-dns-response.json; then
+            echo "DNS add failed or already exists"
+            cat /tmp/cf-dns-response.json
+            exit 1
+          fi
+      - name: Verify DNS propagation
+        run: |
+          for i in 1 12; do
+            dig status.delqhi.com CNAME +short | grep -q cfargotunnel && exit 0
+            echo "Waiting for DNS propagation... ($i/12)"
+            sleep 10
+          done
+          echo "DNS not yet propagated"
+          exit 1
