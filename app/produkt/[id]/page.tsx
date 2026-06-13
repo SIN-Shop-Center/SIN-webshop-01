@@ -27,6 +27,7 @@ import { TrustBadges } from '@/components/product/trust-badges'
 import { SizeGuide } from '@/components/product/size-guide'
 import { AccordionInfo } from '@/components/product/accordion-info'
 import { StickyAddToCart } from '@/components/product/sticky-add-to-cart'
+import { PriceTag } from '@/components/PriceTag'
 import {
   CheckIcon,
 } from '@/components/icons'
@@ -104,8 +105,8 @@ export default async function ProductPage({
       ? toCents(product.originalPrice)
       : null
 
-  const galleryImages = product.imageGallery?.length
-    ? product.imageGallery
+  const galleryImages = Array.isArray(product.imageGallery)
+    ? product.imageGallery.flat(2).filter((img): img is string => typeof img === 'string' && Boolean(img))
     : product.imageUrl
       ? [product.imageUrl]
       : []
@@ -139,8 +140,8 @@ export default async function ProductPage({
             badges={badges}
           />
 
-          <div>
-            <h1 className="mb-3 text-3xl font-bold tracking-tight text-balance md:text-4xl">
+          <div className="flex flex-col">
+            <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-balance md:text-4xl lg:text-5xl">
               {product.title}
             </h1>
             <RatingSummary
@@ -148,12 +149,22 @@ export default async function ProductPage({
               ratingCount={product.ratingCount}
               soldCount={product.soldCount}
             />
-            <p className="mb-6 text-pretty text-muted-foreground">
+
+            {/* Price - prominent */}
+            <div className="my-4 pb-4 border-b border-border">
+              <PriceTag
+                priceCents={priceCents}
+                originalPriceCents={originalPriceCents}
+                size="lg"
+              />
+            </div>
+
+            <p className="mb-6 text-base leading-relaxed text-muted-foreground text-pretty">
               {product.description}
             </p>
 
-            {/* Variants + Price + Add to Cart */}
-            <div className="mb-4">
+            {/* Variants + Add to Cart */}
+            <div className="mb-6">
               <VariantSelector product={product} />
             </div>
 
@@ -167,12 +178,9 @@ export default async function ProductPage({
             <FreeShippingNudge />
 
             {/* Trust badges */}
-            <div className="mb-6">
+            <div className="my-6 py-4 border-y border-border">
               <TrustBadges />
             </div>
-
-            {/* Product accordion */}
-            <AccordionInfo description={product.description} />
 
             {/* Wishlist */}
             <div className="mb-6">
@@ -186,15 +194,15 @@ export default async function ProductPage({
             {/* Features */}
             {product.features && product.features.length > 0 && (
               <div className="mb-8">
-                <h2 className="mb-3 text-base font-semibold">Highlights</h2>
-                <ul className="space-y-1.5 text-sm text-pretty">
+                <h2 className="mb-4 text-lg font-bold">Highlights</h2>
+                <ul className="space-y-2 text-sm text-pretty">
                   {product.features.map((feature, i) => (
-                    <li key={i} className="flex gap-2">
+                    <li key={i} className="flex gap-3">
                       <CheckIcon
-                        className="mt-0.5 size-4 shrink-0 text-success"
+                        className="mt-0.5 size-5 shrink-0 text-success"
                         aria-hidden
                       />
-                      <span>{feature}</span>
+                      <span className="text-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -204,29 +212,32 @@ export default async function ProductPage({
             {/* Specifications */}
             {product.specifications &&
               Object.keys(product.specifications).length > 0 && (
-                <div>
-                  <h2 className="mb-3 text-base font-semibold">Spezifikationen</h2>
-                  <dl className="overflow-hidden rounded-lg border border-border text-sm">
+                <div className="mb-8">
+                  <h2 className="mb-4 text-lg font-bold">Spezifikationen</h2>
+                  <dl className="overflow-hidden rounded-xl border border-border text-sm">
                     {Object.entries(product.specifications).map(
                       ([key, value], i) => (
                         <div
                           key={key}
                           className={
                             i % 2 === 0
-                              ? 'flex bg-muted/30 px-3 py-2'
-                              : 'flex px-3 py-2'
+                              ? 'flex bg-muted/50 px-4 py-3'
+                              : 'flex px-4 py-3'
                           }
                         >
-                          <dt className="w-1/2 font-medium text-muted-foreground">
+                          <dt className="w-1/2 font-semibold text-muted-foreground">
                             {key}
                           </dt>
-                          <dd className="w-1/2 text-pretty">{value}</dd>
+                          <dd className="w-1/2 text-pretty text-foreground">{value}</dd>
                         </div>
                       ),
                     )}
                   </dl>
                 </div>
               )}
+
+            {/* Product accordion */}
+            <AccordionInfo description={product.description} />
           </div>
         </div>
 

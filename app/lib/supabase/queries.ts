@@ -32,6 +32,13 @@ interface DbProductRow {
 }
 
 function transformProduct(row: DbProductRow): Product {
+  // Flatten image_gallery: ensure it's a flat array of strings
+  const imageGallery = Array.isArray(row.image_gallery)
+    ? row.image_gallery
+        .flat(2)
+        .filter((img): img is string => typeof img === 'string' && Boolean(img))
+    : []
+
   return {
     id: row.id,
     title: row.title_de ?? row.title,
@@ -47,7 +54,7 @@ function transformProduct(row: DbProductRow): Product {
     ratingCount: row.rating_count,
     category: '',   // wird per Kategorie-ID aufgelöst
     imageUrl: row.image_url,
-    imageGallery: row.image_gallery,
+    imageGallery,
     stock: row.stock,
     isFeatured: row.is_featured,
     colors: row.variants?.colors,

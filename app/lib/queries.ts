@@ -60,6 +60,13 @@ function transformProduct(row: DbProductViewRow): Product {
   }
   const variants = parseVariants(row.variants)
 
+  // Flatten image_gallery: ensure it's a flat array of strings
+  const imageGallery = Array.isArray(row.image_gallery)
+    ? row.image_gallery
+        .flat(2)
+        .filter((img): img is string => typeof img === 'string' && Boolean(img))
+    : []
+
   return {
     id: row.id,
     title: row.title,
@@ -77,7 +84,7 @@ function transformProduct(row: DbProductViewRow): Product {
     categoryId: row.category_id ?? undefined,
     subcategory: undefined,
     imageUrl: row.image_url,
-    imageGallery: row.image_gallery,
+    imageGallery,
     stock: row.stock,
     soldCount: row.sold_count ?? undefined,
     createdAt: row.created_at,

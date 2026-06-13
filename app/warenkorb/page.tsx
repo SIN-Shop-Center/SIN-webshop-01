@@ -50,21 +50,22 @@ export default async function CartPage() {
     return (
       <div className="container mx-auto px-4 py-16">
         <h1 className="mb-8 text-3xl font-bold tracking-tight">Warenkorb</h1>
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
-          <CartIcon
-            className="mb-4 size-12 text-muted-foreground"
-            aria-hidden
-          />
-          <h2 className="mb-2 text-lg font-semibold">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-gradient-to-br from-muted/30 to-muted/10 px-6 py-20 text-center">
+          <div className="mb-6 rounded-full bg-primary/10 p-6">
+            <CartIcon
+              className="size-16 text-primary"
+              aria-hidden
+            />
+          </div>
+          <h2 className="mb-3 text-2xl font-bold">
             Dein Warenkorb ist leer
           </h2>
-          <p className="mb-6 max-w-sm text-pretty text-sm text-muted-foreground">
-            Entdecke unsere handverlesenen Produkte und lege deine Favoriten in
-            den Warenkorb.
+          <p className="mb-8 max-w-md text-pretty text-base text-muted-foreground">
+            Entdecke unsere handverlesenen Produkte und lege deine Favoriten in den Warenkorb.
           </p>
-          <Link href="/" className="btn btn-primary btn-md">
-            Weiter einkaufen
-            <ArrowRightIcon className="size-4" aria-hidden />
+          <Link href="/produkte" className="btn btn-primary btn-lg group">
+            Jetzt stöbern
+            <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-1" aria-hidden />
           </Link>
         </div>
       </div>

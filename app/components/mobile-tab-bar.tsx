@@ -46,7 +46,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Hauptnavigation mobil"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)] md:hidden shadow-lg"
     >
       <ul className="flex">
         {tabs.map((tab) => {
@@ -56,16 +56,24 @@ export function MobileTabBar() {
               <Link
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
-                className={`relative flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
-                  active ? 'text-primary' : tab.highlight ? 'text-sale' : 'text-muted-foreground'
+                className={`relative flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold transition-colors ${
+                  active
+                    ? 'text-primary'
+                    : tab.highlight
+                      ? 'text-sale hover:text-sale/80'
+                      : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <span className="relative">
-                  <tab.icon className="size-5" aria-hidden="true" />
+                  <tab.icon
+                    className={`size-6 transition-transform ${active ? 'scale-110' : ''}`}
+                    aria-hidden="true"
+                    strokeWidth={active ? 2.5 : 2}
+                  />
                   {tab.showBadge && cartCount > 0 && (
                     <span
                       aria-hidden="true"
-                      className="absolute -right-2 -top-1.5 flex size-4 items-center justify-center rounded-full bg-sale text-[9px] font-bold text-sale-foreground"
+                      className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-sale text-[10px] font-bold text-sale-foreground shadow-sm"
                     >
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>

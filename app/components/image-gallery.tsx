@@ -6,7 +6,10 @@ import { ProductImageOverlay } from '@/components/product-image-overlay'
 import type { ProductBadge } from '@/lib/product-badges'
 
 export function ImageGallery({ images, alt, badges }: { images: string[]; alt: string; badges?: ProductBadge[] }) {
-  const validImages = images.filter(Boolean)
+  // Flatten arrays and ensure strings
+  const validImages = images
+    .map(img => Array.isArray(img) ? img[0] : img)
+    .filter((img): img is string => typeof img === 'string' && Boolean(img))
   const [active, setActive] = useState(0)
 
   if (validImages.length === 0) {

@@ -21,28 +21,37 @@ export function PriceTag({
   const hasDiscount =
     originalPriceCents != null && originalPriceCents > priceCents
 
+  const discountPercent = hasDiscount
+    ? Math.round(((originalPriceCents! - priceCents) / originalPriceCents!) * 100)
+    : 0
+
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline gap-2">
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline gap-3">
         <span
           className={
             size === 'lg'
-              ? 'text-3xl font-bold tracking-tight' + (hasDiscount ? ' text-sale' : '')
-              : 'text-lg font-bold tracking-tight' + (hasDiscount ? ' text-sale' : '')
+              ? 'text-4xl font-extrabold tracking-tight text-foreground'
+              : 'text-xl font-bold tracking-tight text-foreground'
           }
         >
           {formatEuro(priceCents)}
         </span>
         {hasDiscount && (
-          <span
-            className={
-              size === 'lg'
-                ? 'text-lg text-muted-foreground line-through'
-                : 'text-sm text-muted-foreground line-through'
-            }
-          >
-            {formatEuro(originalPriceCents)}
-          </span>
+          <>
+            <span
+              className={
+                size === 'lg'
+                  ? 'text-xl text-muted-foreground line-through'
+                  : 'text-sm text-muted-foreground line-through'
+              }
+            >
+              {formatEuro(originalPriceCents)}
+            </span>
+            <span className="rounded-full bg-sale px-2 py-0.5 text-xs font-bold text-sale-foreground">
+              -{discountPercent}%
+            </span>
+          </>
         )}
         {hasDiscount && (
           <span className="sr-only">

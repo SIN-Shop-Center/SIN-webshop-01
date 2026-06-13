@@ -10,8 +10,9 @@ export function ProductCardImage({
   images: string[]
   alt: string
 }) {
-  const primary = images[0]
-  const secondary = images[1]
+  // Ensure we're working with strings, not arrays
+  const primary = Array.isArray(images[0]) ? images[0][0] : images[0]
+  const secondary = Array.isArray(images[1]) ? images[1][0] : images[1]
 
   return (
     <>

@@ -14,7 +14,15 @@ type ImageWithFallbackProps = Omit<ImageProps, 'src'> & {
 export function ImageWithFallback({ src, alt, ...rest }: ImageWithFallbackProps) {
   const [failed, setFailed] = useState(false)
 
-  if (!src || failed) {
+  // Safety net: if src is an array (nested gallery), extract first string
+  const raw = src as unknown
+  const safeSrc = typeof raw === 'string'
+    ? raw
+    : Array.isArray(raw)
+      ? ((raw as unknown[]).flat(2).find((img): img is string => typeof img === 'string' && Boolean(img)) ?? null)
+      : null
+
+  if (!safeSrc || failed) {
     return (
       <div
         role="img"
@@ -26,5 +34,5 @@ export function ImageWithFallback({ src, alt, ...rest }: ImageWithFallbackProps)
     )
   }
 
-  return <Image src={src || "/placeholder.svg"} alt={alt} onError={() => setFailed(true)} {...rest} />
+  return <Image src={safeSrc || "/placeholder.svg"} alt={alt} onError={() => setFailed(true)} {...rest} />
 }
