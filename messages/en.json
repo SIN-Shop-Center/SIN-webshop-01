@@ -1,0 +1,162 @@
+{
+  "layout": {
+    "skipToContent": "Skip to main content",
+    "metaTitle": "ShopSIN — Your Everyday. Our Selection.",
+    "metaTitleTemplate": "{title} — ShopSIN",
+    "metaDescription": "Curated products in fashion, home, electronics and more — with free shipping from 49 €.",
+    "ogTitle": "ShopSIN — Premium Tech & Lifestyle",
+    "twitterTitle": "ShopSIN — Your Everyday. Our Selection."
+  },
+  "nav": {
+    "main": "Main navigation",
+    "wishlist": "Wishlist",
+    "signIn": "Sign in",
+    "cart": "Cart",
+    "cartWithCount": "Cart, {count} items",
+    "cartNineOrMore": "Cart, 9 or more items",
+    "categories": "Categories",
+    "allProducts": "All Products",
+    "menu": "Menu",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "myAccount": "My Account",
+    "further": "More"
+  },
+  "trustBar": {
+    "freeShipping": "Free shipping from 49 €",
+    "returnPolicy": "14-day return policy",
+    "buyerProtection": "Buyer protection included",
+    "securePayment": "Secure payment"
+  },
+  "uspTopbar": {
+    "freeShipping": "Free shipping from 49 €",
+    "securePayment": "Secure payment with Stripe",
+    "returnPolicy": "14-day right of withdrawal",
+    "satisfiedCustomers": "Over 2,500 satisfied customers"
+  },
+  "homeHero": {
+    "saveUp": "Save up to 50%",
+    "heading": "Everything you need.",
+    "headingHighlight": "At prices you'll love.",
+    "subheading": "Over 50 products in fashion, beauty, home and more — new deals daily, free shipping from 49 €.",
+    "searchPlaceholder": "What are you looking for?",
+    "searchLabel": "Search products",
+    "searchButton": "Search",
+    "discoverDeals": "Discover deals",
+    "allProducts": "All Products",
+    "freeFrom": "Free from 49 €",
+    "returnDays": "14-day returns",
+    "buyerProtection": "Buyer protection"
+  },
+  "home": {
+    "trustStripLabel": "Our promises",
+    "freeShippingTitle": "Free shipping from {amount}",
+    "freeShippingDesc": "Delivery in {min}–{max} business days within Germany",
+    "securePaymentTitle": "Secure payment",
+    "securePaymentDesc": "Stripe-encrypted. Your data is safe.",
+    "returnTitle": "14-day cancellation",
+    "returnDesc": "Hassle-free returns as required by law",
+    "dealsHeading": "Flash Deals",
+    "allDeals": "All deals",
+    "featuredHeading": "Our Recommendations",
+    "allProducts": "All Products",
+    "noProductsTitle": "No products available yet",
+    "noProductsDesc": "We're working on providing a selection for you soon."
+  },
+  "trustStats": {
+    "label": "Trust in numbers",
+    "productsValue": "50+",
+    "productsLabel": "Products in assortment",
+    "productsSub": "New deals daily",
+    "customersValue": "2,500+",
+    "customersLabel": "Satisfied customers",
+    "customersSub": "Growing steadily",
+    "deliveryValue": "7–15",
+    "deliveryLabel": "Days delivery time",
+    "deliverySub": "With tracking",
+    "ratingLabel": "4.8 out of 5 stars",
+    "ratingText": "4.8 — Excellent",
+    "ratingSub": "Based on customer reviews"
+  },
+  "howItWorks": {
+    "label": "How it works",
+    "heading": "In 3 easy steps ",
+    "headingHighlight": "to your order",
+    "step1Title": "Find a product",
+    "step1Text": "Browse over 50 products in fashion, beauty, home and more — or use the search.",
+    "step2Title": "Pay securely",
+    "step2Text": "Pay encrypted via Stripe — by card, Klarna or Apple Pay & Google Pay.",
+    "step3Title": "Receive your delivery",
+    "step3Text": "Your package arrives in 7–15 business days with tracking. 14-day cancellation right included."
+  },
+  "footer": {
+    "brandName": "SIN Shop",
+    "brandDesc": "Your online shop for fashion, home, electronics and more — with buyer protection and 14-day return policy.",
+    "shopHeading": "Shop",
+    "shopAllProducts": "All Products",
+    "shopSale": "Sale",
+    "shopWishlist": "Wishlist",
+    "shopMyOrders": "My Orders",
+    "serviceHeading": "Customer Service",
+    "serviceShipping": "Shipping & Delivery Times",
+    "serviceReturns": "Returns & Exchanges",
+    "servicePayment": "Payment Methods",
+    "serviceContact": "Contact",
+    "serviceTrackOrder": "Track Order",
+    "newsletterHeading": "Newsletter",
+    "newsletterDesc": "Offers and news delivered straight to your inbox.",
+    "legalHeading": "Legal",
+    "legalImprint": "Legal Notice",
+    "legalTerms": "Terms & Conditions",
+    "legalCancellation": "Cancellation Policy",
+    "legalPrivacy": "Privacy Policy",
+    "copyright": "© {year} SIN Shop · Jeremy Schulze · Kurfürstenstraße 124, 10785 Berlin"
+  },
+  "filter": {
+    "label": "Product filters",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "price": "Price",
+    "allPrices": "All Prices",
+    "upTo10": "Up to 10 €",
+    "upTo25": "Up to 25 €",
+    "upTo50": "Up to 50 €",
+    "upTo100": "Up to 100 €"
+  },
+  "productCard": {
+    "soldOut": "Sold out",
+    "newInSortiment": "New in assortment",
+    "ratingOf5": "{rating} out of 5 stars from {count} reviews"
+  },
+  "notFound": {
+    "title": "Error 404",
+    "description": "This page doesn't exist. It may have been moved or the link is outdated.",
+    "goHome": "Go to homepage"
+  },
+  "cookieConsent": {
+    "label": "Cookie consent",
+    "text": "We use cookies to operate the shop (e.g. cart and payment). Details in our {privacyPolicy}.",
+    "privacyLink": "Privacy Policy",
+    "essentialOnly": "Essential only",
+    "acceptAll": "Accept all"
+  },
+  "newsletter": {
+    "heading": "Stay up to date",
+    "description": "New products and offers straight to your inbox. Unsubscribe anytime.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "submitting": "Sending...",
+    "submit": "Subscribe"
+  },
+  "megaMenu": {
+    "sale": "Sale %",
+    "allProducts": "All Products"
+  },
+  "mobileNav": {
+    "menu": "Menu",
+    "sale": "Sale %",
+    "allProducts": "All Products",
+    "myAccount": "My Account",
+    "wishlist": "Wishlist"
+  }
+}

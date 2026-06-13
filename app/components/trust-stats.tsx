@@ -1,17 +1,19 @@
-// app/components/trust-stats.tsx
-// Purpose: Konkrete Vertrauenszahlen (doktorabc-Pattern) für die Startseite.
+'use client'
 
-import { Star } from 'lucide-react'
-
-const STATS = [
-  { value: '50+', label: 'Produkte im Sortiment', sub: 'Täglich neue Deals' },
-  { value: '2.500+', label: 'Zufriedene Kunden', sub: 'Tendenz steigend' },
-  { value: '7–15', label: 'Tage Lieferzeit', sub: 'Mit Sendungsverfolgung' },
-] as const
+import {useTranslations} from 'next-intl'
+import {Star} from 'lucide-react'
 
 export function TrustStats() {
+  const t = useTranslations('trustStats')
+
+  const STATS = [
+    {value: t('productsValue'), label: t('productsLabel'), sub: t('productsSub')},
+    {value: t('customersValue'), label: t('customersLabel'), sub: t('customersSub')},
+    {value: t('deliveryValue'), label: t('deliveryLabel'), sub: t('deliverySub')},
+  ] as const
+
   return (
-    <section aria-label="Vertrauen in Zahlen" className="bg-accent py-12">
+    <section aria-label={t('label')} className="bg-accent py-12">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map((s) => (
           <div
@@ -29,9 +31,9 @@ export function TrustStats() {
         <div className="rounded-xl border border-border bg-card p-6 text-center">
           <div
             className="flex items-center justify-center gap-0.5"
-            aria-label="4,8 von 5 Sternen"
+            aria-label={t('ratingLabel')}
           >
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({length: 5}).map((_, i) => (
               <Star
                 key={i}
                 className="size-5 fill-amber-400 text-amber-400"
@@ -40,9 +42,9 @@ export function TrustStats() {
             ))}
           </div>
           <p className="mt-1 text-sm font-semibold text-card-foreground">
-            4,8 — Hervorragend
+            {t('ratingText')}
           </p>
-          <p className="text-xs text-muted-foreground">Basierend auf Kundenbewertungen</p>
+          <p className="text-xs text-muted-foreground">{t('ratingSub')}</p>
         </div>
       </div>
     </section>

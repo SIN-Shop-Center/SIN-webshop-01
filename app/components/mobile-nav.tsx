@@ -7,10 +7,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import type { GroupedCategory } from '@/lib/category-groups'
+import { useFocusTrap } from '@/lib/hooks/use-focus-trap'
 
 export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
+  const trapRef = useFocusTrap(open, { onEscape: () => setOpen(false) })
 
   return (
     <div className="md:hidden">
@@ -19,20 +21,28 @@ export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
         onClick={() => setOpen(true)}
         aria-label="Menü öffnen"
         aria-expanded={open}
+        aria-controls="mobile-nav-panel"
         className="rounded-md p-2 text-foreground transition-colors hover:bg-muted"
       >
         <Menu aria-hidden className="size-6" />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-background">
+        <div
+          id="mobile-nav-panel"
+          ref={trapRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation"
+          className="fixed inset-0 z-50 bg-background"
+        >
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <span className="text-lg font-bold text-foreground">Menü</span>
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Menü schließen"
-              className="rounded-md p-2 text-foreground transition-colors hover:bg-muted"
+              className="rounded-md p-2 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X aria-hidden className="size-6" />
             </button>
@@ -41,14 +51,14 @@ export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
             <Link
               href="/sale"
               onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-3 text-base font-semibold text-sale hover:bg-sale/10"
+              className="rounded-md px-3 py-3 text-base font-semibold text-sale hover:bg-sale/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Sale %
             </Link>
             <Link
               href="/produkte"
               onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-3 text-base font-semibold text-foreground hover:bg-muted"
+              className="rounded-md px-3 py-3 text-base font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Alle Produkte
             </Link>
@@ -61,7 +71,7 @@ export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
                     type="button"
                     aria-expanded={isExpanded}
                     onClick={() => setExpanded(isExpanded ? null : group.label)}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {group.label}
                     <ChevronDown
@@ -78,7 +88,7 @@ export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
                           <Link
                             href={`/produkte?kategorie=${cat.id}`}
                             onClick={() => setOpen(false)}
-                            className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                            className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
                             {cat.name}
                           </Link>
@@ -94,14 +104,14 @@ export function MobileNav({ groups }: { groups: GroupedCategory[] }) {
             <Link
               href="/konto"
               onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Mein Konto
             </Link>
             <Link
               href="/wunschliste"
               onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="rounded-md px-3 py-3 text-base text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Wunschliste
             </Link>

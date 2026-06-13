@@ -1,32 +1,34 @@
-// app/components/how-it-works.tsx
-// Purpose: 3-Schritte-Prozess-Sektion (doktorabc-Pattern) für die Startseite.
+'use client'
 
-import { Search, CreditCard, PackageCheck } from 'lucide-react'
-
-const STEPS = [
-  {
-    icon: Search,
-    title: 'Produkt finden',
-    text: 'Stöbere durch über 50 Produkte aus Mode, Beauty, Haushalt und mehr — oder nutze die Suche.',
-  },
-  {
-    icon: CreditCard,
-    title: 'Sicher bezahlen',
-    text: 'Bezahle verschlüsselt über Stripe — per Karte, Klarna oder Apple Pay & Google Pay.',
-  },
-  {
-    icon: PackageCheck,
-    title: 'Lieferung erhalten',
-    text: 'Dein Paket kommt in 7–15 Werktagen mit Sendungsverfolgung. 14 Tage Widerrufsrecht inklusive.',
-  },
-] as const
+import {useTranslations} from 'next-intl'
+import {Search, CreditCard, PackageCheck} from 'lucide-react'
 
 export function HowItWorks() {
+  const t = useTranslations('howItWorks')
+
+  const STEPS = [
+    {
+      icon: Search,
+      title: t('step1Title'),
+      text: t('step1Text'),
+    },
+    {
+      icon: CreditCard,
+      title: t('step2Title'),
+      text: t('step2Text'),
+    },
+    {
+      icon: PackageCheck,
+      title: t('step3Title'),
+      text: t('step3Text'),
+    },
+  ] as const
+
   return (
-    <section aria-label="So funktioniert es" className="bg-accent py-16">
+    <section aria-label={t('label')} className="bg-accent py-16">
       <div className="mx-auto w-full max-w-7xl px-4">
         <h2 className="text-center text-3xl font-extrabold tracking-tight text-balance">
-          In 3 einfachen Schritten <span className="text-primary">zu deiner Bestellung</span>
+          {t('heading')}<span className="text-primary">{t('headingHighlight')}</span>
         </h2>
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
           {STEPS.map((step, i) => (

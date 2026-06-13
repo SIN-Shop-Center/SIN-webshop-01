@@ -46,7 +46,7 @@ export function AnnouncementBar() {
             type="button"
             onClick={copyCoupon}
             aria-label={`Gutscheincode ${current.coupon} kopieren`}
-            className="rounded border border-primary-foreground/40 bg-primary-foreground/10 px-1.5 py-0.5 font-mono font-bold tracking-wide hover:bg-primary-foreground/20"
+            className="rounded border border-primary-foreground/40 bg-primary-foreground/10 px-1.5 py-0.5 font-mono font-bold tracking-wide hover:bg-primary-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {copied ? 'Kopiert!' : current.coupon}
           </button>

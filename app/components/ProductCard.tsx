@@ -66,17 +66,20 @@ export function ProductCard({ product }: { product: Product }) {
 
         {soldOut && (
           <div
-            aria-hidden
             className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm"
+            aria-hidden="true"
           >
             <span className="rounded-full bg-foreground/90 px-4 py-1.5 text-sm font-semibold text-background">
               Ausverkauft
             </span>
           </div>
         )}
+        {soldOut && (
+          <span className="sr-only">Ausverkauft</span>
+        )}
 
         {!soldOut && (
-          <div className="absolute inset-x-2 bottom-2 z-20 translate-y-2 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="absolute inset-x-2 bottom-2 z-20 translate-y-2 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
             <CardQuickAdd productId={product.id} />
           </div>
         )}

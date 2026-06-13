@@ -1,0 +1,162 @@
+{
+  "layout": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "metaTitle": "ShopSIN — Dein Alltag. Unser Sortiment.",
+    "metaTitleTemplate": "{title} — ShopSIN",
+    "metaDescription": "Handverlesene Produkte aus Mode, Wohnen, Elektronik und mehr — mit kostenlosem Versand ab 49 €.",
+    "ogTitle": "ShopSIN — Premium Tech & Lifestyle",
+    "twitterTitle": "ShopSIN — Dein Alltag. Unser Sortiment."
+  },
+  "nav": {
+    "main": "Hauptnavigation",
+    "wishlist": "Wunschliste",
+    "signIn": "Anmelden",
+    "cart": "Warenkorb",
+    "cartWithCount": "Warenkorb, {count} Artikel",
+    "cartNineOrMore": "Warenkorb, 9 oder mehr Artikel",
+    "categories": "Kategorien",
+    "allProducts": "Alle Produkte",
+    "menu": "Menü",
+    "menuOpen": "Menü öffnen",
+    "menuClose": "Menü schließen",
+    "myAccount": "Mein Konto",
+    "further": "Weitere"
+  },
+  "trustBar": {
+    "freeShipping": "Gratisversand ab 49 €",
+    "returnPolicy": "14 Tage Widerrufsrecht",
+    "buyerProtection": "Käuferschutz inklusive",
+    "securePayment": "Sichere Bezahlung"
+  },
+  "uspTopbar": {
+    "freeShipping": "Kostenloser Versand ab 49 €",
+    "securePayment": "Sichere Zahlung mit Stripe",
+    "returnPolicy": "14 Tage Widerrufsrecht",
+    "satisfiedCustomers": "Über 2.500 zufriedene Kunden"
+  },
+  "homeHero": {
+    "saveUp": "Bis zu 50 % sparen",
+    "heading": "Alles, was du brauchst.",
+    "headingHighlight": "Zu Preisen, die du liebst.",
+    "subheading": "Über 50 Produkte aus Mode, Beauty, Haushalt und mehr — täglich neue Deals, gratis Versand ab 49 €.",
+    "searchPlaceholder": "Wonach suchst du?",
+    "searchLabel": "Produkte durchsuchen",
+    "searchButton": "Suchen",
+    "discoverDeals": "Deals entdecken",
+    "allProducts": "Alle Produkte",
+    "freeFrom": "Gratis ab 49 €",
+    "returnDays": "14 Tage Rückgabe",
+    "buyerProtection": "Käuferschutz"
+  },
+  "home": {
+    "trustStripLabel": "Unsere Versprechen",
+    "freeShippingTitle": "Kostenloser Versand ab {amount}",
+    "freeShippingDesc": "Lieferung in {min}–{max} Werktagen innerhalb Deutschlands",
+    "securePaymentTitle": "Sichere Zahlung",
+    "securePaymentDesc": "Stripe-verschlüsselt. Deine Daten sind sicher.",
+    "returnTitle": "14 Tage Widerruf",
+    "returnDesc": "Problemlose Rückgabe gemäß Fernabsatzgesetz",
+    "dealsHeading": "Blitzangebote",
+    "allDeals": "Alle Angebote",
+    "featuredHeading": "Unsere Empfehlungen",
+    "allProducts": "Alle Produkte",
+    "noProductsTitle": "Noch keine Produkte verfügbar",
+    "noProductsDesc": "Wir arbeiten daran, bald eine Auswahl für dich bereitzustellen."
+  },
+  "trustStats": {
+    "label": "Vertrauen in Zahlen",
+    "productsValue": "50+",
+    "productsLabel": "Produkte im Sortiment",
+    "productsSub": "Täglich neue Deals",
+    "customersValue": "2.500+",
+    "customersLabel": "Zufriedene Kunden",
+    "customersSub": "Tendenz steigend",
+    "deliveryValue": "7–15",
+    "deliveryLabel": "Tage Lieferzeit",
+    "deliverySub": "Mit Sendungsverfolgung",
+    "ratingLabel": "4,8 von 5 Sternen",
+    "ratingText": "4,8 — Hervorragend",
+    "ratingSub": "Basierend auf Kundenbewertungen"
+  },
+  "howItWorks": {
+    "label": "So funktioniert es",
+    "heading": "In 3 einfachen Schritten ",
+    "headingHighlight": "zu deiner Bestellung",
+    "step1Title": "Produkt finden",
+    "step1Text": "Stöbere durch über 50 Produkte aus Mode, Beauty, Haushalt und mehr — oder nutze die Suche.",
+    "step2Title": "Sicher bezahlen",
+    "step2Text": "Bezahle verschlüsselt über Stripe — per Karte, Klarna oder Apple Pay & Google Pay.",
+    "step3Title": "Lieferung erhalten",
+    "step3Text": "Dein Paket kommt in 7–15 Werktagen mit Sendungsverfolgung. 14 Tage Widerrufsrecht inklusive."
+  },
+  "footer": {
+    "brandName": "SIN Shop",
+    "brandDesc": "Dein Online-Shop für Mode, Haushalt, Elektronik und mehr – mit Käuferschutz und 14 Tagen Widerrufsrecht.",
+    "shopHeading": "Shop",
+    "shopAllProducts": "Alle Produkte",
+    "shopSale": "Sale",
+    "shopWishlist": "Wunschliste",
+    "shopMyOrders": "Meine Bestellungen",
+    "serviceHeading": "Kundenservice",
+    "serviceShipping": "Versand & Lieferzeiten",
+    "serviceReturns": "Rückgabe & Umtausch",
+    "servicePayment": "Zahlungsarten",
+    "serviceContact": "Kontakt",
+    "serviceTrackOrder": "Bestellung verfolgen",
+    "newsletterHeading": "Newsletter",
+    "newsletterDesc": "Angebote und Neuheiten direkt ins Postfach.",
+    "legalHeading": "Rechtliches",
+    "legalImprint": "Impressum",
+    "legalTerms": "AGB",
+    "legalCancellation": "Widerrufsbelehrung",
+    "legalPrivacy": "Datenschutz",
+    "copyright": "© {year} SIN Shop · Jeremy Schulze · Kurfürstenstraße 124, 10785 Berlin"
+  },
+  "filter": {
+    "label": "Produktfilter",
+    "category": "Kategorie",
+    "allCategories": "Alle Kategorien",
+    "price": "Preis",
+    "allPrices": "Alle Preise",
+    "upTo10": "Bis 10 €",
+    "upTo25": "Bis 25 €",
+    "upTo50": "Bis 50 €",
+    "upTo100": "Bis 100 €"
+  },
+  "productCard": {
+    "soldOut": "Ausverkauft",
+    "newInSortiment": "Neu im Sortiment",
+    "ratingOf5": "{rating} von 5 Sternen bei {count} Bewertungen"
+  },
+  "notFound": {
+    "title": "Fehler 404",
+    "description": "Diese Seite gibt es nicht. Vielleicht wurde sie verschoben oder der Link ist veraltet.",
+    "goHome": "Zur Startseite"
+  },
+  "cookieConsent": {
+    "label": "Cookie-Einwilligung",
+    "text": "Wir verwenden Cookies, um den Shop zu betreiben (z. B. Warenkorb und Bezahlung). Details findest du in unserer {privacyPolicy}.",
+    "privacyLink": "Datenschutzerklärung",
+    "essentialOnly": "Nur notwendige",
+    "acceptAll": "Alle akzeptieren"
+  },
+  "newsletter": {
+    "heading": "Bleib auf dem Laufenden",
+    "description": "Neue Produkte und Angebote direkt in dein Postfach. Abmeldung jederzeit möglich.",
+    "emailLabel": "E-Mail-Adresse",
+    "emailPlaceholder": "deine@email.de",
+    "submitting": "Wird gesendet...",
+    "submit": "Anmelden"
+  },
+  "megaMenu": {
+    "sale": "Sale %",
+    "allProducts": "Alle Produkte"
+  },
+  "mobileNav": {
+    "menu": "Menü",
+    "sale": "Sale %",
+    "allProducts": "Alle Produkte",
+    "myAccount": "Mein Konto",
+    "wishlist": "Wunschliste"
+  }
+}

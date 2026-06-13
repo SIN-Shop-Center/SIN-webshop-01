@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     .eq('status', 'paid')
     .in('fulfillment_status', ['pending', 'failed'])
     .lt('fulfillment_attempts', 5)
-    .limit(20)
+    .limit(10)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -41,6 +41,5 @@ export async function GET(request: Request) {
     }
   }
 
-  console.log(`[fulfillment-retry] ok=${succeeded} failed=${failures.length}`)
   return NextResponse.json({ succeeded, failures })
 }

@@ -4,7 +4,7 @@
 import Link from 'next/link'
 import { getCartCount } from '@/lib/actions/cart'
 import { SearchAutocomplete } from '@/components/conversion/search-autocomplete'
-import { CartIcon, HeartIcon, UserIcon, MenuIcon } from './icons'
+import { CartIcon, HeartIcon, UserIcon } from './icons'
 import { TrustBar } from './trust-bar'
 import { MobileNav } from './mobile-nav'
 import { getCategories } from '@/lib/supabase/queries'
@@ -44,14 +44,14 @@ export async function Navbar() {
           <nav aria-label="Hauptnavigation" className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link
               href="/wunschliste"
-              className="inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <HeartIcon className="size-5" aria-hidden />
               <span className="sr-only">Wunschliste</span>
             </Link>
             <Link
               href="/auth/login"
-              className="inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <UserIcon className="size-5" aria-hidden />
               <span className="sr-only">Anmelden</span>
@@ -59,7 +59,7 @@ export async function Navbar() {
             <Link
               href="/warenkorb"
               aria-label={cartLabel}
-              className="relative inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+              className="relative inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <CartIcon className="size-5" aria-hidden />
               <span className="sr-only">{cartLabel}</span>

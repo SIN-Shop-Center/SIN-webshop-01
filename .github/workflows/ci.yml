@@ -1,13 +1,14 @@
 name: CI
+
 on:
   pull_request:
   push:
     branches: [main]
 
 jobs:
-  validate:
+  typecheck:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,8 +18,61 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
       - run: pnpm build
-      - name: Audit
-        run: pnpm audit --audit-level=high
+      - name: Bundle size check
+        run: |
+          SIZE_BYTES=$(du -sb .next/ | cut -f1)
+          THRESHOLD=52428800
+          SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1048576" | bc)
+          THRESHOLD_MB=$(echo "scale=0; $THRESHOLD / 1048576" | bc)
+          echo "Bundle size: ${SIZE_MB}MB (threshold: ${THRESHOLD_MB}MB)"
+          if [ "$SIZE_BYTES" -gt "$THRESHOLD" ]; then
+            echo "::error::Bundle size ${SIZE_MB}MB exceeds ${THRESHOLD_MB}MB threshold"
+            exit 1
+          fi
+
+  security-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Security audit (moderate+)
+        run: pnpm audit --audit-level=moderate
         continue-on-error: true

@@ -22,7 +22,7 @@ export default async function KontoPage() {
 
   const tiles = [
     { href: '/konto/bestellungen', icon: PackageIcon, title: 'Meine Bestellungen', desc: 'Bestellstatus und Historie ansehen' },
-    { href: '/wunschliste', icon: HeartIcon, title: 'Wunschliste', desc: 'Gemerkte Produkte ansehen' },
+    { href: '/konto/wunschliste', icon: HeartIcon, title: 'Wunschliste', desc: 'Gemerkte Produkte ansehen' },
     { href: '/auth/passwort-aktualisieren', icon: KeyRoundIcon, title: 'Passwort ändern', desc: 'Neues Passwort festlegen' },
     { href: '/kontakt', icon: MailIcon, title: 'Hilfe & Kontakt', desc: 'Fragen zu deiner Bestellung?' },
   ]
