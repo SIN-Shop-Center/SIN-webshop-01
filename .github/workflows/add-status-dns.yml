@@ -10,9 +10,12 @@ jobs:
     environment: production
     steps:
       - name: Add CNAME for status.delqhi.com
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
+          echo "Token length: ${#CF_TOKEN}"
           curl -s -X POST "https://api.cloudflare.com/client/v4/zones/3e7ca14550be834b017846ec7f960d16/dns_records" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
             -H "Content-Type: application/json" \
             -d '{"type":"CNAME","name":"status","content":"simone-api.cfargotunnel.com","ttl":1,"proxied":false}' \
             | tee /tmp/cf-dns-response.json
