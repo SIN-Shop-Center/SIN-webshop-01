@@ -8,6 +8,8 @@ import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { randomUUID } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getProductsByIds } from '@/lib/queries'
+import type { Product } from '@/lib/data'
 
 const CART_COOKIE = 'sin_cart_id'
 const MAX_QTY = 99
@@ -204,4 +206,24 @@ export async function updateCartQuantity(itemId: string, quantity: number) {
 
 export async function removeFromCart(itemId: string) {
   await updateCartQuantity(itemId, 0)
+}
+
+export type CartLineItem = {
+  item: CartItem
+  product: Product
+}
+
+export async function getCartItemsWithProducts(): Promise<CartLineItem[]> {
+  const items = await getCartItems()
+  if (items.length === 0) return []
+
+  const products = await getProductsByIds(items.map((i) => i.product_id))
+  const productMap = new Map(products.map((p) => [p.id, p]))
+
+  return items
+    .map((item) => {
+      const product = productMap.get(item.product_id)
+      return product ? { item, product } : null
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null)
 }

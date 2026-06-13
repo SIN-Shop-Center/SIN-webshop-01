@@ -7,6 +7,8 @@ import { SearchAutocomplete } from '@/components/conversion/search-autocomplete'
 import { CartIcon, HeartIcon, UserIcon } from './icons'
 import { TrustBar } from './trust-bar'
 import { MobileNav } from './mobile-nav'
+import { NavbarCategoryMenu } from './navbar-category-menu'
+import { CartDrawerTrigger } from './cart/cart-drawer-trigger'
 import { getCategories } from '@/lib/supabase/queries'
 import { groupCategories } from '@/lib/category-groups'
 
@@ -35,6 +37,9 @@ export async function Navbar() {
             <Link href="/" className="shrink-0 text-xl font-bold tracking-tight">
               ShopSIN
             </Link>
+            <div className="hidden lg:ml-4 lg:block">
+              <NavbarCategoryMenu groups={allGroups} />
+            </div>
           </div>
 
           <div className="hidden sm:flex sm:flex-1 sm:justify-center">
@@ -56,22 +61,20 @@ export async function Navbar() {
               <UserIcon className="size-5" aria-hidden />
               <span className="sr-only">Anmelden</span>
             </Link>
-            <Link
-              href="/warenkorb"
-              aria-label={cartLabel}
-              className="relative inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <CartIcon className="size-5" aria-hidden />
-              <span className="sr-only">{cartLabel}</span>
-              {cartCount > 0 && (
-                <span
-                  aria-hidden
-                  className="absolute right-0.5 top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-foreground"
-                >
-                  {cartCount > 9 ? '9+' : cartCount}
-                </span>
-              )}
-            </Link>
+            <CartDrawerTrigger ariaLabel={cartLabel}>
+              <div className="relative inline-flex items-center rounded-md p-2 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <CartIcon className="size-5" aria-hidden />
+                <span className="sr-only">{cartLabel}</span>
+                {cartCount > 0 && (
+                  <span
+                    aria-hidden
+                    className="absolute right-0.5 top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-foreground"
+                  >
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </div>
+            </CartDrawerTrigger>
           </nav>
         </div>
 

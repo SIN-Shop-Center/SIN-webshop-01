@@ -40,6 +40,7 @@ export function VariantSelector({
       try {
         await addToCart(product.id, quantity, selectedVariant?.cj_variant_id)
         setAdded(true)
+        window.dispatchEvent(new Event('cart-updated'))
         setTimeout(() => setAdded(false), 2000)
       } catch { setError('Das Produkt konnte nicht hinzugefügt werden.') }
     })

@@ -38,15 +38,19 @@ export function AnnouncementBar() {
   const current = messages[index]
 
   return (
-    <div className="bg-primary py-1.5 text-center" role="status" aria-live="polite">
-      <p className="flex items-center justify-center gap-1.5 px-4 text-xs font-medium text-primary-foreground">
+    <div
+      className="bg-foreground py-2 text-center shadow-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <p className="flex flex-wrap items-center justify-center gap-2 px-4 text-xs font-semibold text-background sm:text-sm">
         {current.text}
         {'coupon' in current && current.coupon && (
           <button
             type="button"
             onClick={copyCoupon}
             aria-label={`Gutscheincode ${current.coupon} kopieren`}
-            className="rounded border border-primary-foreground/40 bg-primary-foreground/10 px-1.5 py-0.5 font-mono font-bold tracking-wide hover:bg-primary-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md border border-background/40 bg-background/10 px-2 py-0.5 font-mono font-bold tracking-wide text-background transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {copied ? 'Kopiert!' : current.coupon}
           </button>

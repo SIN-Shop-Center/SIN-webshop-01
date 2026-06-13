@@ -43,6 +43,7 @@ export function AddToCartButton({
       try {
         await addToCart(productId)
         setAdded(true)
+        window.dispatchEvent(new Event('cart-updated'))
       } catch {
         setError('Das Produkt konnte nicht hinzugefügt werden. Bitte versuche es erneut.')
       }

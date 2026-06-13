@@ -5,7 +5,6 @@ import {getMessages, setRequestLocale} from 'next-intl/server'
 import './globals.css'
 import {Navbar} from '@/components/Navbar'
 import {Footer} from '@/components/Footer'
-import {CategoryNav} from '@/components/category-nav'
 import {CookieConsent} from '@/components/cookie-consent'
 import {AnnouncementBar} from '@/components/conversion/announcement-bar'
 import {ExitIntentOffer} from '@/components/conversion/exit-intent-offer'
@@ -14,6 +13,7 @@ import {NewsletterCapture} from '@/components/conversion/newsletter-capture'
 import {FloatingRatingBadge} from '@/components/floating-rating-badge'
 import {UspTopbar} from '@/components/usp-topbar'
 import {FloatingTrustBadge} from '@/components/floating-trust-badge'
+import {CartDrawer} from '@/components/cart/cart-drawer'
 
 const inter = Inter({subsets: ['latin'], display: 'swap'})
 
@@ -108,7 +108,6 @@ export default async function RootLayout({children}: {children: React.ReactNode}
           <UspTopbar />
           <AnnouncementBar />
           <Navbar />
-          <CategoryNav />
           <main id="main-content" className="flex-1">
             {children}
           </main>
@@ -119,6 +118,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
           <MobileTabBar />
           <FloatingRatingBadge />
           <FloatingTrustBadge count={0} />
+          <CartDrawer />
         </NextIntlClientProvider>
       </body>
     </html>
