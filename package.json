@@ -66,9 +66,9 @@
     "@opennextjs/cloudflare": "^1.19.11",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
-    "better-auth": "^1.6.16",
+    "better-auth": "^1.6.18",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.18.0",
     "next": "^16.2.9",
     "next-intl": "^4.13.0",
     "pg": "^8.21.0",
@@ -77,24 +77,24 @@
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
     "sharp": "^0.35.1",
-    "stripe": "^22.2.0",
+    "stripe": "^22.2.1",
     "svix": "^1.95.2",
     "swr": "^2.4.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.60.0",
-    "@tailwindcss/postcss": "^4.3.0",
+    "@tailwindcss/postcss": "^4.3.1",
     "@types/node": "^25.9.3",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.1.8",
     "postcss": "^8.5.15",
-    "tailwindcss": "^4.3.0",
+    "tailwindcss": "^4.3.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8",
-    "wrangler": "^4.99.0"
+    "wrangler": "^4.100.0"
   }
 }
