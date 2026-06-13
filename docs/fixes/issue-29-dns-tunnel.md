@@ -1,6 +1,6 @@
 # Fix #29 — DNS-Fix: supabase.delqhi.com auf Cloudflare-Tunnel umstellen
 
-> **Status:** OPEN · **Priority:** CRITICAL (P0) · **External (Cloudflare-DNS) + Config (Tunnel)**
+> **Status:** RESOLVED ✅ · **Priority:** CRITICAL (P0) · **Closed:** 2026-06-13
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/29
 > **Owner:** Jeremy (Cloudflare-DNS-Klick) + Agent (cloudflared-Config)
 
@@ -10,7 +10,32 @@ Aus AGENTS.md, eiserne Regel #1:
 
 > NIEMALS einen Port in öffentliche URLs schreiben. Cloudflare proxied NUR die Ports 80/443/8080/8443/2052/2053/2082/2083/2086/2087/2095/2096/8880. `https://supabase.delqhi.com:8006` wird am Edge INSTANT abgewiesen.
 
-Aktueller `curl https://supabase.delqhi.com/auth/v1/health` zeigt **401** statt 404 — d.h. Kong antwortet irgendwie. Wahrscheinlich ist es so konfiguriert, dass 8006 per Cloudflare-Tunnel erreichbar ist. Das funktioniert aktuell. **ABER:** wenn der Tunnel aus irgendeinem Grund ausfällt, ist die URL down.
+Aktueller `curl https://supabase.delqhi.com/auth/v1/health` zeigt **401** (Kong gesund). Der Tunnel läuft stabil.
+
+## Aktive Konfiguration (Stand 2026-06-13)
+
+- **Tunnel-Name:** `simone-api`
+- **Aktiver Service:** `cloudflared-simone-api.service` (läuft als User `ubuntu`)
+- **Config-Datei:** `/home/ubuntu/.cloudflared/config.yml`
+- **Credentials:** `/home/ubuntu/.cloudflared/credentials.json`
+- **Inaktiver Dienst:** `cloudflared.service` wurde gestoppt und deaktiviert (doppelter Tunnel-Prozess)
+
+```yaml
+ingress:
+  - hostname: status.delqhi.com
+    service: http://localhost:3001
+  - hostname: api.delqhi.com
+    service: http://localhost:8080
+  - hostname: delqhi.com
+    service: http://localhost:3005
+  - hostname: shopsin.delqhi.com
+    service: http://localhost:3006
+  - hostname: supabase.delqhi.com
+    service: http://localhost:8006
+  - service: http_status:404
+```
+
+> **Wichtig:** Um neue Hostnames (z.B. `status.delqhi.com`) aus dem Tunnel heraus öffentlich zu machen, muss im Cloudflare-Dashboard ein CNAME auf `simone-api.cfargotunnel.com` gesetzt werden. Das CLI-Kommando `cloudflared tunnel route dns` funktioniert auf der VM nicht, weil kein `cert.pem` (Origin-Cert) vorhanden ist.
 
 ## Diagnose: was ist aktuell konfiguriert?
 

@@ -142,12 +142,12 @@ curl -s -H "Priority: high" -H "Tags: warning" -d "$MESSAGE" ntfy.sh/shopsin-ops
 ```bash
 # On VM (92.5.60.87)
 docker run -d --name=grafana --restart=always \
-  -p 3001:3000 \
+  -p 3000:3000 \
   -v grafana-storage:/var/lib/grafana \
   grafana/grafana-oss
 
 # Expose via Cloudflare Tunnel (add ingress)
-# grafana.delqhi.com → localhost:3001
+# grafana.delqhi.com → localhost:3000
 ```
 
 Data sources:
@@ -163,14 +163,25 @@ Data sources:
 | Hyperping | 10 monitors | EU-based |
 | ntfy.sh | Unlimited | Push notifications, no signup |
 
-### Option C: Uptime Kuma (self-hosted, already in use)
+### Option C: Uptime Kuma (self-hosted, deployed on VM)
 
-Already deployed per Issue #39. Push monitors configured for cron jobs.
+Uptime Kuma is deployed on the VM per Issue #39.
 
-Add HTTP monitors for:
+| Item | Value |
+|---|---|
+| Container | `uptime-kuma` |
+| Local URL | `http://localhost:3001` |
+| Intended public URL | `https://status.delqhi.com` |
+| Status | Running, first-setup wizard reachable at `http://localhost:3001` |
+
+**Required DNS record:** Add a CNAME in Cloudflare for `status.delqhi.com` → `simone-api.cfargotunnel.com` (or use the Cloudflare Tunnel dashboard to route `status.delqhi.com`). No port in the URL. Once DNS resolves, the tunnel will expose the dashboard.
+
+Add HTTP monitors after first login:
 - `https://shopsin.delqhi.com/api/health` (no auth)
 - `https://supabase.delqhi.com/auth/v1/health` (no auth)
 - `https://shopsin.delqhi.com/api/cron/health-check` (add Authorization header)
+
+**Note:** Grafana (Option A) also defaults to port 3000. Uptime Kuma uses port 3001 on the VM to avoid conflict. If you later deploy Grafana, use port 3000 or another free port.
 
 ## Smoke Test Checklist
 

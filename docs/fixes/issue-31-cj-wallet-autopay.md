@@ -1,6 +1,6 @@
 # Fix #31 — CJ-Wallet aufladen ($50 Mindestbetrag) + Auto-Pay aktivieren
 
-> **Status:** OPEN · **Priority:** CRITICAL (P0) · **External (CJ-Dashboard)**
+> **Status:** OPEN · **Priority:** CRITICAL (P0) · **External (CJ-Dashboard) · BLOCKED on manual login**
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/31
 > **Owner:** Jeremy (CJ-Dashboard)
 
@@ -8,7 +8,7 @@
 
 Identisch mit #13 — der Unterschied: hier geht es um die **empfohlene $50 + Auto-Pay-Setup** für langfristigen stabilen Betrieb, während #13 die initiale $20-50 für die ersten Bestellungen ist.
 
-Aktueller Stand: Wallet vermutlich leer (nach #13 nicht aufgeladen). Bestellungen mit `fulfillment_status='failed'` wegen `insufficient balance`.
+Aktueller Stand: Wallet-Balance konnte nicht automatisch ermittelt werden. API-Endpunkt liefert `Interface not found`, Dashboard-Login ist durch Cloudflare Turnstile CAPTCHA blockiert. Passwort für das Dashboard ist nicht im Repo/Secrets gespeichert. Manuelller Login nötig.
 
 ## Action: Wallet aufladen (10 Min)
 

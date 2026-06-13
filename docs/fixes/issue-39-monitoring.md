@@ -1,6 +1,6 @@
 # Fix #39 — Monitoring-Stack: Sentry (Errors) + Uptime Kuma (Health) + Resend-Alerts
 
-> **Status:** OPEN · **Priority:** HIGH (P1) · **External (Sentry/Uptime Kuma) + Code (Integration)**
+> **Status:** OPEN · **Priority:** HIGH (P1) · **Uptime Kuma deployed — BLOCKED on public DNS + Sentry DSN**
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/39
 
 ## Context
@@ -12,27 +12,28 @@ A live shop with no monitoring is a time bomb. The 4 must-have signals:
 3. **Cron health** (Resend) — if cj-fulfillment or fx-update haven't run in 25h, send alert
 4. **Order funnel** (Plausible via #58) — add-to-cart / checkout / payment events
 
-## Step 1 — Uptime Kuma (self-hosted, 5 Min)
+## Step 1 — Uptime Kuma (self-hosted, deployed ✅)
 
 ```sh
-# Auf der OCI-VM (oder als Docker-Container irgendwo)
-docker run -d --name uptime-kuma \
-  --restart unless-stopped \
-  -p 3001:3001 \
-  -v uptime-kuma:/app/data \
+# Auf der OCI-VM läuft bereits:
+docker run -d --name uptime-kuma --restart=always \
+  -p 127.0.0.1:3001:3001 \
+  -v uptime-kuma-data:/app/data \
   louislam/uptime-kuma:1
-
-# Cloudflare Tunnel
-cloudflared tunnel route dns sin-monitoring kuma.delqhi.com
-
-# Im Uptime-Kuma-UI:
-# 1. Add Monitor → Type: HTTPS
-# 2. URL: https://shopsin.delqhi.com/
-# 3. Interval: 60s
-# 4. Add to: Production
-# 5. Notification: Resend webhook
-# 6. Repeat for /api/healthz and supabase.delqhi.com
 ```
+
+**Status:** Container läuft, Initial-Setup erreichbar unter `http://localhost:3001` auf der VM.
+
+**Fehlend:** Öffentliche DNS-Route. Im Tunnel-Config (`/home/ubuntu/.cloudflared/config.yml`) ist `status.delqhi.com → http://localhost:3001` hinterlegt. Du musst im Cloudflare-Dashboard einen CNAME für `status.delqhi.com` auf `simone-api.cfargotunnel.com` setzen (oder `cloudflared tunnel route dns` mit einem `cert.pem` ausführen).
+
+**Nach DNS-Setup:** Im Uptime-Kuma-UI unter `https://status.delqhi.com`:
+1. Add Monitor → Type: HTTPS
+2. URL: https://shopsin.delqhi.com/
+3. Interval: 60s
+4. Add to: Production
+5. Notification: Resend webhook (erst nach Resend-Domain-Verifizierung zuverlässig)
+6. Repeat for /api/healthz and supabase.delqhi.com
+
 
 ## Step 2 — Sentry (1 Min setup, 5 Min code)
 

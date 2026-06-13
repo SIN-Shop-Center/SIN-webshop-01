@@ -14,27 +14,33 @@ Ohne Domain-Verifizierung landen alle E-Mails (Bestellbestätigung, Newsletter, 
 - `app/lib/cj/wallet-monitor.ts` (Wallet-Alerts)
 - `app/api/cron/cleanup-reservations/route.ts` (zukünftig)
 
+> **Update 2026-06-13:** Resend nutzt für Cloudflare **TXT-Records** (nicht CNAME) für DKIM. Das CNAME-Format in der alten Doku ist veraltet. Die genauen Werte für DKIM und MX müssen aus dem Resend-Dashboard kopiert werden (region-abhängig).
+
 ## Schritt-für-Schritt (manuell, 10 Min)
 
-### 1. Resend-Dashboard: Domain hinzufügen
+### 1. Resend-Dashboard: Domain hinzufügen / verifizieren
 
 1. Login: https://resend.com/domains
-2. Klick: **Add Domain**
-3. Domain: `delqhi.com`
-4. Resend zeigt 3 DNS-Records zum Hinzufügen:
-   - **SPF**: `TXT @ "v=spf1 include:amazonses.com ~all"` (oder mit Resend-eigenem include)
-   - **DKIM**: `CNAME resend._domainkey.delqhi.com → resend._domainkey.resend.com`
-   - **DMARC**: `TXT _dmarc "v=DMARC1; p=quarantine; rua=mailto:dmarc@delqhi.com"`
-
-Die exakten Werte stehen in Resend → Domains → delqhi.com → "Verify".
+2. Domain: `delqhi.com` → **Records** tab öffnen
+3. Kopiere die exakten Werte für:
+   - **MX** record auf `send`
+   - **TXT** SPF record auf `send`
+   - **TXT** DKIM record auf `resend._domainkey`
 
 ### 2. Cloudflare-DNS: Records hinzufügen
 
 1. Login: https://dash.cloudflare.com → `delqhi.com` → DNS → Records → **Add Record**
-2. Für jeden der 3 Resend-Records:
-   - **SPF**: Type `TXT`, Name `@`, Content (aus Resend kopieren)
-   - **DKIM**: Type `CNAME`, Name `resend._domainkey`, Target (aus Resend)
-   - **DMARC**: Type `TXT`, Name `_dmarc`, Content (aus Resend)
+2. DNS-Proxy auf **DNS only** (grauer Wolke) für alle 4 Records — sonst kann Resend sie nicht validieren.
+3. Füge diese Records hinzu (ersetze Werte in Klammern mit denen aus Resend):
+
+| Type | Name (Cloudflare) | Value / Target | TTL | Proxy | Action |
+|------|-------------------|----------------|-----|-------|--------|
+| MX | `send` | `feedback-smtp.us-east-1.amazonses.com` (aus Resend) | Auto | DNS only | Add |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` (aus Resend) | Auto | DNS only | Add |
+| TXT | `resend._domainkey` | `p=...` (aus Resend kopieren) | Auto | DNS only | Add |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@delqhi.com;` | Auto | DNS only | Add |
+
+**Hinweis:** Die Werte für MX und DKIM sind domain- und regionsspezifisch. Nicht raten — aus dem Resend-Dashboard kopieren.
 
 ### 3. Resend verifizieren
 

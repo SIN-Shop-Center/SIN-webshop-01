@@ -2,7 +2,7 @@
 
 > **Status:** OPEN · **Priority:** HIGH (P1) · **Repo:** `SIN-Shop-Center/SIN-webshop-01`
 > **Issue:** https://github.com/SIN-Shop-Center/SIN-webshop-01/issues/38
-> **Code:** ready — nur VM-Deploy + Restore-Test ausstehend
+> **Code:** deployed to VM — BLOCKED on OCI/R2 credentials + Resend domain verification
 
 ## Status
 
@@ -10,7 +10,7 @@ Im Repo bereits vorhanden (in PR #69):
 - `scripts/ops/backup-shop-db.sh` — pg_dump → OCI Object Storage + 30d Retention + Resend-Alert
 - `scripts/ops/offsite-copy-r2.sh` — 3-2-1 wöchentlich nach R2
 
-Auf der OCI-VM `92.5.60.87` müssen sie noch **deployt und in cron.daily verlinkt** werden.
+Auf der OCI-VM `92.5.60.87` sind die Scripts deployt (`/opt/sin-shop/ops/`), cron läuft täglich 02:00 und sonntags 03:00. Fehlend: OCI/R2-Credentials und Resend-Domain-Verifizierung (Alerts landen sonst im Reject).
 
 ## Step 1 — deploy to VM (manuell, 5 Min)
 

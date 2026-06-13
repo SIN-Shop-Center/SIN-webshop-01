@@ -430,31 +430,29 @@ dig supabase.delqhi.com
 # Should return a Cloudflare proxy IP (104.x.x.x or similar)
 
 # 4. Is the tunnel running on the VM?
-ssh ubuntu@92.5.60.87 "systemctl status cloudflared"
+ssh ubuntu@92.5.60.87 "systemctl status cloudflared-simone-api"
 # or if cloudflared runs in Docker:
 ssh ubuntu@92.5.60.87 "docker ps | grep cloudflared"
 ```
 
 ### Step 2: Fix cloudflared on VM
 
-**If cloudflared service is stopped:**
+**If cloudflared-simone-api service is stopped:**
 
 ```bash
 ssh ubuntu@92.5.60.87
-sudo systemctl start cloudflared
-# or: docker start cloudflared
+sudo systemctl start cloudflared-simone-api
 
 # Check it's connected:
-sudo journalctl -u cloudflared --since "5 minutes ago" | tail -20
+sudo journalctl -u cloudflared-simone-api --since "5 minutes ago" | tail -20
 # Look for "Connection ... registered" messages
 ```
 
 **If cloudflared won't start:**
 
 ```bash
-# Check config
-cat /etc/cloudflared/config.yml
-# or: cat /root/.cloudflared/config.yml
+# Check config (active tunnel uses the ubuntu user's config)
+cat /home/ubuntu/.cloudflared/config.yml
 
 # Verify tunnel token (if using remotely managed tunnel):
 cloudflared tunnel login
@@ -462,7 +460,7 @@ cloudflared tunnel list
 
 # Re-run as service:
 sudo cloudflared service install
-sudo systemctl start cloudflared
+sudo systemctl start cloudflared-simone-api
 ```
 
 ### Step 3: Fix Cloudflare DNS
