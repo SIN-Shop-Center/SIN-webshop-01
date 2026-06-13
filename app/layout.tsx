@@ -1,6 +1,19 @@
 import type {Metadata, Viewport} from 'next'
 import {Inter} from 'next/font/google'
+import {NextIntlClientProvider} from 'next-intl'
+import {getMessages, setRequestLocale} from 'next-intl/server'
 import './globals.css'
+import {Navbar} from '@/components/Navbar'
+import {Footer} from '@/components/Footer'
+import {CategoryNav} from '@/components/category-nav'
+import {CookieConsent} from '@/components/cookie-consent'
+import {AnnouncementBar} from '@/components/conversion/announcement-bar'
+import {ExitIntentOffer} from '@/components/conversion/exit-intent-offer'
+import {MobileTabBar} from '@/components/mobile-tab-bar'
+import {NewsletterCapture} from '@/components/conversion/newsletter-capture'
+import {FloatingRatingBadge} from '@/components/floating-rating-badge'
+import {UspTopbar} from '@/components/usp-topbar'
+import {FloatingTrustBadge} from '@/components/floating-trust-badge'
 
 const inter = Inter({subsets: ['latin'], display: 'swap'})
 
@@ -73,6 +86,8 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
   const locale = 'de'
+  setRequestLocale(locale)
+  const messages = await getMessages({locale})
 
   return (
     <html lang={locale} className={`${inter.className} bg-background`}>
@@ -89,7 +104,22 @@ export default async function RootLayout({children}: {children: React.ReactNode}
         >
           Zum Hauptinhalt springen
         </a>
-        {children}
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <UspTopbar />
+          <AnnouncementBar />
+          <Navbar />
+          <CategoryNav />
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <CookieConsent />
+          <ExitIntentOffer />
+          <NewsletterCapture />
+          <MobileTabBar />
+          <FloatingRatingBadge />
+          <FloatingTrustBadge count={0} />
+        </NextIntlClientProvider>
       </body>
     </html>
   )
