@@ -49,7 +49,20 @@ jobs:
           key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-      - run: pnpm build
+      - name: Build (Dependabot)
+        if: github.actor == 'dependabot[bot]'
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://supabase.example.com
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1MTkyODU0LCJleHAiOjE4MTAyNTQ4NTR9.h1cPjLOfP4z0X2G9X6y9X4X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9
+          NEXT_PUBLIC_APP_URL: https://shopsin.example.com
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_dummy
+          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2NDUxOTI4NTQsImV4cCI6MTgxMDI1NDg1NH0.dummy
+          STRIPE_SECRET_KEY: sk_test_dummy
+          STRIPE_WEBHOOK_SECRET: whsec_dummy
+      - name: Build (non-Dependabot)
+        if: github.actor != 'dependabot[bot]'
+        run: pnpm build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
