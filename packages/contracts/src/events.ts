@@ -19,7 +19,7 @@ export const AnalyticsEventSchema = z.object({
   occurredAt: z.string().datetime(),
   segment: z.enum(['b2c', 'b2b']).optional(),
   route: z.string().optional(),
-  payload: z.record(z.any()).default({}),
+  payload: z.record(z.string(), z.any()).default({}),
 });
 
 export const EventEnvelopeSchema = z.object({
@@ -51,7 +51,7 @@ export const EventEnvelopeSchema = z.object({
   ]),
   occurredAt: z.string().datetime(),
   version: z.literal('v1'),
-  payload: z.record(z.any())
+  payload: z.record(z.string(), z.any())
 });
 
 export const OrderCreatedPayloadSchema = z.object({

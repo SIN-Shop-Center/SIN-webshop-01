@@ -114,7 +114,7 @@ export const BlogPostSchema = z.object({
 
 export const SettingSchema = z.object({
   key: z.string().min(1),
-  value: z.record(z.any()),
+  value: z.record(z.string(), z.any()),
   updatedAt: z.string().datetime().optional(),
 });
 

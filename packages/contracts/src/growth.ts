@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const TrendPolicySchema = z.object({
   default_decision: z.enum(['allow', 'review_required', 'deny']),
-  country_defaults: z.record(z.any()).default({}),
-  channel_defaults: z.record(z.any()).default({}),
+  country_defaults: z.record(z.string(), z.any()).default({}),
+  channel_defaults: z.record(z.string(), z.any()).default({}),
   category_policies: z.array(z.object({
     category_key: z.string().min(1),
     country: z.string().min(2),
@@ -86,8 +86,8 @@ export const ChannelConnectStartSchema = z.object({
 export const ChannelConnectCompleteSchema = z.object({
   state_token: z.string().min(1),
   account_external_id: z.string().optional(),
-  auth_snapshot: z.record(z.any()).default({}),
-  health_snapshot: z.record(z.any()).default({}),
+  auth_snapshot: z.record(z.string(), z.any()).default({}),
+  health_snapshot: z.record(z.string(), z.any()).default({}),
 });
 
 export const AttributionSummaryItemSchema = z.object({

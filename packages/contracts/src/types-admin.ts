@@ -45,7 +45,7 @@ export const SupplierCredentialRefSchema = z.object({
   username: z.string().nullable().optional(),
   hasSecret: z.boolean().default(false),
   lastRotatedAt: z.string().datetime().nullable().optional(),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.string(), z.any()).default({}),
 });
 
 export const ProductSupplierMappingSchema = z.object({
@@ -77,7 +77,7 @@ export const SupplierCatalogProductSchema = z.object({
   status: z.enum(['new', 'reviewing', 'approved', 'imported', 'rejected', 'archived']).default('new'),
   reviewNote: z.string().nullable().optional(),
   aiScore: z.number().nullable().optional(),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.string(), z.any()).default({}),
   importedProductId: z.string().uuid().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -94,7 +94,7 @@ export const CRMTaskSchema = z.object({
   ownerId: z.string().uuid().nullable().optional(),
   dueAt: z.string().datetime().nullable().optional(),
   source: z.string().min(1),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.string(), z.any()).default({}),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -108,7 +108,7 @@ export const CRMActivitySchema = z.object({
   actorType: z.string().min(1),
   actorId: z.string().uuid().nullable().optional(),
   message: z.string().min(1),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.string(), z.any()).default({}),
   createdAt: z.string().datetime(),
 });
 

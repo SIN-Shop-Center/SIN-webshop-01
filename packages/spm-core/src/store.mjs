@@ -10,7 +10,7 @@ const targetSchema = z.object({
   id: z.string().min(1),
   kind: z.enum(['github_actions_repo', 'cloudflare_worker_secret', 'vercel_project_env', 'huggingface_space_secret']),
   authSecretName: z.string().min(1),
-  params: z.record(z.any()).default({}),
+  params: z.record(z.string(), z.any()).default({}),
 })
 
 function maskValue(value) {
