@@ -17,8 +17,8 @@ export async function RelatedProducts({
         Das könnte dir auch gefallen
       </h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {products.map((p, i) => (
+          <ProductCard key={p.id} product={p} index={i} />
         ))}
       </div>
     </section>

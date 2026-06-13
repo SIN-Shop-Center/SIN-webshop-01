@@ -44,6 +44,7 @@ export function BoughtTogether({ mainProduct, suggestions }: { mainProduct: Bund
         items.push({ id: p.id, product_id: p.id, name: p.name, price: p.price, image: p.image, quantity: 1 })
         localStorage.setItem('sin-cart', JSON.stringify(items))
         window.dispatchEvent(new Event('cart-updated'))
+        window.dispatchEvent(new CustomEvent('open-cart'))
       } catch { /* ignore */ }
     })
     setAdded(true)

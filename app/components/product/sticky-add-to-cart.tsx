@@ -55,6 +55,8 @@ export function StickyAddToCart({
       try {
         await addToCart(productId)
         setAdded(true)
+        window.dispatchEvent(new Event('cart-updated'))
+        window.dispatchEvent(new CustomEvent('open-cart'))
       } catch {
         /* error handled by cart state */
       }

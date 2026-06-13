@@ -36,7 +36,7 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, index }: { product: Product; index?: number }) {
   const soldOut = product.stock <= 0
   const badges = getProductBadges({
     price: product.price,
@@ -50,7 +50,10 @@ export function ProductCard({ product }: { product: Product }) {
   })
 
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20">
+    <div
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 fade-in-up"
+      style={{ animationDelay: index != null ? `${Math.min(index, 11) * 60}ms` : undefined }}
+    >
       <Link
         href={`/produkt/${product.id}`}
         className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

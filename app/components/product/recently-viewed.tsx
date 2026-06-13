@@ -30,8 +30,8 @@ export async function RecentlyViewed({ excludeId }: { excludeId?: string }) {
         Zuletzt angesehen
       </h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {ordered.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {ordered.map((product, i) => (
+          <ProductCard key={product.id} product={product} index={i} />
         ))}
       </div>
     </section>

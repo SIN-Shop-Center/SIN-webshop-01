@@ -19,6 +19,7 @@ export function CardQuickAdd({ productId }: { productId: string }) {
         await addToCart(productId, 1)
         setAdded(true)
         window.dispatchEvent(new Event('cart-updated'))
+        window.dispatchEvent(new CustomEvent('open-cart'))
         setTimeout(() => setAdded(false), 2000)
       } catch {
         /* ignore */
