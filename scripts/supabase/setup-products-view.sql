@@ -19,35 +19,34 @@ DROP VIEW IF EXISTS shop.products_v;
 CREATE VIEW shop.products_v AS
 SELECT
   p.id,
-  p.name AS title,                                    -- name → title
+  COALESCE(p.title_de, p.name) AS title,              -- title_de → name → title
   p.slug,
-  p.description,
+  COALESCE(p.description_de, p.description) AS description,  -- description_de → description
   p.price,
   p.original_price,
   p.compare_at_price,                                 -- sale strikethrough
   p.category_id,                                      -- für Kategorie-Filter
-  COALESCE(p.images->>0, '') AS image_url,            -- images[0] → image_url
+  COALESCE(p.image_url_local, p.images->>0, '') AS image_url,  -- image_url_local → images[0] → image_url
   COALESCE(
-    p.image_gallery,                                  -- real text[] column (cj-sync)
-    ARRAY(SELECT jsonb_array_elements_text(p.images)),
+    p.image_gallery,
     ARRAY[]::text[]
-  ) AS image_gallery,                                  -- images[] → text[]
+  ) AS image_gallery,                                  -- real text[] column (cj-sync)
   p.stock,
   p.is_active,
   COALESCE(p.variants, '[]'::jsonb) AS variants,      -- variant selector JSONB
   p.metadata,
   p.badge,                                            -- bestseller | neu | sale
-  p.sold_count,                                       -- social proof
+  COALESCE(p.sold_count, 0) AS sold_count,            -- social proof (default 0)
+  COALESCE(p.rating, 0) AS rating,                    -- rating (default 0)
+  COALESCE(p.rating_count, 0) AS rating_count,        -- rating count (default 0)
+  COALESCE((p.metadata->>'is_featured')::boolean, false) AS is_featured,
   p.created_at,
   p.updated_at,
   p.cj_product_id,
   p.cj_variant_id,
   p.cj_sku,
   p.cj_cost_price,
-  p.cj_last_synced_at,
-  COALESCE(p.rating, (p.metadata->>'rating')::numeric, 0) AS rating,
-  COALESCE(p.rating_count, (p.metadata->>'ratingCount')::integer, 0) AS rating_count,
-  COALESCE((p.metadata->>'is_featured')::boolean, false) AS is_featured
+  p.cj_last_synced_at
 FROM shop.products p;
 
 ALTER VIEW shop.products_v SET (security_invoker = true);

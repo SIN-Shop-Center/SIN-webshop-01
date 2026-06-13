@@ -26,10 +26,10 @@ export type SearchSort = 'relevance' | 'price-asc' | 'price-desc' | 'newest'
 export type SearchResult = {
   products: Array<{
     id: string
-    name: string
+    title: string
     description: string | null
     price: number
-    images: string[] | null
+    image_gallery: string[] | null
     slug: string
     stock: number
   }>
@@ -47,10 +47,10 @@ export async function searchProducts(
   page = 1,
 ): Promise<SearchResult> {
   const supabase = createDataClient()
-  // Selektives Select — `*` wäre zu breit
+  // Nutze products_v View statt direkter Tabelle — hat bereits korrekte Spalten
   let q = supabase
-    .from('products')
-    .select('id, name, slug, description, price, images, stock', {
+    .from('products_v')
+    .select('id, title, slug, description, price, image_gallery, stock', {
       count: 'exact',
     })
     .eq('is_active', true)

@@ -4,37 +4,39 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 
-// Check if the new JS chunk is loaded
-const jsChunks = [];
-page.on('response', response => {
-  const url = response.url();
-  if (url.includes('_next/static/chunks/') && url.endsWith('.js')) {
-    jsChunks.push(url.split('/').pop());
+const brokenImgs = [];
+page.on('console', msg => {
+  const loc = msg.location();
+  if (msg.type() === 'error' && loc?.url?.includes('_next/image')) {
+    brokenImgs.push(decodeURIComponent(loc.url).substring(0, 200));
   }
 });
 
 await page.goto('https://shopsin.delqhi.com/produkte', { waitUntil: 'networkidle' });
-await page.waitForTimeout(2000);
+await page.waitForTimeout(3000);
 
-// Check if the ImageWithFallback component has the fix
-const hasFix = await page.evaluate(() => {
-  // Check if the component handles arrays
-  const img = document.querySelector('img[src*="_next/image"]');
-  return img ? img.src : 'no img found';
-});
-
-console.log('JS chunks:', jsChunks.slice(0, 5));
-console.log('First img src:', hasFix?.substring(0, 100));
-
-// Count broken images
-const brokenCount = await page.evaluate(() => {
+// Count total images and broken ones
+const imgInfo = await page.evaluate(() => {
   const imgs = document.querySelectorAll('img');
-  let broken = 0;
+  const results = [];
   imgs.forEach(img => {
-    if (img.src.includes('%5B%22')) broken++; // URL-encoded array
+    if (img.src.includes('_next/image')) {
+      const urlParam = new URL(img.src).searchParams.get('url');
+      results.push({
+        src: img.src.substring(0, 100),
+        urlParam: urlParam?.substring(0, 80),
+        isArray: urlParam?.startsWith('["') || false,
+      });
+    }
   });
-  return broken;
+  return results;
 });
-console.log('Broken images (array in src):', brokenCount);
+
+const arrayImages = imgInfo.filter(i => i.isArray);
+console.log(`Total images: ${imgInfo.length}, Array images: ${arrayImages.length}`);
+if (arrayImages.length > 0) {
+  console.log('Array image URLs:');
+  arrayImages.forEach(i => console.log('  ', i.urlParam?.substring(0, 100)));
+}
 
 await browser.close();

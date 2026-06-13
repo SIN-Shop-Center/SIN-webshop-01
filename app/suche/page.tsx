@@ -78,13 +78,14 @@ export default async function SearchPage({
           ) : (
             <ProductGrid products={products.map(p => ({
               id: p.id,
-              title: p.name,
+              title: p.title,
               description: '',
               price: Number(p.price),
               rating: 0,
               ratingCount: 0,
               category: '',
-              imageUrl: p.images?.[0] || '',
+              imageUrl: p.image_gallery?.[0] || '',
+              imageGallery: p.image_gallery || [],
               stock: p.stock,
             }))} />
           )}
