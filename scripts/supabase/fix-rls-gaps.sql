@@ -45,10 +45,10 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_tables
     WHERE tablename = 'processed_events'
-      AND schemaname IN ('public', 'shop')
+      AND schemaname = 'shop'
       AND rowsecurity = false
   ) THEN
-    ALTER TABLE public.processed_events ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE shop.processed_events ENABLE ROW LEVEL SECURITY;
     RAISE NOTICE 'RLS enabled on processed_events';
   END IF;
 END $$;
@@ -215,9 +215,9 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE tablename = 'orders' AND policyname = 'orders_admin_select'
+    WHERE schemaname = 'shop' AND tablename = 'orders' AND policyname = 'orders_admin_select'
   ) THEN
-    CREATE POLICY "orders_admin_select" ON public.orders
+    CREATE POLICY "orders_admin_select" ON shop.orders
       FOR SELECT USING (public.is_admin());
     RAISE NOTICE 'Added orders_admin_select';
   END IF;
@@ -231,16 +231,55 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE tablename = 'contact_messages' AND policyname = 'Only admins read'
+    WHERE schemaname = 'shop' AND tablename = 'contact_messages' AND policyname = 'Only admins read'
   ) THEN
-    CREATE POLICY "Only admins read" ON public.contact_messages
-      FOR SELECT TO authenticated USING (is_admin());
+    CREATE POLICY "Only admins read" ON shop.contact_messages
+      FOR SELECT TO authenticated USING (public.is_admin());
     RAISE NOTICE 'Added admin-read policy on contact_messages';
   END IF;
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 10. Remove legacy email-match policy on orders (JWT-claim attack vector)
+-- 10. Remove public ALL access on openai_tokens (API key leak risk)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- The `service_full_access` policy on public.openai_tokens grants ALL to the
+-- public role with USING(true) / WITH CHECK(true). Service-role clients bypass
+-- RLS anyway, so this policy only exposes API keys to any authenticated or anon
+-- user. Drop it and rely on default-deny + service-role for writes.
+
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN
+    SELECT policyname
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'openai_tokens'
+      AND roles @> '{public}'
+  LOOP
+    EXECUTE format('DROP POLICY %I ON public.openai_tokens', r.policyname);
+    RAISE NOTICE 'Dropped public policy on openai_tokens: %', r.policyname;
+  END LOOP;
+END $$;
+
+-- Optional explicit service-role policy (no-op for RLS bypass but documents intent).
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'openai_tokens'
+      AND policyname = 'openai_tokens_service_role'
+  ) THEN
+    CREATE POLICY "openai_tokens_service_role" ON public.openai_tokens
+      FOR ALL TO service_role USING (true) WITH CHECK (true);
+    RAISE NOTICE 'Added openai_tokens_service_role policy';
+  END IF;
+END $$;
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- 11. Remove legacy email-match policy on orders (JWT-claim attack vector)
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- The setup-customer-orders.sql added OR email = (SELECT ...) which is a known
@@ -255,14 +294,14 @@ BEGIN
   FOR r IN
     SELECT policyname
     FROM pg_policies
-    WHERE tablename = 'orders'
+    WHERE schemaname = 'shop' AND tablename = 'orders'
       AND policyname = 'orders_select_own'
       AND qual LIKE '%email%'
   LOOP
-    EXECUTE format('DROP POLICY %I ON orders', r.policyname);
+    EXECUTE format('DROP POLICY %I ON shop.orders', r.policyname);
     RAISE NOTICE 'Dropped email-matching orders policy: % — replacing with user_id-only', r.policyname;
 
-    CREATE POLICY "orders_select_own" ON orders
+    CREATE POLICY "orders_select_own" ON shop.orders
       FOR SELECT USING (auth.uid() = user_id);
   END LOOP;
 END $$;

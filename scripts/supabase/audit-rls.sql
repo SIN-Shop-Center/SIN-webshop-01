@@ -76,6 +76,7 @@ SELECT
          AND p.cmd = 'SELECT' AND p.qual = 'true' THEN 'OK: public-read lookup data'
     WHEN p.tablename IN ('csp_violations')
          AND p.roles @> '{service_role}' THEN 'OK: service-role only'
+    WHEN p.roles = '{service_role}' THEN 'OK: service-role bypasses RLS anyway'
     WHEN p.tablename IN ('newsletter_subscribers', 'stock_notifications')
          AND p.cmd = 'INSERT' AND p.with_check = 'true' THEN 'OK: anon self-subscribe'
     ELSE 'REVIEW: potentially over-permissive'
@@ -142,12 +143,20 @@ SELECT
   p.policyname,
   p.cmd,
   p.roles,
+  p.qual,
+  p.with_check,
   CASE
     WHEN p.cmd = 'SELECT' THEN 'OK: read'
     WHEN p.cmd = 'INSERT' AND p.tablename IN ('newsletter_subscribers', 'stock_notifications')
     THEN 'OK: self-subscribe'
     WHEN p.cmd IN ('UPDATE', 'DELETE', 'ALL')
+         AND (p.qual = 'true' OR p.with_check = 'true')
     THEN 'CRITICAL: anon can mutate data!'
+    WHEN p.cmd IN ('UPDATE', 'DELETE', 'ALL')
+         AND p.qual = 'false' AND p.with_check = 'false'
+    THEN 'OK: default deny'
+    WHEN p.cmd IN ('UPDATE', 'DELETE', 'ALL')
+    THEN 'REVIEW: may be default deny'
     ELSE 'REVIEW'
   END AS assessment
 FROM pg_policies p
@@ -170,7 +179,8 @@ WHERE v.schemaname IN ('public', 'shop')
     JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
     WHERE c.relname = v.viewname
       AND n.nspname = v.schemaname
-      AND c.reloptions @> ARRAY['security_invoker=on']
+      AND (c.reloptions @> ARRAY['security_invoker=on']
+           OR c.reloptions @> ARRAY['security_invoker=true'])
   )
 ORDER BY schemaname, viewname;
 
