@@ -1,4 +1,5 @@
 name: Deploy
+
 on:
   push:
     branches: [main]
@@ -6,6 +7,17 @@ on:
 concurrency:
   group: deploy-production
   cancel-in-progress: false
+
+# To require manual approval before deploying, configure protection rules
+# for the "production" environment in GitHub repo settings:
+#   Settings → Environments → production → Required reviewers
+# Then uncomment the environment block below:
+#
+# jobs:
+#   deploy:
+#     environment:
+#       name: production
+#       # required_reviewers is set in GitHub UI, not here
 
 jobs:
   deploy:
@@ -25,3 +37,44 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: deploy --env production
+      - name: Smoke test
+        run: |
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://shopsin.delqhi.com/ || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "Smoke test passed (HTTP 200)"
+              exit 0
+            fi
+            echo "Attempt $i: got HTTP $STATUS, retrying in 10s..."
+            sleep 10
+          done
+          echo "::error::Smoke test failed after 5 attempts"
+          exit 1
+
+  rollback:
+    needs: deploy
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Rollback to previous deployment
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: rollback --env production
+      - name: Verify rollback
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://shopsin.delqhi.com/ || true)
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::Rollback deployed but site returned HTTP $STATUS"
+          else
+            echo "Rollback verified (HTTP 200)"
+          fi

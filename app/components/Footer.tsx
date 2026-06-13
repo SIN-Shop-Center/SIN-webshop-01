@@ -1,52 +1,53 @@
-// Purpose: Footer with brand, shop links, newsletter, legal links
-// Docs: PLAN-VERKAUFSFAEHIG.md
+'use client'
 
 import Link from 'next/link'
-import { NewsletterSignup } from '@/components/newsletter-signup'
-import { PaymentMethods } from '@/components/payment-methods'
-
-const SHOP_LINKS = [
-  { href: '/produkte', label: 'Alle Produkte' },
-  { href: '/sale', label: 'Sale' },
-  { href: '/wunschliste', label: 'Wunschliste' },
-  { href: '/konto/bestellungen', label: 'Meine Bestellungen' },
-]
-
-const SERVICE_LINKS = [
-  { href: '/hilfe/versand', label: 'Versand & Lieferzeiten' },
-  { href: '/hilfe/rueckgabe', label: 'Rückgabe & Umtausch' },
-  { href: '/hilfe/zahlung', label: 'Zahlungsarten' },
-  { href: '/kontakt', label: 'Kontakt' }, // FIX: war /hilfe/kontakt — jetzt echtes Kontaktformular
-  { href: '/bestellung-verfolgen', label: 'Bestellung verfolgen' }, // NEU
-]
-
-const LEGAL_LINKS = [
-  { href: '/impressum', label: 'Impressum' },
-  { href: '/agb', label: 'AGB' },
-  { href: '/widerrufsrecht', label: 'Widerrufsbelehrung' },
-  { href: '/datenschutz', label: 'Datenschutz' },
-]
+import {useTranslations} from 'next-intl'
+import {NewsletterSignup} from '@/components/newsletter-signup'
+import {PaymentMethods} from '@/components/payment-methods'
 
 export function Footer() {
+  const t = useTranslations('footer')
+
+  const SHOP_LINKS = [
+    {href: '/produkte', label: t('shopAllProducts')},
+    {href: '/sale', label: t('shopSale')},
+    {href: '/wunschliste', label: t('shopWishlist')},
+    {href: '/konto/bestellungen', label: t('shopMyOrders')},
+  ]
+
+  const SERVICE_LINKS = [
+    {href: '/hilfe/versand', label: t('serviceShipping')},
+    {href: '/hilfe/rueckgabe', label: t('serviceReturns')},
+    {href: '/hilfe/zahlung', label: t('servicePayment')},
+    {href: '/kontakt', label: t('serviceContact')},
+    {href: '/bestellung-verfolgen', label: t('serviceTrackOrder')},
+  ]
+
+  const LEGAL_LINKS = [
+    {href: '/impressum', label: t('legalImprint')},
+    {href: '/agb', label: t('legalTerms')},
+    {href: '/widerrufsrecht', label: t('legalCancellation')},
+    {href: '/datenschutz', label: t('legalPrivacy')},
+  ]
+
   return (
     <footer className="mt-auto border-t border-border bg-muted">
       <div className="container mx-auto grid gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-3">
-          <h3 className="text-base font-bold">SIN Shop</h3>
+          <h3 className="text-base font-bold">{t('brandName')}</h3>
           <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
-            Dein Online-Shop für Mode, Haushalt, Elektronik und mehr &ndash; mit
-            Käuferschutz und 14 Tagen Widerrufsrecht.
+            {t('brandDesc')}
           </p>
         </div>
 
-        <nav aria-label="Shop">
-          <h3 className="mb-3 text-sm font-semibold">Shop</h3>
+        <nav aria-label={t('shopHeading')}>
+          <h3 className="mb-3 text-sm font-semibold">{t('shopHeading')}</h3>
           <ul className="flex flex-col gap-2">
             {SHOP_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className="text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {link.label}
                 </Link>
@@ -55,14 +56,14 @@ export function Footer() {
           </ul>
         </nav>
 
-        <nav aria-label="Kundenservice">
-          <h3 className="mb-3 text-sm font-semibold">Kundenservice</h3>
+        <nav aria-label={t('serviceHeading')}>
+          <h3 className="mb-3 text-sm font-semibold">{t('serviceHeading')}</h3>
           <ul className="flex flex-col gap-2">
             {SERVICE_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className="text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {link.label}
                 </Link>
@@ -72,9 +73,9 @@ export function Footer() {
         </nav>
 
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold">Newsletter</h3>
+          <h3 className="text-sm font-semibold">{t('newsletterHeading')}</h3>
           <p className="text-sm text-muted-foreground">
-            Angebote und Neuheiten direkt ins Postfach.
+            {t('newsletterDesc')}
           </p>
           <NewsletterSignup />
         </div>
@@ -82,13 +83,13 @@ export function Footer() {
 
       <div className="border-t border-border">
         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-5 sm:flex-row">
-          <nav aria-label="Rechtliches">
+          <nav aria-label={t('legalHeading')}>
             <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-xs text-muted-foreground hover:text-foreground"
+                    className="text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {link.label}
                   </Link>
@@ -98,8 +99,7 @@ export function Footer() {
           </nav>
           <PaymentMethods />
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} SIN Shop &middot; Jeremy Schulze &middot;
-            Kurf&uuml;rstenstra&szlig;e 124, 10785 Berlin
+            {t('copyright', {year: new Date().getFullYear()})}
           </p>
         </div>
       </div>

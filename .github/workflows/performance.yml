@@ -1,13 +1,13 @@
 name: Performance Budget
+
 on:
   pull_request:
     branches: [main]
-  schedule:
-    - cron: '0 5 * * 1' # Montags 5 Uhr
 
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

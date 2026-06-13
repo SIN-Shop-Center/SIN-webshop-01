@@ -2,13 +2,10 @@
 // Docs: AGENTS.md
 
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
 import { getProductBadges } from '@/lib/product-badges'
 import { canUserReview } from '@/app/actions/reviews'
-import { PriceTag } from '@/components/PriceTag'
-import { AddToCartButton } from '@/components/AddToCartButton'
 import { toCents } from '@/lib/format'
 import { ImageGallery } from '@/components/image-gallery'
 import { VariantSelector } from '@/components/variant-selector'
@@ -25,14 +22,13 @@ import { TrackView } from '@/components/product/track-view'
 import { DeliveryEstimate } from '@/components/product/delivery-estimate'
 import { RatingSummary } from '@/components/product/rating-summary'
 import { Breadcrumbs } from '@/components/breadcrumbs'
-import { ProductTabs } from '@/components/product-tabs'
 import { ProductJsonLd } from '@/components/ProductJsonLd'
+import { TrustBadges } from '@/components/product/trust-badges'
+import { SizeGuide } from '@/components/product/size-guide'
+import { AccordionInfo } from '@/components/product/accordion-info'
+import { StickyAddToCart } from '@/components/product/sticky-add-to-cart'
 import {
-  TruckIcon,
-  ShieldCheckIcon,
-  RotateCcwIcon,
   CheckIcon,
-  ArrowLeftIcon,
 } from '@/components/icons'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
@@ -59,6 +55,10 @@ export async function generateMetadata({
     const product = await getProductById(id)
     if (!product) return { title: 'Produkt nicht gefunden' }
     const description = product.description.slice(0, 160)
+    const productUrl = `${APP_URL}/produkt/${product.id}`
+    const ogImage = product.imageUrl
+      ? { url: product.imageUrl, width: 1200, height: 630, alt: product.title }
+      : undefined
     return {
       title: product.title,
       description,
@@ -66,13 +66,19 @@ export async function generateMetadata({
         title: product.title,
         description,
         type: 'website',
-        images: product.imageUrl
-          ? [{ url: product.imageUrl, alt: product.title }]
-          : undefined,
-        url: `${APP_URL}/produkt/${product.id}`,
+        images: ogImage ? [ogImage] : undefined,
+        url: productUrl,
+        siteName: 'ShopSIN',
+        locale: 'de_DE',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: product.title,
+        description,
+        images: product.imageUrl ? [product.imageUrl] : undefined,
       },
       alternates: {
-        canonical: `${APP_URL}/produkt/${product.id}`,
+        canonical: productUrl,
       },
     }
   } catch {
@@ -147,36 +153,31 @@ export default async function ProductPage({
             </p>
 
             {/* Variants + Price + Add to Cart */}
-            <div className="mb-8">
+            <div className="mb-4">
               <VariantSelector product={product} />
             </div>
+
+            {/* Size Guide */}
+            <div className="mb-6">
+              <SizeGuide />
+            </div>
+
             {product.stock > 0 && <StockIndicator stock={product.stock} />}
             <LiveViewers productId={product.id} />
             <FreeShippingNudge />
 
-            {/* Product Tabs */}
-            <ProductTabs description={product.description} />
+            {/* Trust badges */}
+            <div className="mb-6">
+              <TrustBadges />
+            </div>
+
+            {/* Product accordion */}
+            <AccordionInfo description={product.description} />
 
             {/* Wishlist */}
             <div className="mb-6">
               <WishlistButton productId={product.id} />
             </div>
-
-            {/* Trust badges */}
-            <ul className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-border bg-muted/30 p-4 text-sm sm:grid-cols-3">
-              <li className="flex items-center gap-2">
-                <TruckIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                <span>Kostenloser Versand ab 49 €</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ShieldCheckIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                <span>Sichere Stripe-Zahlung</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <RotateCcwIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                <span>14 Tage Widerrufsrecht</span>
-              </li>
-            </ul>
 
             <div className="mb-8">
               <DeliveryEstimate />
@@ -252,22 +253,13 @@ export default async function ProductPage({
         <TrackView productId={product.id} />
 
         {product.stock > 0 && (
-          <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden">
-            <div className="container mx-auto flex items-center gap-4 px-4 py-3">
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-xs text-muted-foreground">
-                  {product.title}
-                </span>
-                <PriceTag
-                  priceCents={priceCents}
-                  originalPriceCents={originalPriceCents}
-                />
-              </div>
-              <div className="flex-1">
-                <AddToCartButton productId={product.id} stock={product.stock} />
-              </div>
-            </div>
-          </div>
+          <StickyAddToCart
+            productId={product.id}
+            title={product.title}
+            priceCents={priceCents}
+            originalPriceCents={originalPriceCents}
+            stock={product.stock}
+          />
         )}
       </div>
     </>

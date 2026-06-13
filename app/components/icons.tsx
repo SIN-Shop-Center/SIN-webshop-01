@@ -210,34 +210,6 @@ export function UserIcon(props: IconProps) {
   )
 }
 
-export function SearchIcon(props: IconProps) {
-  return (
-    <svg {...baseProps} {...props}>
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  )
-}
-
-export function MenuIcon(props: IconProps) {
-  return (
-    <svg {...baseProps} {...props}>
-      <line x1="4" x2="20" y1="12" y2="12" />
-      <line x1="4" x2="20" y1="6" y2="6" />
-      <line x1="4" x2="20" y1="18" y2="18" />
-    </svg>
-  )
-}
-
-export function XIcon(props: IconProps) {
-  return (
-    <svg {...baseProps} {...props}>
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
-}
-
 export function LogOutIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props}>
@@ -265,6 +237,14 @@ export function KeyRoundIcon(props: IconProps) {
     <svg {...baseProps} {...props}>
       <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
       <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="m6 9 6 6 6-6" />
     </svg>
   )
 }

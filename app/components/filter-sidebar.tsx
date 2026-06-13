@@ -1,17 +1,16 @@
-// Purpose: Filter sidebar for product listing — category and price range
-// Docs: filter-sidebar.doc.md
-
 'use client'
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { translateCategory } from '@/lib/category-labels'
+import {useRouter, useSearchParams, usePathname} from 'next/navigation'
+import {useTranslations} from 'next-intl'
+import {translateCategory} from '@/lib/category-labels'
 
 interface FilterSidebarProps {
-  categories: Array<{ id: string; name: string }>
+  categories: Array<{id: string; name: string}>
   activeCategory?: string
 }
 
-export function FilterSidebar({ categories, activeCategory }: FilterSidebarProps) {
+export function FilterSidebar({categories, activeCategory}: FilterSidebarProps) {
+  const t = useTranslations('filter')
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -22,32 +21,31 @@ export function FilterSidebar({ categories, activeCategory }: FilterSidebarProps
     if (value === null) params.delete(key)
     else params.set(key, value)
     params.delete('seite')
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    router.push(`${pathname}?${params.toString()}`, {scroll: false})
   }
 
-  // Deutsch übersetzt und alphabetisch sortiert
   const sortedCategories = [...categories].sort((a, b) =>
     translateCategory(a.name).localeCompare(translateCategory(b.name), 'de'),
   )
 
   return (
-    <aside aria-label="Produktfilter" className="flex w-full flex-col gap-6 md:w-56 md:shrink-0">
+    <aside aria-label={t('label')} className="flex w-full flex-col gap-6 md:w-56 md:shrink-0">
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-foreground">Kategorie</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('category')}</h3>
         <ul className="flex flex-col gap-1">
           <li>
             <button
               onClick={() => setParam('kategorie', null)}
-              className={`text-sm ${!activeCategory ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${!activeCategory ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Alle Kategorien
+              {t('allCategories')}
             </button>
           </li>
           {sortedCategories.map((cat) => (
             <li key={cat.id}>
               <button
                 onClick={() => setParam('kategorie', cat.id)}
-                className={`text-left text-sm ${activeCategory === cat.id ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${activeCategory === cat.id ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {translateCategory(cat.name)}
               </button>
@@ -57,19 +55,19 @@ export function FilterSidebar({ categories, activeCategory }: FilterSidebarProps
       </div>
 
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-foreground">Preis</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('price')}</h3>
         <ul className="flex flex-col gap-1">
           {[
-            { label: 'Alle Preise', value: null },
-            { label: 'Bis 10 €', value: '10' },
-            { label: 'Bis 25 €', value: '25' },
-            { label: 'Bis 50 €', value: '50' },
-            { label: 'Bis 100 €', value: '100' },
+            {label: t('allPrices'), value: null},
+            {label: t('upTo10'), value: '10'},
+            {label: t('upTo25'), value: '25'},
+            {label: t('upTo50'), value: '50'},
+            {label: t('upTo100'), value: '100'},
           ].map((opt) => (
             <li key={opt.label}>
               <button
                 onClick={() => setParam('preis_max', opt.value)}
-                className={`text-sm ${maxPrice === opt.value || (!maxPrice && opt.value === null) ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${maxPrice === opt.value || (!maxPrice && opt.value === null) ? 'font-semibold text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {opt.label}
               </button>

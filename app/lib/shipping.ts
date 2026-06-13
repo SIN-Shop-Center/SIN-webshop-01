@@ -5,36 +5,18 @@
 // Falls CJ nicht erreichbar: Fallback auf 4,99 € Flat.
 
 import { getCheapestFreight } from '@/lib/cj/freight'
+import { getUsdToEurRate } from '@/app/lib/fx-rate'
+import { SHIPPING } from '@/lib/shipping-constants'
 
-export const SHIPPING = {
-  standardCents: 499,
-  freeAboveCents: 4900,
-  deliveryDaysMin: 7,
-  deliveryDaysMax: 15,
-} as const
+export { SHIPPING }
 
 const HANDLING_FEE_EUR = 1.0
 const MAX_CUSTOMER_SHIPPING_EUR = 6.99
-const USD_TO_EUR_FALLBACK = 0.92
 
 type CachedQuote = { costEur: number; agingMin: number; agingMax: number }
 
 const quoteCache = new Map<string, { quote: CachedQuote; ts: number }>()
 const CACHE_TTL_MS = 300_000
-
-async function getUsdToEurRate(): Promise<number> {
-  try {
-    const res = await fetch(
-      'https://api.frankfurter.app/latest?from=USD&to=EUR',
-      { next: { revalidate: 86_400 } },
-    )
-    if (!res.ok) return USD_TO_EUR_FALLBACK
-    const data = (await res.json()) as { rates?: { EUR?: number } }
-    return data.rates?.EUR ?? USD_TO_EUR_FALLBACK
-  } catch {
-    return USD_TO_EUR_FALLBACK
-  }
-}
 
 export async function getShippingQuoteAsync(params: {
   items: { cj_variant_id: string; quantity: number }[]

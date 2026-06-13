@@ -1,8 +1,8 @@
-import type { NextConfig } from 'next'
+import type {NextConfig} from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 
-// CSP: bewusst ohne `require-trusted-types-for` und ohne COEP
-// (COEP bricht Stripe-iframes). Erst aktivieren wenn SharedArrayBuffer
-// oder Cross-Origin-Isolation gebraucht wird.
+const withNextIntl = createNextIntlPlugin()
+
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://js.stripe.com",
@@ -18,8 +18,6 @@ const csp = [
   'upgrade-insecure-requests',
 ].join('; ')
 
-// Phase 1 (7 Tage Report-Only): CSP_ENFORCE !== 'true' → Report-Only
-// Phase 2: Nach 7 Tagen ohne Violations → CSP_ENFORCE=true als Env-Var setzen
 const cspHeader = process.env.CSP_ENFORCE === 'true'
   ? { key: 'Content-Security-Policy', value: csp }
   : { key: 'Content-Security-Policy-Report-Only', value: csp }
@@ -53,19 +51,6 @@ const nextConfig: NextConfig = {
       { source: '/(.*)', headers: securityHeaders },
     ]
   },
-  // NEU: Englische/falsche URLs auf deutsche Routen umleiten (kein 404 mehr)
-  async redirects() {
-    return [
-      { source: '/products', destination: '/produkte', permanent: true },
-      { source: '/product/:id', destination: '/produkt/:id', permanent: true },
-      { source: '/cart', destination: '/warenkorb', permanent: true },
-      { source: '/search', destination: '/suche', permanent: true },
-      { source: '/contact', destination: '/kontakt', permanent: true },
-      { source: '/wishlist', destination: '/wunschliste', permanent: true },
-      // Alte Hilfe-Kontaktseite auf das echte Kontaktformular
-      { source: '/hilfe/kontakt', destination: '/kontakt', permanent: false },
-    ]
-  },
 }
 
-export default nextConfig
+export default withNextIntl(nextConfig)

@@ -4,7 +4,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Meine Bestellungen',
+  title: 'Mein Konto',
   robots: { index: false, follow: false },
 }
 

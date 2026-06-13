@@ -14,7 +14,6 @@ import { Resend } from 'resend'
 
 export const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL ?? 'ShopSIN <onboarding@resend.dev>'
-export const REPLY_TO_EMAIL = process.env.RESEND_REPLY_TO ?? 'opensin@gmx.com'
 export const FOOTER_COMPANY = 'ShopSIN'
 
 /**

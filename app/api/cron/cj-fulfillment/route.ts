@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     .in('fulfillment_status', ['forwarded', 'shipped'])
     .is('tracking_notified_at', null)
     .not('cj_order_id', 'is', null)
-    .limit(15) // Issue #36: Worker 30s CPU-Limit
+    .limit(10) // Issue #36: Worker 30s CPU-Limit
 
   for (const order of forwarded ?? []) {
     try {

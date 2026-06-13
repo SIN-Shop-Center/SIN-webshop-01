@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       .from('cart_items')
       .select('id, product_id, quantity')
       .lt('updated_at', cutoff)
-      .limit(200)
+      .limit(50)
 
     for (const item of stale ?? []) {
       try {

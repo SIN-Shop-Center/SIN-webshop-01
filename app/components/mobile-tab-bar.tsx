@@ -63,12 +63,18 @@ export function MobileTabBar() {
                 <span className="relative">
                   <tab.icon className="size-5" aria-hidden="true" />
                   {tab.showBadge && cartCount > 0 && (
-                    <span className="absolute -right-2 -top-1.5 flex size-4 items-center justify-center rounded-full bg-sale text-[9px] font-bold text-sale-foreground">
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-2 -top-1.5 flex size-4 items-center justify-center rounded-full bg-sale text-[9px] font-bold text-sale-foreground"
+                    >
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>
                   )}
                 </span>
                 {tab.label}
+                {tab.showBadge && cartCount > 0 && (
+                  <span className="sr-only">, {cartCount} Artikel</span>
+                )}
               </Link>
             </li>
           )

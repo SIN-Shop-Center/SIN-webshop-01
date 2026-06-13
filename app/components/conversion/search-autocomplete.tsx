@@ -10,7 +10,7 @@ import Link from 'next/link'
 import useSWR from 'swr'
 import { Search, Loader2 } from 'lucide-react'
 
-type SearchResult = { id: string; title: string; price: number | string; image_url: string }
+type AutocompleteItem = { id: string; title: string; price: number | string; image_url: string }
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
@@ -38,7 +38,7 @@ export function SearchAutocomplete() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const { data, isLoading } = useSWR<{ results: SearchResult[] }>(
+  const { data, isLoading } = useSWR<{ results: AutocompleteItem[] }>(
     debounced.length >= 2 ? `/api/search?q=${encodeURIComponent(debounced)}&limit=5` : null,
     fetcher,
   )
@@ -69,27 +69,35 @@ export function SearchAutocomplete() {
           onFocus={() => setOpen(true)}
           placeholder="Wonach suchst du?"
           aria-label="Produkte durchsuchen"
+          aria-expanded={open && debounced.length >= 2}
+          aria-controls="search-autocomplete-listbox"
+          aria-autocomplete="list"
           className="w-full rounded-full border border-border bg-muted/50 py-2 pl-9 pr-4 text-sm focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </form>
 
       {open && debounced.length >= 2 && (
-        <div className="absolute top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg">
+        <div
+          id="search-autocomplete-listbox"
+          role="listbox"
+          aria-label="Suchergebnisse"
+          className="absolute top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg"
+        >
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2 p-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 p-4 text-sm text-muted-foreground" role="status">
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
               Suche läuft…
             </div>
           ) : results.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground">Keine Treffer für &quot;{debounced}&quot;</p>
+            <p className="p-4 text-sm text-muted-foreground" role="status">Keine Treffer für &quot;{debounced}&quot;</p>
           ) : (
             <ul>
               {results.map((result) => (
-                <li key={result.id}>
+                <li key={result.id} role="option" aria-selected={false}>
                   <Link
                     href={`/produkt/${result.id}`}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 p-2.5 hover:bg-muted"
+                    className="flex items-center gap-3 p-2.5 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                   >
                     <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-muted">
                       <Image src={result.image_url || '/placeholder.svg'} alt="" fill sizes="40px" className="object-cover" />
@@ -105,7 +113,7 @@ export function SearchAutocomplete() {
                 <Link
                   href={`/suche?q=${encodeURIComponent(debounced)}`}
                   onClick={() => setOpen(false)}
-                  className="block p-2.5 text-center text-sm font-medium text-primary hover:bg-muted"
+                  className="block p-2.5 text-center text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                 >
                   Alle Ergebnisse anzeigen
                 </Link>

@@ -1,17 +1,19 @@
-// Purpose: Sales-oriented hero — doktorabc-Pattern: große Typografie mit
-// farbigem Schlüsselwort + Suchfeld direkt im Hero, Deal-Teaser rechts.
-// Docs: AGENTS.md
-
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Search, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
-import { getDealProducts } from '@/lib/queries'
+import {ArrowRight, Search, Truck, ShieldCheck, RotateCcw} from 'lucide-react'
+import {getTranslations, getLocale} from 'next-intl/server'
+import {getDealProducts} from '@/lib/queries'
 
-function formatEur(value: number) {
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value)
+function formatEur(value: number, locale: string) {
+  return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(value)
 }
 
 export async function HomeHero() {
+  const t = await getTranslations('homeHero')
+  const locale = await getLocale()
   const teasers = (await getDealProducts(3)).slice(0, 3)
 
   return (
@@ -19,20 +21,18 @@ export async function HomeHero() {
       <div className="container mx-auto flex flex-col gap-8 px-4 py-10 md:flex-row md:items-center md:gap-10 md:py-16">
         <div className="flex flex-1 flex-col items-start gap-5">
           <span className="rounded-full bg-sale px-3 py-1 text-xs font-bold uppercase tracking-wide text-sale-foreground">
-            Bis zu 50 % sparen
+            {t('saveUp')}
           </span>
 
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-balance md:text-5xl">
-            Alles, was du brauchst.{' '}
-            <span className="text-primary">Zu Preisen, die du liebst.</span>
+            {t('heading')}{' '}
+            <span className="text-primary">{t('headingHighlight')}</span>
           </h1>
 
           <p className="text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
-            Über 50 Produkte aus Mode, Beauty, Haushalt und mehr &mdash; täglich
-            neue Deals, gratis Versand ab 49&nbsp;&euro;.
+            {t('subheading')}
           </p>
 
-          {/* Suchfeld direkt im Hero (doktorabc-Pattern) */}
           <form
             action="/suche"
             method="GET"
@@ -44,15 +44,15 @@ export async function HomeHero() {
               type="search"
               name="q"
               required
-              placeholder="Wonach suchst du?"
-              aria-label="Produkte durchsuchen"
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchLabel')}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
             <button
               type="submit"
               className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
-              Suchen
+              {t('searchButton')}
             </button>
           </form>
 
@@ -61,29 +61,29 @@ export async function HomeHero() {
               href="/sale"
               className="flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
-              Deals entdecken
+              {t('discoverDeals')}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
             <Link
               href="/produkte"
               className="rounded-md border border-border bg-background px-5 py-3 text-sm font-medium hover:bg-muted"
             >
-              Alle Produkte
+              {t('allProducts')}
             </Link>
           </div>
 
           <ul className="mt-1 flex flex-wrap gap-4 text-xs text-muted-foreground">
             <li className="flex items-center gap-1.5">
               <Truck className="size-3.5 text-primary" aria-hidden="true" />
-              Gratis ab 49 &euro;
+              {t('freeFrom')}
             </li>
             <li className="flex items-center gap-1.5">
               <RotateCcw className="size-3.5 text-primary" aria-hidden="true" />
-              14 Tage Rückgabe
+              {t('returnDays')}
             </li>
             <li className="flex items-center gap-1.5">
               <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-              Käuferschutz
+              {t('buyerProtection')}
             </li>
           </ul>
         </div>
@@ -106,7 +106,7 @@ export async function HomeHero() {
                   />
                 </div>
                 <span className="absolute bottom-2 left-2 rounded bg-sale px-1.5 py-0.5 text-xs font-bold text-sale-foreground">
-                  {formatEur(product.price)}
+                  {formatEur(product.price, locale)}
                 </span>
               </Link>
             ))}

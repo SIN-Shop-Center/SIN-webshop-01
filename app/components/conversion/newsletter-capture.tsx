@@ -1,12 +1,14 @@
 // app/components/conversion/newsletter-capture.tsx
 // Purpose: Zeitgesteuertes Newsletter-Popup — erscheint erst NACH dem
 // Cookie-Consent, nie gleichzeitig mit anderen Overlays.
+// Docs: AGENTS.md
 
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
 import { X, Gift } from 'lucide-react'
 import { subscribeNewsletter } from '@/app/actions/newsletter'
+import { useFocusTrap } from '@/lib/hooks/use-focus-trap'
 
 const SEEN_KEY = 'newsletter-popup-seen'
 const DELAY_MS = 25_000
@@ -20,6 +22,7 @@ export function NewsletterCapture() {
   const [email, setEmail] = useState('')
   const [done, setDone] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const trapRef = useFocusTrap(show, { onEscape: () => dismiss() })
 
   useEffect(() => {
     if (localStorage.getItem(SEEN_KEY)) return
@@ -47,15 +50,6 @@ export function NewsletterCapture() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!show) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') dismiss()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [show])
-
   function dismiss() {
     localStorage.setItem(SEEN_KEY, '1')
     setShow(false)
@@ -72,15 +66,16 @@ export function NewsletterCapture() {
       onClick={dismiss}
     >
       <div
+        ref={trapRef}
         className="relative w-full max-w-sm rounded-xl bg-background p-6 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={dismiss}
           aria-label="Schließen"
-          className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <X className="size-5" />
+          <X className="size-5" aria-hidden="true" />
         </button>
 
         <Gift className="mx-auto mb-3 size-10 text-primary" aria-hidden="true" />
@@ -115,19 +110,23 @@ export function NewsletterCapture() {
               }}
               className="flex flex-col gap-2"
             >
+              <label htmlFor="nl-capture-email" className="sr-only">
+                E-Mail-Adresse
+              </label>
               <input
+                id="nl-capture-email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="deine@email.de"
-                aria-label="E-Mail-Adresse"
+                autoFocus
                 className="rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <button
                 type="submit"
                 disabled={isPending}
-                className="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+                className="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {isPending ? 'Wird gesendet…' : 'Code sichern'}
               </button>

@@ -3,7 +3,7 @@
 
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin-guard'
-import { AlertCircleIcon, ExternalLinkIcon } from '@/components/icons'
+import { ExternalLinkIcon } from '@/components/icons'
 
 const NAV_LINKS = [
   { href: '/admin', label: 'Übersicht' },

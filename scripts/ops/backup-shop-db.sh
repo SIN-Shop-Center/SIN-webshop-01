@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # /usr/local/bin/backup-shop-db.sh — daily pg_dump → OCI Object Storage
 # FIX #38: Automated backups
+# Docs: scripts/ops/backup-shop-db.doc.md
 set -euo pipefail
 
 BUCKET="s3://simone-backups"
@@ -9,6 +10,7 @@ TMP="/tmp/shop-${DATE}.sql.gz"
 ALERT_EMAIL="opensin@gmx.com"
 RESEND_KEY_FILE="/etc/backup/resend.key"
 
+# ── Alert via Resend ──────────────────────────
 notify_failure() {
   local msg="$1"
   if [ -f "$RESEND_KEY_FILE" ]; then
@@ -20,20 +22,24 @@ notify_failure() {
 }
 trap 'notify_failure "Backup-Script aborted at line $LINENO"' ERR
 
-# 1. Dump (shop-Schema)
-docker exec supabase-db pg_dump -U postgres -d postgres -n shop | gzip > "$TMP"
+# ── 1. Dump (shop + public schemas) ───────────
+# -n shop alone misses auth/users/storage in public schema
+docker exec supabase-db pg_dump -U postgres -d postgres \
+  -n shop -n public \
+  --no-owner --no-privileges \
+  | gzip > "$TMP"
 
-# 2. Integrity: Hash + minimum size
-[ "$(stat -c%s "$TMP")" -gt 1024 ] || { notify_failure "Dump suspiciously small"; exit 1; }
+# ── 2. Integrity: Hash + minimum size ─────────
+[ "$(stat -c%s "$TMP")" -gt 1024 ] || { notify_failure "Dump suspiciously small (<1 KB)"; exit 1; }
 sha256sum "$TMP" > "${TMP}.sha256"
 
-# 3. Upload OCI (S3-compatible)
+# ── 3. Upload OCI (S3-compatible) ─────────────
 aws s3 cp "$TMP" "${BUCKET}/db/shop-${DATE}.sql.gz" \
   --endpoint-url "$OCI_S3_ENDPOINT"
 aws s3 cp "${TMP}.sha256" "${BUCKET}/db/shop-${DATE}.sql.gz.sha256" \
   --endpoint-url "$OCI_S3_ENDPOINT"
 
-# 4. Retention: 30 days
+# ── 4. Retention: 30 days ─────────────────────
 CUTOFF=$(date -d '-30 days' +%Y%m%d)
 aws s3 ls "${BUCKET}/db/" --endpoint-url "$OCI_S3_ENDPOINT" | awk '{print $4}' | while read -r f; do
   FDATE=$(echo "$f" | grep -oP '\d{8}' | head -1 || true)

@@ -9,9 +9,27 @@ import { Pagination } from '@/components/pagination'
 import { SortSelect } from '@/components/sort-select'
 import { FilterSidebar } from '@/components/filter-sidebar'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://shopsin.delqhi.com'
+
 export const metadata: Metadata = {
   title: 'Alle Produkte | ShopSIN',
-  description: 'Entdecke unser gesamtes Sortiment bei ShopSIN.',
+  description: 'Entdecke unser gesamtes Sortiment bei ShopSIN — Mode, Wohnen, Elektronik und mehr.',
+  openGraph: {
+    title: 'Alle Produkte | ShopSIN',
+    description: 'Entdecke unser gesamtes Sortiment bei ShopSIN — Mode, Wohnen, Elektronik und mehr.',
+    url: `${APP_URL}/produkte`,
+    type: 'website',
+    siteName: 'ShopSIN',
+    locale: 'de_DE',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Alle Produkte | ShopSIN',
+    description: 'Entdecke unser gesamtes Sortiment bei ShopSIN — Mode, Wohnen, Elektronik und mehr.',
+  },
+  alternates: {
+    canonical: `${APP_URL}/produkte`,
+  },
 }
 
 interface PageProps {

@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendOrderConfirmation } from '@/lib/email'
+import { sendOrderConfirmation } from '@/lib/emails/send'
 import { submitOrderToCj } from '@/lib/fulfillment/submit-order'
 
 export async function POST(request: Request) {
@@ -107,19 +107,10 @@ export async function POST(request: Request) {
         await supabase.from('cart_items').delete().eq('cart_id', cartId)
       }
 
-      // 1) Bestätigungsmail (Fehler nicht eskalieren)
-      if (email) {
-        try {
-          await sendOrderConfirmation({
-            to: email,
-            orderId: order.id,
-            items,
-            totalCents: session.amount_total ?? 0,
-          })
-        } catch (e) {
-          console.error('Order confirmation email failed:', e)
-        }
-      }
+      // 1) Bestätigungsmail (fire-and-forget — Fehler blockieren Checkout nicht)
+      sendOrderConfirmation(order.id).catch((e) =>
+        console.error('Order confirmation email failed:', e),
+      )
 
       // 2) Order an CJ weiterleiten (Fehler blockieren Checkout nicht)
       const result = await submitOrderToCj(order.id)

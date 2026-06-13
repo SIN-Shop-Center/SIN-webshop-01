@@ -1,9 +1,9 @@
-// Purpose: robots.txt — disallow private/auth routes (Step 10 — SEO)
+// Purpose: robots.txt — disallow private/auth/api routes (Step 10 — SEO)
 // Docs: PLAN-VERKAUFSFAEHIG.md
 
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://shopsin.delqhi.com'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/konto', '/warenkorb', '/wunschliste', '/kasse', '/auth'],
+        disallow: ['/admin/', '/api/', '/konto/', '/warenkorb/', '/wunschliste/', '/kasse/', '/auth/'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

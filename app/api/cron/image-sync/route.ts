@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await syncCjImages(50)
+    const result = await syncCjImages(5)
     return NextResponse.json(result)
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 })
