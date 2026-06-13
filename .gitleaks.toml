@@ -54,6 +54,7 @@ paths = [
   '''gitleaks\.toml''',
   '''gitleaksAllowlist\.toml''',
   '''gitleaks-baseline\.json''',
+  '''\.github\/workflows\/ci\.yml''',
 ]
 
 [[rules]]
