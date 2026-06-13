@@ -32,12 +32,22 @@ interface DbProductRow {
 }
 
 function transformProduct(row: DbProductRow): Product {
-  // Flatten image_gallery: ensure it's a flat array of strings
-  const imageGallery = Array.isArray(row.image_gallery)
-    ? row.image_gallery
-        .flat(2)
-        .filter((img): img is string => typeof img === 'string' && Boolean(img))
-    : []
+  // Parse image_gallery: DB stores as JSON string, not JSONB
+  let imageGallery: string[] = []
+  if (typeof row.image_gallery === 'string') {
+    try {
+      const parsed = JSON.parse(row.image_gallery)
+      imageGallery = Array.isArray(parsed)
+        ? parsed.flat(2).filter((img): img is string => typeof img === 'string' && Boolean(img))
+        : []
+    } catch {
+      imageGallery = []
+    }
+  } else if (Array.isArray(row.image_gallery)) {
+    imageGallery = row.image_gallery
+      .flat(2)
+      .filter((img): img is string => typeof img === 'string' && Boolean(img))
+  }
 
   return {
     id: row.id,
