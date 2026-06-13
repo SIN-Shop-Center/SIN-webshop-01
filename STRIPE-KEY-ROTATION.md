@@ -22,9 +22,9 @@
 
 ```bash
 # In .env.local und .env.production die 3 Stripe-Zeilen ersetzen:
-STRIPE_SECRET_KEY="sk_live_NEUER_KEY_HIER"
-STRIPE_WEBHOOK_SECRET="whsec_NEUER_SECRET_HIER"  # falls auch rotiert
-STRIPE_PUBLISHABLE_KEY="pk_live_51TEhmv..."      # bleibt meist gleich
+STRIPE_SECRET_KEY="sk_live_<NEUER_KEY_HIER>"
+STRIPE_WEBHOOK_SECRET="whsec_<NEUER_SECRET_HIER>"  # falls auch rotiert
+STRIPE_PUBLISHABLE_KEY="pk_live_<PUBLISHABLE_KEY_HIER>"  # bleibt meist gleich
 ```
 
 ---

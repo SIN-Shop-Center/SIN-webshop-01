@@ -27,13 +27,13 @@ sudo install -m 755 /tmp/offsite-copy-r2.sh /etc/cron.daily/offsite-copy-r2
 # 3. ENV-File anlegen
 sudo mkdir -p /etc/backup
 sudo tee /etc/backup/resend.key > /dev/null << 'EOF'
-re_YAnqVXrV_DUsgUHWtdP8FcNWGQfPgLiL6
+re_<RESEND_API_KEY_HIER>
 EOF
 sudo chmod 600 /etc/backup/resend.key
 
 sudo tee /etc/backup-shop-db.env > /dev/null << 'EOF'
 OCI_S3_ENDPOINT=https://<namespace>.compat.objectstorage.eu-frankfurt-1.oci.oraclecloud.com
-RESEND_API_KEY=re_YAnqVXrV_DUsgUHWtdP8FcNWGQfPgLiL6
+RESEND_API_KEY=re_<RESEND_API_KEY_HIER>
 RESEND_FROM_EMAIL=alerts@delqhi.com
 RESEND_ALERT_TO=opensin@gmx.com
 EOF
