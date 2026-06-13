@@ -30,6 +30,9 @@ export default function GlobalError({
         Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut —
         sollte der Fehler bestehen bleiben, melde dich gerne bei uns.
       </p>
+      <pre className="mb-4 max-w-2xl overflow-auto rounded bg-muted p-4 text-left text-xs">
+        {error.message}
+      </pre>
       <div className="flex gap-3">
         <button
           type="button"

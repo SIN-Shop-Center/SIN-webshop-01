@@ -1,19 +1,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import {ArrowRight, Search, Truck, ShieldCheck, RotateCcw} from 'lucide-react'
-import {getTranslations, getLocale} from 'next-intl/server'
-import {getDealProducts, getFeaturedProducts} from '@/lib/queries'
-
-function formatEur(value: number, locale: string) {
-  return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(value)
-}
+import { ArrowRight, Search, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
+import { getDealProducts, getFeaturedProducts } from '@/lib/queries'
 
 export async function HomeHero() {
-  const t = await getTranslations('homeHero')
-  const locale = await getLocale()
+  const locale: 'de' | 'en' = 'de'
   // Prefer deal products for the hero teasers; fall back to featured if no deals exist.
   let teasers = (await getDealProducts(3)).slice(0, 3)
   if (teasers.length === 0) {
@@ -25,16 +16,17 @@ export async function HomeHero() {
       <div className="container mx-auto flex flex-col gap-8 px-4 py-10 md:flex-row md:items-center md:gap-10 md:py-16">
         <div className="flex flex-1 flex-col items-start gap-5">
           <span className="rounded-full bg-sale px-3 py-1 text-xs font-bold uppercase tracking-wide text-sale-foreground">
-            {t('saveUp')}
+            Bis zu -51 % sparen
           </span>
 
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-balance md:text-5xl">
-            {t('heading')}{' '}
-            <span className="text-primary">{t('headingHighlight')}</span>
+            Premium Produkte{' '}
+            <span className="text-primary">zu fairen Preisen</span>
           </h1>
 
           <p className="text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
-            {t('subheading')}
+            Handverlesene Produkte aus Mode, Wohnen, Elektronik und Lifestyle – mit
+            kostenlosem Versand ab 49 € und 14 Tagen Widerrufsrecht.
           </p>
 
           <form
@@ -48,15 +40,15 @@ export async function HomeHero() {
               type="search"
               name="q"
               required
-              placeholder={t('searchPlaceholder')}
-              aria-label={t('searchLabel')}
+              placeholder="Wonach suchst du?"
+              aria-label="Produkte suchen"
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
             <button
               type="submit"
               className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
-              {t('searchButton')}
+              Suchen
             </button>
           </form>
 
@@ -65,29 +57,29 @@ export async function HomeHero() {
               href="/sale"
               className="flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
-              {t('discoverDeals')}
+              Deals entdecken
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
             <Link
               href="/produkte"
               className="rounded-md border border-border bg-background px-5 py-3 text-sm font-medium hover:bg-muted"
             >
-              {t('allProducts')}
+              Alle Produkte
             </Link>
           </div>
 
           <ul className="mt-1 flex flex-wrap gap-4 text-xs text-muted-foreground">
             <li className="flex items-center gap-1.5">
               <Truck className="size-3.5 text-primary" aria-hidden="true" />
-              {t('freeFrom')}
+              Versand ab 49 € gratis
             </li>
             <li className="flex items-center gap-1.5">
               <RotateCcw className="size-3.5 text-primary" aria-hidden="true" />
-              {t('returnDays')}
+              14 Tage Widerrufsrecht
             </li>
             <li className="flex items-center gap-1.5">
               <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-              {t('buyerProtection')}
+              Käuferschutz inklusive
             </li>
           </ul>
         </div>
@@ -110,7 +102,10 @@ export async function HomeHero() {
                   />
                 </div>
                 <span className="absolute bottom-2 left-2 rounded bg-sale px-1.5 py-0.5 text-xs font-bold text-sale-foreground">
-                  {formatEur(product.price, locale)}
+                  {product.price.toLocaleString('de-DE', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
                 </span>
               </Link>
             ))}

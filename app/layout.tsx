@@ -1,6 +1,5 @@
 import type {Metadata, Viewport} from 'next'
 import {Inter} from 'next/font/google'
-import {getLocale} from 'next-intl/server'
 import './globals.css'
 
 const inter = Inter({subsets: ['latin'], display: 'swap'})
@@ -73,7 +72,7 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
-  const locale = await getLocale()
+  const locale = 'de'
 
   return (
     <html lang={locale} className={`${inter.className} bg-background`}>

@@ -1,6 +1,5 @@
 // Purpose: OpenNext Cloudflare adapter config
 // Docs: https://opennext.js.org/cloudflare/get-started
-//       https://opennext.js.org/cloudflare/caching
 //
 // Hinweis: Wir nutzen den KV-basierten Incremental Cache anstelle von R2,
 // weil der Cloudflare-Account aktuell R2 nicht aktiviert hat.
@@ -18,8 +17,4 @@ export default defineCloudflareConfig({
   // Tag-Cache via Workers KV (Binding: NEXT_TAG_CACHE_KV)
   // Wird fuer Next.js 16 SWR (stale-while-revalidate) gebraucht.
   tagCache: kvTagCache,
-
-  // Default-Cache fuer ISR (kann pro Route ueberschrieben werden via revalidate)
-  // 60 Sekunden - passt zu unseren revalidate-Werten in app/page.tsx
-  // Lokales Dev: `pnpm preview` laedt den Worker in Miniflare.
 })
