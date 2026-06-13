@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {ArrowRight, Search, Truck, ShieldCheck, RotateCcw} from 'lucide-react'
 import {getTranslations, getLocale} from 'next-intl/server'
-import {getDealProducts} from '@/lib/queries'
+import {getDealProducts, getFeaturedProducts} from '@/lib/queries'
 
 function formatEur(value: number, locale: string) {
   return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'de-DE', {
@@ -14,7 +14,11 @@ function formatEur(value: number, locale: string) {
 export async function HomeHero() {
   const t = await getTranslations('homeHero')
   const locale = await getLocale()
-  const teasers = (await getDealProducts(3)).slice(0, 3)
+  // Prefer deal products for the hero teasers; fall back to featured if no deals exist.
+  let teasers = (await getDealProducts(3)).slice(0, 3)
+  if (teasers.length === 0) {
+    teasers = (await getFeaturedProducts(3)).slice(0, 3)
+  }
 
   return (
     <section className="border-b border-border bg-muted/30">

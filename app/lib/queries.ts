@@ -92,13 +92,15 @@ function transformProduct(row: DbProductViewRow): Product {
 
 // ── Public query functions ────────────────────────────────────────────────────
 
-export async function getFeaturedProducts(): Promise<Product[]> {
+export async function getFeaturedProducts(limit?: number): Promise<Product[]> {
   const supabase = createDataClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('products_v')
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
+  if (limit != null) query = query.limit(limit)
+  const { data, error } = await query
 
   if (error) throw error
   return (data ?? [])
