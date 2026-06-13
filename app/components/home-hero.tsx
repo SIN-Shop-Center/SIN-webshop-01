@@ -1,31 +1,41 @@
+// Purpose: Redesigned homepage hero with lifestyle gradient, focused CTA and prominent search
+// Docs: PLAN-VERKAUFSFAEHIG.md
+
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Search, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
-import { getDealProducts, getFeaturedProducts } from '@/lib/queries'
+import { Search, ArrowRight, Sparkles } from 'lucide-react'
 
 export async function HomeHero() {
-  const locale: 'de' | 'en' = 'de'
-  // Prefer deal products for the hero teasers; fall back to featured if no deals exist.
-  let teasers = (await getDealProducts(3)).slice(0, 3)
-  if (teasers.length === 0) {
-    teasers = (await getFeaturedProducts(3)).slice(0, 3)
-  }
-
   return (
-    <section className="border-b border-border bg-muted/30">
-      <div className="container mx-auto flex flex-col gap-8 px-4 py-10 md:flex-row md:items-center md:gap-10 md:py-16">
-        <div className="flex flex-1 flex-col items-start gap-5">
-          <span className="rounded-full bg-sale px-3 py-1 text-xs font-bold uppercase tracking-wide text-sale-foreground">
-            Bis zu -51 % sparen
+    <section className="relative overflow-hidden border-b border-border">
+      {/* Decorative background gradients */}
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] via-background to-accent/[0.06]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -right-32 -top-32 size-[520px] rounded-full bg-primary/10 blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-40 -left-40 size-[480px] rounded-full bg-accent/10 blur-3xl"
+        aria-hidden="true"
+      />
+
+      <div className="container relative mx-auto px-4 py-16 md:py-24 lg:py-32">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-sale/10 px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-sale">
+            <Sparkles className="size-4" aria-hidden="true" />
+            Bis zu 51 % sparen
           </span>
 
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-balance md:text-5xl">
-            Premium Produkte{' '}
-            <span className="text-primary">zu fairen Preisen</span>
+          <h1 className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-balance md:text-6xl lg:text-7xl">
+            Premium Produkte,
+            <br className="hidden md:block" />
+            <span className="text-primary"> faire Preise</span>
           </h1>
 
-          <p className="text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
-            Handverlesene Produkte aus Mode, Wohnen, Elektronik und Lifestyle – mit
+          <p className="mb-8 text-lg leading-relaxed text-muted-foreground text-pretty md:text-xl">
+            Handverlesene Produkte aus Mode, Wohnen, Elektronik und Lifestyle — mit
             kostenlosem Versand ab 49 € und 14 Tagen Widerrufsrecht.
           </p>
 
@@ -33,84 +43,41 @@ export async function HomeHero() {
             action="/suche"
             method="GET"
             role="search"
-            className="flex w-full max-w-md items-center gap-2 rounded-lg border border-border bg-background p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-ring"
+            className="mx-auto mb-8 flex w-full max-w-xl items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-lg shadow-primary/5 transition-shadow focus-within:shadow-primary/10 focus-within:ring-2 focus-within:ring-ring"
           >
-            <Search className="ml-2 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <Search className="ml-3 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <input
               type="search"
               name="q"
               required
               placeholder="Wonach suchst du?"
               aria-label="Produkte suchen"
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
             />
             <button
               type="submit"
-              className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="hidden shrink-0 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:block"
             >
               Suchen
             </button>
           </form>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/sale"
-              className="flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:translate-y-[-2px] hover:shadow-xl hover:shadow-primary/25"
             >
               Deals entdecken
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
             <Link
               href="/produkte"
-              className="rounded-md border border-border bg-background px-5 py-3 text-sm font-medium hover:bg-muted"
+              className="inline-flex items-center rounded-xl border border-border bg-background px-6 py-3.5 text-sm font-semibold transition-all hover:translate-y-[-2px] hover:bg-muted"
             >
               Alle Produkte
             </Link>
           </div>
-
-          <ul className="mt-1 flex flex-wrap gap-4 text-xs text-muted-foreground">
-            <li className="flex items-center gap-1.5">
-              <Truck className="size-3.5 text-primary" aria-hidden="true" />
-              Versand ab 49 € gratis
-            </li>
-            <li className="flex items-center gap-1.5">
-              <RotateCcw className="size-3.5 text-primary" aria-hidden="true" />
-              14 Tage Widerrufsrecht
-            </li>
-            <li className="flex items-center gap-1.5">
-              <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-              Käuferschutz inklusive
-            </li>
-          </ul>
         </div>
-
-        {teasers.length > 0 && (
-          <div className="grid flex-1 grid-cols-3 gap-3 md:max-w-md">
-            {teasers.map((product, i) => (
-              <Link
-                key={product.id}
-                href={`/produkt/${product.id}`}
-                className={`group relative overflow-hidden rounded-lg border border-border bg-card ${i === 0 ? 'col-span-2 row-span-2' : ''}`}
-              >
-                <div className="relative aspect-square">
-                  <Image
-                    src={product.imageUrl || '/placeholder.svg'}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 768px) 33vw, 200px"
-                    className="object-cover transition-transform group-hover:scale-105"
-                  />
-                </div>
-                <span className="absolute bottom-2 left-2 rounded bg-sale px-1.5 py-0.5 text-xs font-bold text-sale-foreground">
-                  {product.price.toLocaleString('de-DE', {
-                    style: 'currency',
-                    currency: 'EUR',
-                  })}
-                </span>
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
     </section>
   )

@@ -10,6 +10,7 @@ import { StarIcon } from './icons'
 import { CardQuickAdd } from './card-quick-add'
 import { ProductImageOverlay } from './product-image-overlay'
 import { ProductCardImage } from './product-card-image'
+import { WishlistButton } from './WishlistButton'
 
 function StarRating({ rating }: { rating: number }) {
   const percentage = Math.max(0, Math.min(100, (rating / 5) * 100))
@@ -49,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
   })
 
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/30">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20">
       <Link
         href={`/produkt/${product.id}`}
         className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -69,6 +70,10 @@ export function ProductCard({ product }: { product: Product }) {
         />
 
         <ProductImageOverlay badges={badges} size="sm" />
+
+        <div className="absolute right-2 top-2 z-20">
+          <WishlistButton productId={product.id} variant="icon" />
+        </div>
 
         {soldOut && (
           <div

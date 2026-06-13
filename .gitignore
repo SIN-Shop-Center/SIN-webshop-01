@@ -116,4 +116,5 @@ docs/infisical-secrets.env
 # Local agent state files
 sin_goal_mode.db
 .sin/
+.sin-code/
 test-results

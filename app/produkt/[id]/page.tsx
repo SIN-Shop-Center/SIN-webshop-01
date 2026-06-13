@@ -27,7 +27,6 @@ import { TrustBadges } from '@/components/product/trust-badges'
 import { SizeGuide } from '@/components/product/size-guide'
 import { AccordionInfo } from '@/components/product/accordion-info'
 import { StickyAddToCart } from '@/components/product/sticky-add-to-cart'
-import { PriceTag } from '@/components/PriceTag'
 import {
   CheckIcon,
 } from '@/components/icons'
@@ -141,32 +140,32 @@ export default async function ProductPage({
           />
 
           <div className="flex flex-col">
-            <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-balance md:text-4xl lg:text-5xl">
-              {product.title}
-            </h1>
+            <div className="mb-2 flex items-start justify-between gap-4">
+              <h1 className="text-3xl font-extrabold tracking-tight text-balance md:text-4xl lg:text-5xl">
+                {product.title}
+              </h1>
+              <div className="shrink-0 pt-1">
+                <WishlistButton productId={product.id} variant="icon" />
+              </div>
+            </div>
+
             <RatingSummary
               rating={product.rating}
               ratingCount={product.ratingCount}
               soldCount={product.soldCount}
             />
 
-            {/* Price - prominent */}
-            <div className="my-4 pb-4 border-b border-border">
-              <PriceTag
-                priceCents={priceCents}
-                originalPriceCents={originalPriceCents}
-                size="lg"
-              />
+            {/* Buy Box — price, variants, add to cart, trust */}
+            <div className="mb-6 rounded-2xl border border-border bg-muted/30 p-5 shadow-sm">
+              <VariantSelector product={product} originalPriceCents={originalPriceCents} />
+              <div className="mt-5 border-t border-border pt-4">
+                <TrustBadges />
+              </div>
             </div>
 
             <p className="mb-6 text-base leading-relaxed text-muted-foreground text-pretty">
               {product.description}
             </p>
-
-            {/* Variants + Add to Cart */}
-            <div className="mb-6">
-              <VariantSelector product={product} />
-            </div>
 
             {/* Size Guide */}
             <div className="mb-6">
@@ -176,16 +175,6 @@ export default async function ProductPage({
             {product.stock > 0 && <StockIndicator stock={product.stock} />}
             <LiveViewers productId={product.id} />
             <FreeShippingNudge />
-
-            {/* Trust badges */}
-            <div className="my-6 py-4 border-y border-border">
-              <TrustBadges />
-            </div>
-
-            {/* Wishlist */}
-            <div className="mb-6">
-              <WishlistButton productId={product.id} />
-            </div>
 
             <div className="mb-8">
               <DeliveryEstimate />

@@ -7,7 +7,13 @@ import { toCents } from '@/lib/format'
 import { PriceTag } from './PriceTag'
 import type { Product, ProductVariant } from '@/lib/data'
 
-export function VariantSelector({ product }: { product: Product }) {
+export function VariantSelector({
+  product,
+  originalPriceCents,
+}: {
+  product: Product
+  originalPriceCents?: number | null
+}) {
   const cjVariants = (product.variants ?? []).filter((v) => v.name)
   const hasColors = (product.colors?.length ?? 0) > 0
   const hasSizes = (product.sizes?.length ?? 0) > 0
@@ -41,7 +47,7 @@ export function VariantSelector({ product }: { product: Product }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <PriceTag priceCents={toCents(product.price)} size="lg" />
+      <PriceTag priceCents={toCents(product.price)} originalPriceCents={originalPriceCents} size="lg" />
 
       {hasCjVariants && (
         <fieldset className="flex flex-col gap-2">

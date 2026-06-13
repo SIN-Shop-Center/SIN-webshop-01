@@ -12,9 +12,11 @@ import { HeartIcon, SpinnerIcon, AlertCircleIcon } from './icons'
 export function WishlistButton({
   productId,
   initiallyWishlisted = false,
+  variant = 'default',
 }: {
   productId: string
   initiallyWishlisted?: boolean
+  variant?: 'default' | 'icon'
 }) {
   const [isPending, startTransition] = useTransition()
   const [wishlisted, setWishlisted] = useState(initiallyWishlisted)
@@ -39,6 +41,39 @@ export function WishlistButton({
         setError('Wunschliste konnte nicht aktualisiert werden. Bitte versuche es erneut.')
       }
     })
+  }
+
+  const heartIcon = isPending ? (
+    <SpinnerIcon className="size-5 animate-spin" aria-hidden />
+  ) : wishlisted ? (
+    <HeartIcon className="size-5 fill-current" aria-hidden />
+  ) : (
+    <HeartIcon className="size-5" aria-hidden />
+  )
+
+  if (variant === 'icon') {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={isPending}
+          aria-pressed={wishlisted}
+          aria-label={wishlisted ? 'Von Wunschliste entfernen' : 'Auf die Wunschliste'}
+          className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition-all hover:scale-110 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        >
+          {heartIcon}
+        </button>
+        {error && (
+          <p className="sr-only" role="alert">
+            {error}
+          </p>
+        )}
+        <span className="sr-only" role="status" aria-live="polite">
+          {error ?? (wishlisted ? 'Zur Wunschliste hinzugefügt' : '')}
+        </span>
+      </>
+    )
   }
 
   return (
