@@ -36,7 +36,7 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: deploy --env production
+          command: deploy
       - name: Smoke test
         run: |
           for i in 1 2 3 4 5; do
@@ -69,7 +69,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: rollback --env production
+          command: rollback
       - name: Verify rollback
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://shopsin.delqhi.com/ || true)
