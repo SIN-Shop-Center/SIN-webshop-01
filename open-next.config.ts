@@ -1,20 +1,23 @@
-// Purpose: OpenNext Cloudflare adapter config
-// Docs: https://opennext.js.org/cloudflare/get-started
+// Purpose: OpenNext Cloudflare adapter config — R2 ISR cache + DO queue + D1 tag cache
+// Docs: https://opennext.js.org/cloudflare/caching
+//       docs/DEPLOY-CLOUDFLARE.md
 //
-// Hinweis: Wir nutzen den KV-basierten Incremental Cache anstelle von R2,
-// weil der Cloudflare-Account aktuell R2 nicht aktiviert hat.
-// R2 kann spaeter ueber das Dashboard aktiviert und optional migriert werden
-// (siehe docs/DEPLOY-CLOUDFLARE.md, Sektion "R2-Migration").
+// Setup: R2 incremental cache, Durable Objects queue, D1 tag cache.
+// R2 muss im Cloudflare-Dashboard aktiviert sein; Bucket + D1 DB werden via
+// Wrangler angelegt (siehe docs/DEPLOY-CLOUDFLARE.md).
 
 import { defineCloudflareConfig } from "@opennextjs/cloudflare"
-import kvIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache"
-import kvTagCache from "@opennextjs/cloudflare/overrides/tag-cache/kv-next-tag-cache"
+import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache"
+import doQueue from "@opennextjs/cloudflare/overrides/queue/do-queue"
+import d1NextTagCache from "@opennextjs/cloudflare/overrides/tag-cache/d1-next-tag-cache"
 
 export default defineCloudflareConfig({
-  // ISR-Cache via Workers KV (Binding: NEXT_INC_CACHE_KV)
-  incrementalCache: kvIncrementalCache,
+  // ISR-Cache via R2 (Binding: NEXT_INC_CACHE_R2_BUCKET)
+  incrementalCache: r2IncrementalCache,
 
-  // Tag-Cache via Workers KV (Binding: NEXT_TAG_CACHE_KV)
-  // Wird fuer Next.js 16 SWR (stale-while-revalidate) gebraucht.
-  tagCache: kvTagCache,
+  // Zeitbasierte Revalidierung (z. B. revalidate = 300) via Durable Objects Queue
+  queue: doQueue,
+
+  // On-Demand Revalidierung (revalidatePath / revalidateTag) via D1
+  tagCache: d1NextTagCache,
 })

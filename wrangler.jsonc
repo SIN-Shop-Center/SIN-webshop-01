@@ -5,10 +5,11 @@
 // DEPLOYMENT TARGET: shopsin.delqhi.com (neuer Next.js 16 Storefront)
 // ALTE DOMAIN delqhi.com: bleibt unangetastet (alter Vite-Worker bleibt live)
 //
-// HINWEIS: Wir nutzen Workers KV fuer ISR-Cache (Binding: NEXT_INC_CACHE_KV)
-// anstelle von R2, weil der Cloudflare-Account aktuell R2 nicht aktiviert hat.
-// Sobald R2 uebers Dashboard aktiviert ist, kann optional auf R2-Cache
-// migriert werden (siehe docs/DEPLOY-CLOUDFLARE.md, Sektion "R2-Migration").
+// HINWEIS: ISR-Cache laeuft jetzt ueber R2 Object Storage (Binding:
+// NEXT_INC_CACHE_R2_BUCKET). On-Demand Revalidierung nutzt D1
+// (NEXT_TAG_CACHE_D1), zeitbasierte Revalidierung eine Durable Objects Queue
+// (NEXT_CACHE_DO_QUEUE). R2 muss im Cloudflare-Dashboard aktiviert sein; das
+// Setup ist in docs/DEPLOY-CLOUDFLARE.md dokumentiert.
 
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -26,20 +27,45 @@
     "enabled": true
   },
 
-  // Workers KV fuer ISR-Cache und Tag-Cache (Next.js 16 SWR)
-  // KV Namespaces werden von wrangler automatisch angelegt falls nicht existent.
-  // Erstellt via:
-  //   wrangler kv namespace create shopsin-cache
-  //   wrangler kv namespace create shopsin-tag-cache
-  // IDs siehe unten (per `wrangler kv namespace list`).
-  "kv_namespaces": [
+  // R2 Object Storage fuer ISR-Cache (Next.js 16 SWR)
+  // Bucket muss vorhanden sein: wrangler r2 bucket create shopsin-storefront-cache
+  "r2_buckets": [
     {
-      "binding": "NEXT_INC_CACHE_KV",
-      "id": "2814f891c4ad4c8ba0a6acfa5c1e5f72"
-    },
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "shopsin-storefront-cache"
+    }
+  ],
+
+  // D1 Datenbank fuer On-Demand Revalidierung (revalidatePath / revalidateTag)
+  "d1_databases": [
     {
-      "binding": "NEXT_TAG_CACHE_KV",
-      "id": "a3a86ddb28b541be855e9c8c23084999"
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "shopsin-tag-cache",
+      "database_id": "41988646-c756-4da9-9507-49183221a8c3"
+    }
+  ],
+
+  // Durable Objects Queue fuer zeitbasierte Revalidierung (revalidate = N)
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler"]
+    }
+  ],
+
+  // Self-Reference Service Binding (wird fuer DO Queue + Cache Purge benoetigt)
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "shopsin-storefront"
     }
   ],
 

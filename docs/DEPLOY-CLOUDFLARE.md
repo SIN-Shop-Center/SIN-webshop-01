@@ -31,8 +31,12 @@ pnpm exec wrangler login
 ### 3. Erstes Deploy
 
 ```bash
-# Vor dem ersten Deploy: R2-Bucket anlegen
+# Voraussetzungen vor dem ersten Deploy (R2 + D1 + DO Queue)
+# R2 muss im Cloudflare-Dashboard aktiviert sein
 pnpm exec wrangler r2 bucket create shopsin-storefront-cache
+pnpm exec wrangler d1 create shopsin-tag-cache
+pnpm exec wrangler d1 execute shopsin-tag-cache --remote --command \
+  "CREATE TABLE IF NOT EXISTS revalidations (tag TEXT PRIMARY KEY, revalidatedAt INTEGER NOT NULL, stale INTEGER, expire INTEGER);"
 
 # Build + Deploy
 pnpm deploy:cloudflare
