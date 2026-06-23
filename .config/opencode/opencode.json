@@ -9,591 +9,208 @@
     "/Users/jeremy/.config/opencode/plugins/omoc-swarm.ts"
   ],
   "mcp": {
-    "sin-analyse": {
+    "serena": {
+      "type": "local",
       "command": [
-        "/Users/jeremy/dev/SIN-Analyse-Suite/sin-analyse",
-        "serve"
+        "uvx",
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server"
       ],
-      "description": "SIN-Analyse-Suite \u2014 multimodal preprocessing (image, video, PDF, logs, data, audio)",
-      "enabled": true,
-      "type": "local"
+      "enabled": true
     },
-    "sin-code": {
+    "tavily": {
+      "type": "local",
       "command": [
-        "/Users/jeremy/.local/bin/sin-code",
-        "serve"
+        "npx",
+        "-y",
+        "@tavily/claude-mcp"
       ],
-      "description": "SIN-Code unified MCP server \u2014 49+ tools (code, audit, security, hub, ledger, progress, tool timing, live token/cost). Exposes sin_* builtins + external prefixes.",
       "enabled": true,
-      "type": "local"
+      "environment": {
+        "TAVILY_API_KEY": "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"
+      }
+    },
+    "canva": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@canva/claude-mcp"
+      ],
+      "enabled": true
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@anthropics/context7-mcp"
+      ],
+      "enabled": true
+    },
+    "skyvern": {
+      "type": "local",
+      "command": [
+        "python",
+        "-m",
+        "skyvern.mcp.server"
+      ],
+      "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@anthropics/chrome-devtools-mcp"
+      ],
+      "enabled": true
+    },
+    "linear": {
+      "type": "remote",
+      "url": "https://mcp.linear.app/sse",
+      "enabled": true
+    },
+    "singularity": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/jeremy/.singularity/CLI/bin/singularity.js",
+        "mcp"
+      ],
+      "enabled": true
+    },
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true
+    },
+    "sin_social": {
+      "type": "remote",
+      "url": "https://sin-social.delqhi.com",
+      "enabled": true
+    },
+    "sin_deep_research": {
+      "type": "remote",
+      "url": "https://sin-research.delqhi.com",
+      "enabled": true
+    },
+    "sin_video_gen": {
+      "type": "remote",
+      "url": "https://sin-video.delqhi.com",
+      "enabled": true
+    },
+    "sin_plugins": {
+      "type": "remote",
+      "url": "https://sin-plugins.delqhi.com",
+      "enabled": true
+    },
+    "sin_api_coordinator": {
+      "type": "remote",
+      "url": "https://api-coordinator.delqhi.com",
+      "enabled": true
+    },
+    "sin_clawdbot": {
+      "type": "remote",
+      "url": "https://clawdbot-ceo.delqhi.com",
+      "enabled": true
+    },
+    "sin_survey_worker": {
+      "type": "remote",
+      "url": "https://survey.delqhi.com",
+      "enabled": true
+    },
+    "sin_captcha_worker": {
+      "type": "remote",
+      "url": "https://captcha.delqhi.com",
+      "enabled": true
+    },
+    "sin_website_worker": {
+      "type": "remote",
+      "url": "https://website-worker.delqhi.com",
+      "enabled": true
+    },
+    "sin_browser_agent_zero": {
+      "type": "remote",
+      "url": "https://agent-zero.delqhi.com",
+      "enabled": true
+    },
+    "sin_browser_steel": {
+      "type": "remote",
+      "url": "https://steel.delqhi.com",
+      "enabled": true
+    },
+    "sin_browser_skyvern": {
+      "type": "remote",
+      "url": "https://skyvern.delqhi.com",
+      "enabled": true
+    },
+    "sin_browser_stagehand": {
+      "type": "remote",
+      "url": "https://stagehand.delqhi.com",
+      "enabled": true
+    },
+    "sin-chrome-devtools": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "sin-chrome-devtools-mcp:latest"
+      ],
+      "enabled": false
+    },
+    "sin-agent-zero": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "sin-agent-zero-mcp:latest"
+      ],
+      "enabled": false
+    },
+    "sin-stagehand": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "sin-stagehand-mcp:latest"
+      ],
+      "enabled": false
     }
   },
   "provider": {
-    "fireworks-ai": {
+    "google": {
+      "npm": "@ai-sdk/google",
       "models": {
-        "deepseek-v4-pro": {
-          "id": "accounts/fireworks/models/deepseek-v4-pro",
+        "gemini-3-flash": {
+          "id": "gemini-3-flash-preview",
+          "name": "Gemini 3 Flash (Standard)",
+          "reasoning": true,
           "limit": {
             "context": 1048576,
             "output": 65536
-          },
-          "name": "DeepSeek V4 Pro (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 64000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 128000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
           }
         },
-        "glm-5p1": {
-          "id": "accounts/fireworks/models/glm-5p1",
+        "gemini-3-pro": {
+          "id": "gemini-3-pro-preview",
+          "name": "Gemini 3 Pro (Standard)",
+          "reasoning": true,
           "limit": {
-            "context": 202752,
-            "output": 32768
-          },
-          "name": "GLM 5.1 (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 32000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 32000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "glm-5p1-fast": {
-          "id": "accounts/fireworks/routers/glm-5p1-fast",
-          "limit": {
-            "context": 131072,
-            "output": 16384
-          },
-          "name": "GLM 5.1 Fast (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 4000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 8000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 2000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "glm-5p2": {
-          "id": "accounts/fireworks/models/glm-5p2",
-          "limit": {
-            "context": 202752,
-            "output": 32768
-          },
-          "name": "GLM 5.2 (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 32000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 32000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "kimi-k2p7-code": {
-          "id": "accounts/fireworks/models/kimi-k2p7-code",
-          "limit": {
-            "context": 262144,
-            "output": 32768
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "Kimi K2.7 Code (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 32000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 32000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "kimi-k2p7-code-fast": {
-          "id": "accounts/fireworks/routers/kimi-k2p7-code-fast",
-          "limit": {
-            "context": 131072,
-            "output": 16384
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "Kimi K2.7 Code Fast (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 4000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 8000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 2000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "minimax-m2p7": {
-          "id": "accounts/fireworks/models/minimax-m2p7",
-          "limit": {
-            "context": 196608,
-            "output": 32768
-          },
-          "name": "MiniMax M2.7 (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 32000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 32000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "qwen3p7-plus": {
-          "id": "accounts/fireworks/models/qwen3p7-plus",
-          "limit": {
-            "context": 131072,
-            "output": 32768
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "Qwen3.7 Plus (SIN)",
-          "options": {
-            "thinking": {
-              "budgetTokens": 32000,
-              "type": "enabled"
-            }
-          },
-          "variants": {
-            "high": {
-              "thinking": {
-                "budgetTokens": 32000,
-                "type": "enabled"
-              }
-            },
-            "low": {
-              "thinking": {
-                "budgetTokens": 4000,
-                "type": "enabled"
-              }
-            },
-            "max": {
-              "thinking": {
-                "budgetTokens": 64000,
-                "type": "enabled"
-              }
-            },
-            "medium": {
-              "thinking": {
-                "budgetTokens": 16000,
-                "type": "enabled"
-              }
-            },
-            "off": {
-              "thinking": {
-                "type": "disabled"
-              }
-            }
-          }
-        },
-        "minimax-m3": {
-          "id": "accounts/fireworks/models/minimax-m3",
-          "name": "MiniMax M3 (SIN)",
-          "options": {
-            "thinking": {
-              "type": "enabled"
-            }
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "limit": {
-            "context": 1000000,
+            "context": 2097152,
             "output": 65536
           }
-        }
-      },
-      "name": "Fireworks AI",
-      "npm": "@ai-sdk/fireworks",
-      "options": {
-        "apiKey": "7avN1KkfInNqcOMn2CtwLTvx",
-        "baseURL": "https://sinatorpool-router.delqhi.com/inference/v1"
-      }
-    },
-    "v0-dev": {
-      "models": {
-        "v0-large": {
-          "id": "v0-1.5-lg",
-          "limit": {
-            "context": 524288,
-            "output": 65536
-          },
-          "name": "v0 Large (512K)",
-          "options": {
-            "temperature": 0
-          }
         },
-        "v0-medium": {
-          "id": "v0-1.5-md",
-          "limit": {
-            "context": 131072,
-            "output": 65536
-          },
-          "name": "v0 Medium (128K)",
-          "options": {
-            "temperature": 0
-          }
-        },
-        "v0-small": {
-          "id": "v0-1.0-md",
-          "limit": {
-            "context": 131072,
-            "output": 65536
-          },
-          "name": "v0 Small (legacy)",
-          "options": {
-            "temperature": 0
-          }
-        }
-      },
-      "name": "v0 by Vercel",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "apiKey": "dummy-key",
-        "baseURL": "http://localhost:27401/v1"
-      }
-    },
-    "vercel-pool": {
-      "models": {
-        "grok-4": {
-          "id": "xai/grok-4.3",
-          "limit": {
-            "context": 1000000,
-            "output": 1000000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "Grok 4.3 (SIN Flagship)",
-          "options": {
-            "temperature": 0
-          },
-          "variants": {
-            "high": {
-              "reasoning": {
-                "effort": "high",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "low": {
-              "reasoning": {
-                "effort": "low",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "medium": {
-              "reasoning": {
-                "effort": "medium",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "off": {
-              "reasoning": {
-                "type": "disabled"
-              },
-              "temperature": 0
-            }
-          }
-        },
-        "grok-build": {
-          "id": "xai/grok-build-0.1",
-          "limit": {
-            "context": 256000,
-            "output": 256000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "name": "Grok Build 0.1 (SIN)",
-          "options": {
-            "temperature": 0
-          },
-          "variants": {
-            "high": {
-              "reasoning": {
-                "effort": "high",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "low": {
-              "reasoning": {
-                "effort": "low",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "medium": {
-              "reasoning": {
-                "effort": "medium",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "off": {
-              "reasoning": {
-                "type": "disabled"
-              },
-              "temperature": 0
-            }
-          }
-        },
-        "minimax-m3": {
-          "id": "minimax/minimax-m3",
+        "antigravity-gemini-3-flash": {
+          "id": "gemini-3-flash-preview",
+          "name": "Gemini 3 Flash (Antigravity)",
           "limit": {
             "context": 1048576,
             "output": 65536
@@ -608,45 +225,90 @@
               "text"
             ]
           },
-          "name": "MiniMax M3 (SIN)",
-          "options": {
-            "temperature": 0
-          },
           "variants": {
+            "minimal": {
+              "thinkingLevel": "minimal"
+            },
             "high": {
-              "reasoning": {
-                "effort": "high",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "low": {
-              "reasoning": {
-                "effort": "low",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "medium": {
-              "reasoning": {
-                "effort": "medium",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "off": {
-              "reasoning": {
-                "type": "disabled"
-              },
-              "temperature": 0
+              "thinkingLevel": "high"
             }
           }
         },
-        "nano-banana-2": {
-          "id": "google/gemini-3.1-flash-image",
+        "antigravity-gemini-3-pro": {
+          "id": "gemini-3-pro-preview",
+          "name": "Gemini 3 Pro (Antigravity)",
           "limit": {
-            "context": 131072,
-            "output": 32768
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "thinkingLevel": "low"
+            },
+            "high": {
+              "thinkingLevel": "high"
+            }
+          }
+        },
+        "antigravity-claude-sonnet-4-5-thinking": {
+          "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "variants": {
+            "low": {
+              "thinkingConfig": {
+                "thinkingBudget": 8192
+              }
+            },
+            "max": {
+              "thinkingConfig": {
+                "thinkingBudget": 32768
+              }
+            }
+          }
+        }
+      }
+    },
+    "streamlake": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Streamlake",
+      "options": {
+        "baseURL": "https://vanchin.streamlake.ai/api/gateway/v1/endpoints/kat-coder-pro-v1/claude-code-proxy"
+      },
+      "models": {
+        "kat-coder-pro-v1": {
+          "name": "KAT Coder Pro v1 (Streamlake)",
+          "limit": {
+            "context": 2000000,
+            "output": 128000
+          }
+        }
+      }
+    },
+    "xiaomi": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "XiaoMi MIMO",
+      "options": {
+        "baseURL": "https://api.xiaomi.ai/v1"
+      },
+      "models": {
+        "mimo-v2-flash": {
+          "name": "MIMO v2 Flash (XiaoMi)",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
           },
           "modalities": {
             "input": [
@@ -654,57 +316,77 @@
               "image"
             ],
             "output": [
-              "text",
-              "image"
+              "text"
             ]
-          },
-          "name": "Gemini 3.1 Flash Image / Nano Banana 2 (SIN)",
-          "options": {
-            "modalities": [
-              "text",
-              "image"
-            ],
-            "temperature": 0
-          },
-          "variants": {
-            "high": {
-              "reasoning": {
-                "effort": "high",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "low": {
-              "reasoning": {
-                "effort": "low",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "medium": {
-              "reasoning": {
-                "effort": "medium",
-                "type": "enabled"
-              },
-              "temperature": 0
-            },
-            "off": {
-              "reasoning": {
-                "type": "disabled"
-              },
-              "temperature": 0
-            }
+          }
+        },
+        "mimo-v2-turbo": {
+          "name": "MIMO v2 Turbo (XiaoMi)",
+          "limit": {
+            "context": 1500000,
+            "output": 100000
           }
         }
-      },
-      "name": "Vercel AI Gateway Pool (SIN)",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "apiKey": "dummy",
-        "baseURL": "http://localhost:17341/v1"
       }
-    }
-  },
-  "defaultModel": "fireworks-ai/deepseek-v4-pro",
-  "default_agent": "SIN-Zeus"
+    },
+    "opencode-zen": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OpenCode ZEN (FREE)",
+      "options": {
+        "baseURL": "https://api.opencode.ai/v1"
+      },
+      "models": {
+        "zen/big-pickle": {
+          "name": "Big Pickle (OpenCode ZEN - UNCENSORED)",
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "zen/uncensored": {
+          "name": "Uncensored (OpenCode ZEN)",
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "zen/advanced": {
+          "name": "Advanced (OpenCode ZEN)",
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "zen/code": {
+          "name": "Code (OpenCode ZEN)",
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "zen/reasoning": {
+          "name": "Reasoning (OpenCode ZEN)",
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "grok-code": {
+          "name": "Grok Code (OpenCode ZEN - VIA OPENROUTER)",
+          "limit": {
+            "context": 2000000,
+            "output": 131072
+          }
+        },
+        "glm-4.7-free": {
+          "name": "GLM 4.7 Free (OpenCode ZEN - VIA OPENROUTER)",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          }
+        }
+      }
+    },
+    "openai": {}
+  }
 }
