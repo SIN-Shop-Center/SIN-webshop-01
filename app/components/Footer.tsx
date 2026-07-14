@@ -142,9 +142,17 @@ export function Footer() {
             <PaymentMethods />
           </div>
 
-          <p className="text-xs text-muted-foreground lg:justify-self-end">
-            {t('copyright', { year: new Date().getFullYear() })}
-          </p>
+          <div className="flex flex-col items-start gap-2 lg:items-end">
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium">GPSR:</span> ShopSIN · Jeremy Schulze · Kurfürstenstraße 124 · 10785 Berlin · DE
+            </p>
+            <p className="text-xs text-muted-foreground">
+              zukunftsorientierte.energie@gmail.com · +49 176 41556786
+            </p>
+            <p className="text-xs text-muted-foreground lg:justify-self-end">
+              {t('copyright', { year: new Date().getFullYear() })}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
