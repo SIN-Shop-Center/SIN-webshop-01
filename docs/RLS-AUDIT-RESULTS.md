@@ -6,30 +6,30 @@
 **Run command:**
 ```bash
 # Copy SQL to VM
-scp scripts/supabase/audit-rls.sql scripts/supabase/fix-rls-gaps.sql \
+scp tooling/scripts/supabase/audit-rls.sql tooling/scripts/supabase/fix-rls-gaps.sql \
   ubuntu@92.5.60.87:/home/ubuntu/sin-webshop-01/scripts/supabase/
 
 # Initial audit
-cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -" \
   > /home/ubuntu/sin-webshop-01/audit-rls-before.txt
 
 # Idempotent fix (schema references corrected — see Remediation Log)
-cat scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -" \
   > /home/ubuntu/sin-webshop-01/fix-rls-gaps-output-v2.txt
 
 # Verification audit
-cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -" \
   > /home/ubuntu/sin-webshop-01/audit-rls-final-v2.txt
 
 # Final openai_tokens fix + audit v3
-cat scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -" \
   > /home/ubuntu/sin-webshop-01/fix-rls-openai-tokens.txt
 
-cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -" \
   > /home/ubuntu/sin-webshop-01/audit-rls-final-v3.txt
 ```
@@ -79,12 +79,12 @@ cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
 ## Remediation Log
 
 1. **Initial fix-rls-gaps.sql failed** due to schema references that assumed the older `public` schema for `orders`, `contact_messages`, and `processed_events`. The actual VM has these tables in the `shop` schema.
-2. **Corrected `scripts/supabase/fix-rls-gaps.sql`:**
+2. **Corrected `tooling/scripts/supabase/fix-rls-gaps.sql`:**
    - `public.processed_events` → `shop.processed_events`
    - `public.orders` → `shop.orders`
    - `public.contact_messages` → `shop.contact_messages`
    - `orders` (unqualified) → `shop.orders`
-3. **Corrected `scripts/supabase/audit-rls.sql`:**
+3. **Corrected `tooling/scripts/supabase/audit-rls.sql`:**
    - View `security_invoker` check now accepts `security_invoker=true` (the actual PostgreSQL setting) in addition to `=on`.
    - Section 6 now includes `qual` / `with_check` and distinguishes real mutations from default-deny policies.
    - Section 3 assessment now recognizes `service_role` exclusive policies as safe (`OK: service-role bypasses RLS anyway`).
@@ -198,14 +198,14 @@ cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
 Run the corrected fix script:
 
 ```bash
-cat scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/fix-rls-gaps.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -"
 ```
 
 Then re-run the audit to verify:
 
 ```bash
-cat scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
+cat tooling/scripts/supabase/audit-rls.sql | ssh ubuntu@92.5.60.87 \
   "docker exec -i supabase-db psql -U postgres -d postgres -f -"
 ```
 

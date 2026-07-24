@@ -7,10 +7,10 @@
 
 Im Repo (PR #69):
 - `next/image` in 11 Dateien, `remotePatterns` + AVIF/WebP konfiguriert
-- `scripts/sync-cj-images.ts` (CJ-Bilder → Supabase Storage mit sharp) — **bereits deployed**
-- `app/api/cron/image-sync/route.ts` — **bereits deployed**
+- `tooling/scripts/sync-cj-images.ts` (CJ-Bilder → Supabase Storage mit sharp) — **bereits deployed**
+- `src/app/api/cron/image-sync/route.ts` — **bereits deployed**
 
-Eine Stelle fehlt noch: `app/suche/page.tsx` benutzt rohes `<img>`. Dann Bucket `product-images` anlegen und Cron triggern.
+Eine Stelle fehlt noch: `src/app/suche/page.tsx` benutzt rohes `<img>`. Dann Bucket `product-images` anlegen und Cron triggern.
 
 ## Step 1 — Supabase Storage Bucket anlegen (manuell, 1 Min)
 
@@ -35,7 +35,7 @@ CREATE POLICY "product_images_read" ON storage.objects
   FOR SELECT USING (bucket_id = 'product-images');
 ```
 
-## Step 2 — `<img>` → `<Image>` in `app/suche/page.tsx`
+## Step 2 — `<img>` → `<Image>` in `src/app/suche/page.tsx`
 
 ```diff
 - <img src={product.image_url} alt={product.title} className="..." />
@@ -71,7 +71,7 @@ export PATH=\$HOME/.local/node-22/bin:\$HOME/.local/share/pnpm:\$PATH
 export NEXT_PUBLIC_SUPABASE_URL='https://supabase.delqhi.com'
 export NEXT_PUBLIC_SUPABASE_ANON_KEY='...'
 export SUPABASE_SERVICE_ROLE_KEY='...'
-node scripts/sync-cj-images.ts 2>&1 | head -30
+node tooling/scripts/sync-cj-images.ts 2>&1 | head -30
 " 2>&1 | tail -20
 ```
 
@@ -80,7 +80,7 @@ Expected output: `✓ synced: 50+` (initial backfill).
 ## Step 5 — use `image_url_local ?? image_url` in frontend
 
 ```tsx
-// app/components/product-card.tsx (and other components)
+// src/components/product-card.tsx (and other components)
 <img
   src={product.image_url_local ?? product.image_url}
   alt={product.title}
@@ -102,7 +102,7 @@ crons = [
 
 ## Acceptance
 
-- 0 `<img>` in `app/` (only `<Image>` from `next/image`)
+- 0 `<img>` in `src/app/` (only `<Image>` from `next/image`)
 - `product-images` bucket exists, public, ~50 files
 - 50+ products have `image_url_local` populated
 - Lighthouse image-format score: ✅ (AVIF/WebP)

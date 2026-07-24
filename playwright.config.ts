@@ -1,16 +1,17 @@
 // Playwright Config — E2E Browser-Tests (Issue #32)
 // Docs: https://playwright.dev/docs/test-configuration
 //
-// Verwendet System-Chrome (statt ms-playwright-Chromium) — spart 200MB
-// Download, ist auf macOS Dev-Maschinen eh installiert.
+// Lokale Entwicklung kann einen vorhandenen Browser nutzen. In CI installiert
+// Playwright den versionierten Chromium-Build, damit die Tests reproduzierbar sind.
 
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = Number(process.env.PORT ?? 3000)
-const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
+const BASE_URL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${PORT}`
+const USE_PRODUCTION_SERVER = process.env.E2E_USE_PRODUCTION === 'true'
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './tooling/tests/e2e',
   fullyParallel: false, // sequenziell wegen geteilter Test-User
   workers: 1,
   timeout: 60_000,
@@ -31,7 +32,6 @@ export default defineConfig({
       testMatch: /^(?!.*mobile).*\.spec\.ts$/, // nicht-mobile Tests
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome', // nutze System-Chrome
       },
     },
     {
@@ -43,10 +43,12 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: 'pnpm dev',
-        port: PORT,
-        timeout: 60_000,
+        command: USE_PRODUCTION_SERVER
+          ? `pnpm start --hostname 127.0.0.1 --port ${PORT}`
+          : `pnpm dev --hostname 127.0.0.1 --port ${PORT}`,
+        url: BASE_URL,
+        timeout: 120_000,
         reuseExistingServer: !process.env.CI,
-        env: { PORT: String(PORT) },
+        env: { ...process.env, PORT: String(PORT) },
       },
 })

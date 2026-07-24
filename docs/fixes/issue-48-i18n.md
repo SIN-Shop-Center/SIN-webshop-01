@@ -13,10 +13,10 @@ Adds a `next-intl` layer. The existing German URL paths (`/warenkorb`, `/kasse`,
 pnpm add next-intl
 ```
 
-## Step 2 — `i18n/routing.ts` (new)
+## Step 2 — `src/i18n/routing.ts` (new)
 
 ```ts
-// i18n/routing.ts
+// src/i18n/routing.ts
 import { defineRouting } from 'next-intl/routing'
 
 export const routing = defineRouting({
@@ -34,10 +34,10 @@ export const routing = defineRouting({
 })
 ```
 
-## Step 3 — `i18n/request.ts` (new)
+## Step 3 — `src/i18n/request.ts` (new)
 
 ```ts
-// i18n/request.ts
+// src/i18n/request.ts
 import { getRequestConfig } from 'next-intl/server'
 import { hasLocale } from 'next-intl'
 import { routing } from './routing'
@@ -52,10 +52,10 @@ export default getRequestConfig(async ({ requestLocale }) => {
 })
 ```
 
-## Step 4 — `i18n/navigation.ts` (new)
+## Step 4 — `src/i18n/navigation.ts` (new)
 
 ```ts
-// i18n/navigation.ts
+// src/i18n/navigation.ts
 import { createNavigation } from 'next-intl/navigation'
 import { routing } from './routing'
 
@@ -93,29 +93,29 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 export default withNextIntl(nextConfig)
 ```
 
-## Step 7 — page migration: `app/` → `app/[locale]/`
+## Step 7 — page migration: `src/app/` → `src/app/[locale]/`
 
 ```sh
 # Move all user-facing pages (NOT api/)
-mv app/page.tsx app/[locale]/page.tsx
-mv app/produkte app/[locale]/produkte
-mv app/produkt app/[locale]/produkt
-mv app/warenkorb app/[locale]/warenkorb
-mv app/kasse app/[locale]/kasse
-mv app/konto app/[locale]/konto
-mv app/suche app/[locale]/suche
-mv app/agb app/[locale]/agb
-mv app/datenschutz app/[locale]/datenschutz
-mv app/widerrufsrecht app/[locale]/widerrufsrecht
-mv app/versand app/[locale]/versand
-mv app/kontakt app/[locale]/kontakt
-mv app/bestellung-verfolgen app/[locale]/bestellung-verfolgen
-mv app/sale app/[locale]/sale
-mv app/impressum app/[locale]/impressum
-# app/api/, app/auth/, app/admin/ BLEIBEN (nicht gemoved!)
+mv src/app/page.tsx src/app/[locale]/page.tsx
+mv src/app/produkte src/app/[locale]/produkte
+mv src/app/produkt src/app/[locale]/produkt
+mv src/app/warenkorb src/app/[locale]/warenkorb
+mv src/app/kasse src/app/[locale]/kasse
+mv src/app/konto src/app/[locale]/konto
+mv src/app/suche src/app/[locale]/suche
+mv src/app/agb src/app/[locale]/agb
+mv src/app/datenschutz src/app/[locale]/datenschutz
+mv src/app/widerrufsrecht src/app/[locale]/widerrufsrecht
+mv src/app/versand src/app/[locale]/versand
+mv src/app/kontakt src/app/[locale]/kontakt
+mv src/app/bestellung-verfolgen src/app/[locale]/bestellung-verfolgen
+mv src/app/sale src/app/[locale]/sale
+mv src/app/impressum src/app/[locale]/impressum
+# src/app/api/, src/app/auth/, src/app/admin/ BLEIBEN (nicht gemoved!)
 
 # Add the locale layout
-cat > app/[locale]/layout.tsx << 'EOF'
+cat > src/app/[locale]/layout.tsx << 'EOF'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -147,7 +147,7 @@ export default async function LocaleLayout({
 EOF
 ```
 
-## Step 8 — `messages/de.json` (new)
+## Step 8 — `src/messages/de.json` (new)
 
 ```json
 {
@@ -181,7 +181,7 @@ EOF
 }
 ```
 
-## Step 9 — `messages/en.json` (new)
+## Step 9 — `src/messages/en.json` (new)
 
 ```json
 {
@@ -218,7 +218,7 @@ EOF
 ## Step 10 — convert hardcoded strings
 
 ```sh
-grep -rn "Warenkorb\|Bestellung\|Bezahlen\|In den Warenkorb" app/ components/ | head -30
+grep -rn "Warenkorb\|Bestellung\|Bezahlen\|In den Warenkorb" src/app/ components/ | head -30
 ```
 
 Replace each with:
@@ -252,7 +252,7 @@ revalidatePath('/', 'layout')
 ## Step 12 — Locale-Switcher component
 
 ```tsx
-// app/components/locale-switcher.tsx
+// src/components/locale-switcher.tsx
 'use client'
 
 import { useLocale } from 'next-intl'
@@ -277,13 +277,13 @@ export function LocaleSwitcher() {
 }
 ```
 
-Place in `app/[locale]/layout.tsx` (in the navbar).
+Place in `src/app/[locale]/layout.tsx` (in the navbar).
 
 ## Acceptance
 
 - `/` (German default) and `/en/` (English) both render
-- 0 hardcoded German strings in `app/[locale]/`
-- All German UI has English equivalent in `messages/en.json`
+- 0 hardcoded German strings in `src/app/[locale]/`
+- All German UI has English equivalent in `src/messages/en.json`
 - Locale-Switcher changes the language
 
 ## Closing

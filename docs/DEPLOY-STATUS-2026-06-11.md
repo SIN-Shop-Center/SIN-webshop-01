@@ -106,7 +106,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA shop TO authenticat
 
 ### 3. SQL-Migrations ausgeführt
 
-`scripts/supabase/setup-{rls,cart,orders,cj,contact,customer-orders}.sql` — durchgelaufen, mit einer manuellen Korrektur: `cart_items` Tabelle hatte `user_id`-Schema (von früherer Migration), wurde mit `DROP/CREATE` auf das `cart_id`-Schema umgestellt, das die App-Code erwartet.
+`tooling/scripts/supabase/setup-{rls,cart,orders,cj,contact,customer-orders}.sql` — durchgelaufen, mit einer manuellen Korrektur: `cart_items` Tabelle hatte `user_id`-Schema (von früherer Migration), wurde mit `DROP/CREATE` auf das `cart_id`-Schema umgestellt, das die App-Code erwartet.
 
 ---
 
@@ -114,21 +114,21 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA shop TO authenticat
 
 ### Supabase-Client-Konfiguration (alle 3 Dateien)
 
-`db: { schema: 'shop' }` in `app/lib/supabase/{server,client,admin}.ts` hinzugefügt, damit `supabase.from('products')` automatisch `Accept-Profile: shop` an PostgREST sendet.
+`db: { schema: 'shop' }` in `src/lib/supabase/{server,client,admin}.ts` hinzugefügt, damit `supabase.from('products')` automatisch `Accept-Profile: shop` an PostgREST sendet.
 
 ### `getAllProductIdsForBuild` robuster gemacht
 
-`try/catch` um den Supabase-Call in `app/lib/queries.ts:117`, damit Build-Fehler nicht das Deploy stoppen, wenn die Build-Umgebung die private IP nicht erreichen kann.
+`try/catch` um den Supabase-Call in `src/lib/queries.ts:117`, damit Build-Fehler nicht das Deploy stoppen, wenn die Build-Umgebung die private IP nicht erreichen kann.
 
 ### `generateStaticParams` vorsorglich auskommentiert
 
-In `app/produkt/[id]/page.tsx` — falls nötig; Build klappt aktuell auch ohne.
+In `src/app/produkt/[id]/page.tsx` — falls nötig; Build klappt aktuell auch ohne.
 
 ### Debug-Logs in `server.ts` / `queries.ts`
 
-`console.log('[SUPABASE-DEBUG] …')` Blöcke in `app/lib/supabase/server.ts` und `app/lib/queries.ts:getProductById` — sollten vor Go-Live entfernt werden, sind aktuell Gold wert fürs Debugging.
+`console.log('[SUPABASE-DEBUG] …')` Blöcke in `src/lib/supabase/server.ts` und `src/lib/queries.ts:getProductById` — sollten vor Go-Live entfernt werden, sind aktuell Gold wert fürs Debugging.
 
-### `app/produkt/[id]/error.tsx` (neu)
+### `src/app/produkt/[id]/error.tsx` (neu)
 
 Damit Fehler im Produkt-Render im UI sichtbar werden (vorher nur 500 mit leerer Page).
 
@@ -247,7 +247,7 @@ Statt `supabase.delqhi.com` als eigene Zone zu konfigurieren, könnten wir `shop
 4. **Re-Deploy** des Workers mit neuer `NEXT_PUBLIC_SUPABASE_URL=https://supabase.delqhi.com`
 5. **Web-Recherche** zu dem Worker-Connectivity-Problem (siehe Liste oben)
 6. **Stripe-Key rotation** (offen, war bewusst BLOCKED für Woche 1)
-7. **Debug-Logs entfernen** in `app/lib/queries.ts` und `app/lib/supabase/server.ts` (vor Go-Live)
+7. **Debug-Logs entfernen** in `src/lib/queries.ts` und `src/lib/supabase/server.ts` (vor Go-Live)
 8. **`.env.production` aus lokalem Filesystem aufräumen** (Backup, nicht in Git, nicht im Repo-Root)
 
 ### Was funktioniert und nicht angefasst werden sollte
@@ -273,16 +273,16 @@ Statt `supabase.delqhi.com` als eigene Zone zu konfigurieren, könnten wir `shop
 
 **Geänderte Dateien:**
 - `.gitignore` — `.env.production` hinzugefügt
-- `app/lib/queries.ts` — `try/catch` in `getAllProductIdsForBuild`, Debug-Log in `getProductById`
-- `app/lib/supabase/admin.ts` — `db: { schema: 'shop' }`
-- `app/lib/supabase/client.ts` — `db: { schema: 'shop' }`
-- `app/lib/supabase/server.ts` — `db: { schema: 'shop' }`, Debug-Logs (zum Entfernen vor Go-Live)
-- `app/produkt/[id]/page.tsx` — `generateStaticParams` auskommentiert
+- `src/lib/queries.ts` — `try/catch` in `getAllProductIdsForBuild`, Debug-Log in `getProductById`
+- `src/lib/supabase/admin.ts` — `db: { schema: 'shop' }`
+- `src/lib/supabase/client.ts` — `db: { schema: 'shop' }`
+- `src/lib/supabase/server.ts` — `db: { schema: 'shop' }`, Debug-Logs (zum Entfernen vor Go-Live)
+- `src/app/produkt/[id]/page.tsx` — `generateStaticParams` auskommentiert
 - `open-next.config.ts` — KV-Cache-Adapter
 - `wrangler.jsonc` — Routes, KV-Bindings, vars
 
 **Neue Dateien:**
-- `app/produkt/[id]/error.tsx` — Error-Boundary für Produkt-Render
+- `src/app/produkt/[id]/error.tsx` — Error-Boundary für Produkt-Render
 
 **Nicht committed (lokal / in `.gitignore`):**
 - `.env.production` (Live-Secrets)
