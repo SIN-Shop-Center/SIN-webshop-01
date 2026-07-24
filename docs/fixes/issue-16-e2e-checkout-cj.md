@@ -60,7 +60,7 @@ export default defineConfig({
 })
 ```
 
-## `tests/e2e/checkout-cj.spec.ts`
+## `tooling/tests/e2e/checkout-cj.spec.ts`
 
 ```ts
 import { test, expect } from '@playwright/test'
@@ -108,7 +108,7 @@ test('full Stripe → CJ order flow', async ({ page, request }) => {
 })
 ```
 
-## `app/api/test/order-by-session/route.ts` (test-only)
+## `src/app/api/test/order-by-session/route.ts` (test-only)
 
 ```ts
 import { NextResponse } from 'next/server'

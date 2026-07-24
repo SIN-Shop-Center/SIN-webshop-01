@@ -1,4 +1,3 @@
 packages:
   - 'packages/*'
-  - 'workers/*'
-  - 'tests/*'
+  - 'platform/workers/*'

@@ -30,7 +30,7 @@ head -120 README.md
 
 1. `README.md` mentions `localStorage`, "Vitest SPA", or `neon-storefront` as a project name.
 2. `package.json` or `pnpm-workspace.yaml` references a stale workspace (`packages/fixtures`, `packages/legacy-storefront`).
-3. Comment in `app/page.tsx` or `app/layout.tsx` still says "TODO: replace localStorage".
+3. Comment in `src/app/page.tsx` or `src/app/layout.tsx` still says "TODO: replace localStorage".
 
 ## Fix recipe (concrete edits)
 
@@ -88,7 +88,7 @@ find docs -type f -name '*.md' | xargs grep -l -E 'neon|localStorage|Vite SPA' |
 - Data: Supabase self-hosted on `sin-supabase` OCI VM, schema `shop`.
 - Commerce: Stripe Checkout; order data persisted via Supabase service-role
   in `shop.orders`.
-- Dropshipping: CJ Dropshipping API; orders created in `app/lib/fulfillment/`.
+- Dropshipping: CJ Dropshipping API; orders created in `src/lib/fulfillment/`.
 
 ## Local dev
 

@@ -6,35 +6,39 @@ on:
     branches: [main]
 
 jobs:
-  typecheck:
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+      - name: Governance and documentation contract
+        run: pnpm check:governance
+      - name: TypeScript
+        run: pnpm typecheck
+      - name: Static release gates
+        run: |
+          pnpm check:env:template
+          pnpm check:migrations
+          pnpm check:routes
+          pnpm check:browser-automator
+          pnpm guard:lines
+          pnpm guard:baseline
+          pnpm guard:complexity
+      - name: Unit and safe integration tests
+        run: pnpm test:quality
 
   build:
+    needs: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -49,24 +53,40 @@ jobs:
           key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-      - name: Build (Dependabot)
+      - name: Build (Dependabot-safe environment)
         if: github.actor == 'dependabot[bot]'
         run: pnpm build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://supabase.example.com
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1MTkyODU0LCJleHAiOjE4MTAyNTQ4NTR9.h1cPjLOfP4z0X2G9X6y9X4X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9
-          NEXT_PUBLIC_APP_URL: https://shopsin.example.com
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_dummy
-          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2NDUxOTI4NTQsImV4cCI6MTgxMDI1NDg1NH0.dummy
-          STRIPE_SECRET_KEY: sk_test_dummy
-          STRIPE_WEBHOOK_SECRET: whsec_dummy
-      - name: Build (non-Dependabot)
+          SITE_URL: https://ci-shopsin.test
+          NEXT_PUBLIC_APP_URL: https://ci-shopsin.test
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-supabase.test
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key-not-a-secret-000000000000
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_dummy
+          SUPABASE_SERVICE_ROLE_KEY: ci-service-role-not-a-secret-000000000000
+          STRIPE_SECRET_KEY: sk_test_ci_dummy
+          STRIPE_WEBHOOK_SECRET: whsec_ci_dummy
+      - name: Build (repository secrets)
         if: github.actor != 'dependabot[bot]'
         run: pnpm build
         env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      - name: Scan built output
+        run: pnpm check:fallbacks
+      - name: Runtime smoke (non-Dependabot)
+        if: github.actor != 'dependabot[bot]'
+        run: pnpm check:web:runtime
+        env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -76,24 +96,8 @@ jobs:
           SIZE_BYTES=$(du -sb .next/ | cut -f1)
           THRESHOLD=52428800
           SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1048576" | bc)
-          THRESHOLD_MB=$(echo "scale=0; $THRESHOLD / 1048576" | bc)
-          echo "Bundle size: ${SIZE_MB}MB (threshold: ${THRESHOLD_MB}MB)"
+          echo "Bundle size: ${SIZE_MB}MB"
           if [ "$SIZE_BYTES" -gt "$THRESHOLD" ]; then
-            echo "::error::Bundle size ${SIZE_MB}MB exceeds ${THRESHOLD_MB}MB threshold"
+            echo "::error::Bundle size ${SIZE_MB}MB exceeds 50MB threshold"
             exit 1
           fi
-
-  security-audit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Security audit (moderate+)
-        run: pnpm audit --audit-level=moderate
-        continue-on-error: true

@@ -15,9 +15,9 @@ find app components -name '*.ts' -o -name '*.tsx' | xargs wc -l 2>/dev/null | so
 ```
 
 The current top candidates are likely:
-- `app/components/cj-dropshipping-product-page.tsx` (PDP)
-- `app/components/checkout/checkout-flow.tsx`
-- `app/admin/fulfillment/page.tsx`
+- `src/components/cj-dropshipping-product-page.tsx` (PDP)
+- `src/components/checkout/checkout-flow.tsx`
+- `src/app/admin/fulfillment/page.tsx`
 
 ## Step 2 — common refactor pattern for a 1k+ line component
 
@@ -25,7 +25,7 @@ The current top candidates are likely:
 // BEFORE: 1 file with 1,151 lines, 12 useState, 4 useEffect, 3 fetches, complex render
 
 // AFTER: split by responsibility
-app/components/pdp/
+src/components/pdp/
 ├── index.tsx                      // re-exports the public component
 ├── pdp-page.tsx                   // top-level orchestrator (~150 lines)
 ├── pdp-gallery.tsx                 // image gallery + zoom (~120 lines)
@@ -40,7 +40,7 @@ app/components/pdp/
 ## Step 3 — extract state into a `useReducer`
 
 ```tsx
-// app/components/pdp/use-pdp-state.ts
+// src/components/pdp/use-pdp-state.ts
 'use client'
 
 import { useReducer } from 'react'
@@ -97,7 +97,7 @@ export function usePdpState(initialVariantId?: string) {
 ## Step 4 — extract data fetching into a hook
 
 ```tsx
-// app/components/pdp/use-pdp-data.ts
+// src/components/pdp/use-pdp-data.ts
 'use client'
 
 import useSWR from 'swr'
@@ -114,7 +114,7 @@ export function usePdpData(productId: string) {
 ## Step 5 — sub-components become < 200 lines each
 
 ```tsx
-// app/components/pdp/pdp-actions.tsx (80 lines)
+// src/components/pdp/pdp-actions.tsx (80 lines)
 'use client'
 
 import { useTransition } from 'react'
@@ -146,7 +146,7 @@ export function PdpActions({ productId, quantity, selectedVariantId }: {
 ## Step 6 — root component
 
 ```tsx
-// app/components/pdp/pdp-page.tsx (150 lines)
+// src/components/pdp/pdp-page.tsx (150 lines)
 'use client'
 
 import { usePdpData } from './use-pdp-data'

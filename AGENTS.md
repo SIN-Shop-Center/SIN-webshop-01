@@ -1,134 +1,197 @@
-# AGENTS.md — SIN-webshop-01 (ShopSIN)
+# AGENTS.md — ShopSIN / SIN-webshop-01
 
-Anweisungen für KI-Agenten und Entwickler. Lies dies VOLLSTÄNDIG, bevor du
-Infrastruktur- oder Datenbank-Änderungen vornimmst.
+Stand: 23. Juli 2026
 
-PROJECT_NOTEBOOK_ID=sin-webshop-01-main
-SOURCE_COUNT_REQUIRED=3
+Diese Regeln gelten fuer Menschen und autonome Agenten. Vor Aenderungen zuerst
+`README.md`, `EXECUTE.md`, den aktuellen CEO-Audit und die betroffenen Runbooks lesen.
 
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "SIN-webshop-01 architecture overview" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Supabase self-hosted setup at 92.5.60.87" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Cloudflare Workers OpenNext deployment" --json
+## NotebookLM Judge Protocol
 
-## Systemübersicht
+Die Projekt-Governance ist an genau das in `platform/governance/project-ssot.mjs` gefuehrte
+Notebook und dessen zentrale Google-Docs-Quelle gebunden. Vor Architektur-,
+Security-, Datenbank- oder Betriebsentscheidungen sind diese Abfragen Pflicht.
 
-| Komponente | Wo | URL / Adresse |
-|---|---|---|
-| Storefront (Next.js via OpenNext) | Cloudflare Workers | https://shopsin.delqhi.com |
-| Supabase (self-hosted, Docker) | VM 92.5.60.87 | https://supabase.delqhi.com (öffentlich via Cloudflare Tunnel) |
-| Kong API Gateway | VM, intern | Port **8006** (NUR intern — siehe Regeln) |
-| Postgres | VM, privat | Port 5432 — NIEMALS öffentlich exponieren |
-| simone-api / simone-worker | VM, Docker | intern |
-| Supabase Studio | VM | hinter Cloudflare Access (Zero Trust Login) |
+- `PROJECT_NOTEBOOK_ID=8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
+- `SOURCE_COUNT_REQUIRED=1`
 
-## EISERNE REGELN (aus teuren Fehlern gelernt)
-
-1. **NIEMALS einen Port in öffentliche URLs schreiben.**
-   Cloudflare proxied NUR die Ports 80/443/8080/8443/2052/2053/2082/2083/2086/2087/2095/2096/8880.
-   `https://supabase.delqhi.com:8006` wird am Edge INSTANT abgewiesen
-   ("connection refused in <10ms"). Das ist KEIN Edge-Cache und KEIN Bug —
-   dokumentiertes Verhalten: https://developers.cloudflare.com/fundamentals/reference/network-ports/
-   Port 8006 gehört ausschließlich in die Tunnel-Ingress-Config (Edge → localhost:8006).
-
-2. **`NEXT_PUBLIC_*` Variablen sind BUILD-TIME eingebrannt.**
-   Env-Var ändern reicht nicht — es braucht zwingend einen neuen Build + Deploy.
-
-3. **Keine Worker-Route auf `supabase.delqhi.com/*` anlegen.**
-   Worker-Routes haben Vorrang vor Tunnel-Hostnames und blockieren den Tunnel
-   komplett. Zusätzlich: Worker-Fetch auf same-zone Worker-Hostnames erzeugt
-   Error 1042. Falls serverseitige Fetches auf eigene Zone nötig sind:
-   Compatibility Flag `global_fetch_strictly_public` in wrangler.jsonc.
-
-4. **RLS ist default-deny auf allen Tabellen.**
-   Neue Tabellen: SOFORT `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;`
-   Öffentlich lesbare Shop-Daten brauchen explizite SELECT-Policies
-   (`USING (true)`), nutzerbezogene Daten `auth.uid() = user_id`.
-
-5. **`SERVICE_ROLE_KEY` niemals im Client-Code oder mit `NEXT_PUBLIC_`-Prefix.**
-   Nur in Server-Kontexten (Route Handlers, Server Actions).
-
-6. **Supabase-Client-Architektur (NICHT ändern ohne Grund):**
-   - `app/lib/supabase/data-client.ts` — purer `@supabase/supabase-js` Client
-     mit `auth: { persistSession: false }`. Für ALLE öffentlichen, anonymen
-     Lesezugriffe (getFeaturedProducts, getAllProducts, getProductById,
-     getProductsByIds). Grund: `@supabase/ssr` ruft `cookies()` aus
-     `next/headers` auf, was in Cloudflare Workers außerhalb von
-     Request-Kontexten fehlschlägt und Queries stillschweigend leer macht.
-   - `@supabase/ssr` Client (`app/lib/supabase/server.ts`) — NUR für
-     auth-gebundene Operationen (Login, Wishlist, Orders), die in echten
-     Request-Kontexten laufen.
-
-7. **Secrets:** Niemals die Default-Secrets aus der Supabase-Docker-Doku
-   verwenden (öffentlich bekannt, werden aktiv gescannt). JWT_SECRET,
-   POSTGRES_PASSWORD, Dashboard-Credentials sind rotiert. ANON_KEY und
-   SERVICE_ROLE_KEY werden aus dem JWT_SECRET abgeleitet — bei Rotation des
-   JWT_SECRET müssen beide Keys neu generiert und ÜBERALL ersetzt werden
-   (Supabase .env + Frontend-Secrets + Rebuild).
-
-## Environment-Variablen
-
-### Frontend (Cloudflare Workers Secrets / Build-Env)
+```bash
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche <critical_invariant> und <halt_condition> gelten fuer dieses Projekt?" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Verzeichnisstruktur und Dateien muessen initial angelegt werden (Greenpause, no code)?" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Dokumente sind bis Definition of Done Pflicht (README, Architektur, ADR, RFC, Security, SRE, Standards)?" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Regeln muessen in AGENTS.md stehen, damit jeder Coder-Agent immer NotebookLM als Richter nutzt?" --json
+nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche <interaction_invariant> und <security_gate> gelten fuer Browser-Workflows?" --json
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://supabase.delqhi.com   # https, KEIN Port
+
+## Zielbild
+
+ShopSIN ist ein Next.js-16-Commerce-System auf Cloudflare Workers/OpenNext mit:
+
+- Storefront: `https://shopsin.delqhi.com`
+- self-hosted Supabase hinter HTTPS/Cloudflare Tunnel
+- Stripe Checkout und signierten Webhooks
+- CJ Dropshipping fuer Beschaffung und Fulfillment
+- TikTok Shop als erster Social-Marketplace-Kanal
+- einer Supabase-basierten Commerce Control Plane fuer Recherche, Freigabe,
+  Creative-Handoff, Publishing, Orders, Monitoring und Audit-Evidenz
+
+Eine konfigurierte Ziel-URL ist kein Betriebsnachweis. Live-Status wird nur durch
+`pnpm go-live:today` und dokumentierte externe Abnahmen belegt.
+
+## Unveraenderliche Regeln
+
+1. **Keine Secrets in Git, Logs, Reports oder Screenshots.**
+   Service-Role-, Stripe-, CJ-, TikTok-, Resend- und Cron-Secrets sind nur in
+   Secret-Managern beziehungsweise serverseitiger Runtime-Konfiguration erlaubt.
+
+2. **Supabase oeffentlich nur via HTTPS ohne internen Port.**
+   Port `8006` ist ausschliesslich Tunnel-Ingress. Niemals in Browser-, Worker-,
+   Test- oder Produktions-URLs verwenden. Postgres `5432` bleibt privat.
+
+3. **Keine Worker-Route vor `supabase.delqhi.com/*`.**
+   Der Tunnel-Hostname darf nicht durch eine Worker-Route ueberschrieben werden.
+
+4. **Schema `shop` ist der Storefront-Vertrag.**
+   `createDataClient()` und `createAdminClient()` arbeiten bewusst im Schema
+   `shop`; Control-Plane-Tabellen koennen explizit `public` verwenden.
+
+5. **Nur versionierte Migrationen.**
+   Produktive Schemaaenderungen gehoeren ausschliesslich nach
+   `platform/infra/supabase/migrations/` und werden mit `pnpm db:migrate` angewendet.
+   Historische `tooling/scripts/supabase/setup-*.sql` sind keine zweite Source of Truth.
+   Bestehende Datenbanken werden nur nach Schemaabgleich und mit explizitem
+   Baseline-Ziel uebernommen.
+
+6. **RLS default-deny.**
+   Jede neue Tabelle erhaelt sofort RLS. Oeffentliche Daten brauchen eine enge
+   SELECT-Policy; nutzerbezogene Daten muessen an `auth.uid()` gebunden sein.
+   Der Service-Role-Key darf nie einen `NEXT_PUBLIC_`-Prefix tragen.
+
+7. **Keine Teil-Fulfillments.**
+   Fehlt bei einer bezahlten Bestellung auch nur eine verifizierte CJ-Variante,
+   Menge oder Lieferangabe, wird die gesamte Bestellung zur manuellen Pruefung
+   gestoppt. Niemals Positionen stillschweigend auslassen oder Fake-Daten senden.
+
+8. **Idempotenz ist Datenbankautoritaet.**
+   Stripe-Orders werden durch den UNIQUE-Vertrag auf `stripe_session_id`
+   serialisiert. `processed_events` ist Audit-Trail und darf einen Retry nach
+   fehlgeschlagenem Order-Write nicht blockieren.
+
+9. **Cron-Endpunkte sind fail-closed.**
+   Ausschliesslich `isCronAuthorized()` verwenden. Keine direkten Vergleiche mit
+   ``Bearer ${process.env.CRON_SECRET}`` und keine Default-Secrets.
+
+10. **TikTok startet sicher.**
+    OAuth ausschliesslich ueber den authentifizierten Startpunkt mit Single-Use
+    State. `TIKTOK_SAVE_MODE=AS_DRAFT` und Content Upload `false` bleiben Default,
+    bis Development-Shop, Scopes, Attribute, GPSR, Orders und Returns abgenommen sind.
+
+11. **Keine erfundene Conversion oder Rechtsbehauptung.**
+    Keine Fake-Countdowns, kuenstliche Verknappung, erfundene Vorbestellung,
+    Telefonnummer, Steuerstatus, Lieferfrist oder Herstellerinformation.
+
+12. **Ein Agentenbericht ersetzt keinen Laufzeitnachweis.**
+    „Fertig“ setzt erfolgreiche Commands, Exit-Codes, Produktions-Smokes,
+    Datenbankversion, externe Freigaben und einen dokumentierten Rollback voraus.
+
+## Supabase-Clients
+
+| Client | Schema | Zweck |
+|---|---|---|
+| `src/lib/supabase/data-client.ts` | `shop` | anonyme, read-only Storefront-Abfragen; Session-Persistenz deaktiviert |
+| `src/lib/supabase/server.ts` | Request/Auth | Cookie-gebundene Nutzeroperationen |
+| `src/lib/supabase/admin.ts#createAdminClient` | `shop` | privilegierte Storefront-, Order- und Fulfillment-Operationen |
+| `createPublicAdminClient` | `public` | Queue, Trends, UGC und kanalunabhaengige Control Plane |
+
+Client Components duerfen weder Admin-Client noch Service-Role-Werte importieren.
+
+## Verbindlicher Arbeitsablauf
+
+```bash
+cd /Users/jeremy/dev/SIN-webshop-01
+pnpm install --frozen-lockfile
+pnpm db:migrate:status
+pnpm ci
+pnpm test:e2e
+pnpm pipeline:verify
+```
+
+Bei einer freigegebenen Datenbankmigration:
+
+```bash
+pnpm db:migrate
+```
+
+Nur fuer eine bereits bestehende, manuell verifizierte Datenbank ohne
+Migration-Historie:
+
+```bash
+ALLOW_MIGRATION_BASELINE=true \
+MIGRATION_BASELINE_THROUGH=YYYYMMDDHHMMSS \
+pnpm db:migrate:baseline
+pnpm db:migrate
+```
+
+Baseline niemals bis zu einer noch nicht real angewendeten Migration setzen.
+
+## Release-Gates
+
+```bash
+pnpm check:env:template
+pnpm check:env:live
+pnpm ci
+pnpm test:e2e
+pnpm go-live:today
+```
+
+Das finale Gate muss mindestens belegen:
+
+- TypeScript, Unit-, Integrations- und Browsertests
+- Produktionsbuild und gestarteten Runtime-Smoke
+- aktuelle Migrationen, RLS und keine Schema-Drift
+- Stripe-, Supabase-, Resend-, CJ- und TikTok-Readiness
+- Storefront, Checkout, Rechtstexte und Deep-Health ueber HTTPS
+- Backup/Restore, Monitoring, Alerts und Incident Owner
+
+## Environment-Vertrag
+
+Vorlage: `.env.example` lokal, `.env.live.example` fuer Produktion.
+
+Kernwerte:
+
+```env
+SITE_URL=https://shopsin.delqhi.com
+NEXT_PUBLIC_APP_URL=https://shopsin.delqhi.com
+NEXT_PUBLIC_SUPABASE_URL=https://supabase.delqhi.com
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=           # nur serverseitig
+SUPABASE_SERVICE_ROLE_KEY=
 STRIPE_SECRET_KEY=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+CJ_EMAIL=
+CJ_API_KEY=
+CJ_WEBHOOK_SECRET=
+CRON_SECRET=
+CSP_ENFORCE=true
+TIKTOK_SAVE_MODE=AS_DRAFT
+TIKTOK_CONTENT_UPLOAD_ENABLED=false
 ```
 
-### Supabase VM (docker/.env, Auszug der kritischen)
-```
-SUPABASE_PUBLIC_URL=https://supabase.delqhi.com
-API_EXTERNAL_URL=https://supabase.delqhi.com
-SITE_URL=https://shopsin.delqhi.com
-ADDITIONAL_REDIRECT_URLS=https://shopsin.delqhi.com/**
-PGRST_DB_SCHEMAS="public, storage, shop"
-```
+`NEXT_PUBLIC_*`-Werte werden beim Build eingebrannt. Aenderungen erfordern einen
+neuen Build und Deploy.
 
-### Infisical (Primary Secrets Manager)
-```
-infisical export --domain https://eu.infisical.com \
-  --project-id fa7758b4-f84c-4297-966e-710056d531ef \
-  --path /SIN-Webshop-01 --env dev -f .env
-```
+## Abbruchkriterien
 
-## Smoke-Tests (vor jedem "fertig")
+Sofort stoppen und NO-GO dokumentieren bei:
 
-```bash
-# Tunnel + Kong erreichbar (401 ohne Key = gesund)
-curl -i https://supabase.delqhi.com/auth/v1/health
+- fehlenden oder Platzhalter-Secrets
+- ungeprueften Migrationen oder Datenbankduplikaten
+- fehlschlagendem Typecheck, Build, Test oder Runtime-Smoke
+- 5xx im Checkout-, Webhook-, Order- oder Fulfillmentpfad
+- unvollstaendigen Produkt-/GPSR-/Herstellerdaten
+- direktem TikTok-Listing ohne Development-Shop-Abnahme
+- ungeklaerten Steuer-, Anbieter- oder Widerrufsdaten
+- fehlendem Backup oder nicht getestetem Rollback
 
-# Produkte via REST (RLS public-read greift, Schema: shop)
-curl -s "https://supabase.delqhi.com/rest/v1/products_v?select=id,title,price&limit=3" \
-  -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY" \
-  -H "Accept-Profile: shop"
-
-# RLS-Negativtest: darf NIE fremde Orders liefern
-curl -s "https://supabase.delqhi.com/rest/v1/orders?select=*" \
-  -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY"
-# Erwartet: [] oder 401/403
-
-# Postgres privat
-nc -zv supabase.delqhi.com 5432   # MUSS fehlschlagen
-
-# Storefront live
-curl -s -o /dev/null -w "%{http_code}\n" https://shopsin.delqhi.com/   # 200
-```
-
-## Debugging-Leitfaden
-
-| Symptom | Wahrscheinliche Ursache |
-|---|---|
-| `connection refused` in <10ms auf supabase.delqhi.com | Port in der URL ODER Worker-Route davor — NICHT "Edge-Cache" |
-| 502 vom Tunnel | Ingress-Service-URL falsch (localhost:8006 vs kong:8006) |
-| 404 vom Tunnel | Hostname fehlt in Ingress des LAUFENDEN Tunnels (locally vs remotely managed prüfen) |
-| Leere Produktlisten trotz erreichbarer API | (a) SSR-Client statt data-client benutzt, (b) RLS-SELECT-Policy fehlt, (c) alter Build mit eingebrannter falscher URL |
-| Auth-Mails mit falschen Links | SITE_URL / API_EXTERNAL_URL in Supabase .env falsch |
-| Error 1042 bei Server-Fetch | Same-zone Worker-Fetch → `global_fetch_strictly_public` Flag |
-
-## Hinweis zu historischen Commits
-
-Commits mit der Diagnose "Cloudflare Edge cached/blockt supabase.delqhi.com"
-(u.a. 5073007, 676d4f4) sind FALSCH diagnostiziert. Tatsächliche Ursache:
-Port 8006 in der öffentlichen URL. Nicht dieser Spur folgen.
+Aktueller Audit: `docs/CEO_AUDIT_2026-07-23.md`.
