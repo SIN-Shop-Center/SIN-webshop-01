@@ -7,7 +7,7 @@
 
 A "TikTok ↔ CJ sync" would mean: when a TikTok Shop order arrives → trigger CJ fulfillment automatically. Without it, every TikTok order has to be manually re-entered in CJ (which kills margin).
 
-The shop already has `app/api/cron/cj-fulfillment/route.ts` (every 30 min) which picks up `shop.orders WHERE fulfillment_status='pending' AND source='shop'` and creates CJ orders. So **the only new thing** is: route TikTok orders into the same `pending` bucket.
+The shop already has `src/app/api/cron/cj-fulfillment/route.ts` (every 30 min) which picks up `shop.orders WHERE fulfillment_status='pending' AND source='shop'` and creates CJ orders. So **the only new thing** is: route TikTok orders into the same `pending` bucket.
 
 ## What the existing cron does
 
@@ -22,7 +22,7 @@ The cron reads this, calls `CJ createOrder`, stores `cj_order_id`. This already 
 ## The TikTok-Sync patch (small)
 
 ```ts
-// app/api/webhooks/tiktok-shop/route.ts (already in #18)
+// src/app/api/webhooks/tiktok-shop/route.ts (already in #18)
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -75,7 +75,7 @@ WHERE tiktok_order_id = 'TT-12345';
 When CJ ships a TikTok order, we need to push tracking back to TikTok. This is covered by #14 (CJ webhooks) + a small TikTok tracking update.
 
 ```ts
-// in app/api/webhooks/cj/route.ts (from #14)
+// in src/app/api/webhooks/cj/route.ts (from #14)
 if (order.tiktok_order_id) {
   await tiktokPost('/order/update_tracking', {
     order_id: order.tiktok_order_id,
