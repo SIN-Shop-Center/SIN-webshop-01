@@ -1,0 +1,12 @@
+{
+  "name": "@simone/workers-n8n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ../../../tooling/scripts/check-n8n-workflows.mjs",
+    "lint": "node ../../../tooling/scripts/check-n8n-workflows.mjs",
+    "typecheck": "node ../../../tooling/scripts/check-n8n-workflows.mjs",
+    "test": "node ../../../tooling/scripts/check-n8n-workflows.mjs"
+  }
+}

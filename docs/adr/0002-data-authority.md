@@ -8,5 +8,5 @@ Supabase/Postgres ist das einzige System of Record. Go-API und Worker lesen/schr
 
 ## Rules
 - Kein paralleles zweites Persistenzmodell in Go.
-- Schema-Änderungen nur via versionierten SQL-Migrationen in `infra/supabase/migrations`.
+- Schema-Änderungen nur via versionierten SQL-Migrationen in `platform/infra/supabase/migrations`.
 - Events werden aus DB-Änderungen (Outbox) abgeleitet.
