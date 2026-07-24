@@ -544,7 +544,7 @@ CJ tokens expire. If the stored token is stale:
 
 1. Re-authenticate with CJ API credentials
 2. Update the token in Supabase or environment config
-3. Restart any workers/services that cache the token
+3. Restart any platform/workers/services that cache the token
 
 ### Step 3: Mitigate — queue orders
 

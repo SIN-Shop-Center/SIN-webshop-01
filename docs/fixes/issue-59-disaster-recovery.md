@@ -65,8 +65,8 @@ This is an **architectural epic** with 3 deliverables, each is a full project of
 
 ### CJ fulfillment stuck (orders not fulfilled)
 
-1. Check `app/api/cron/cj-fulfillment/route.ts` last run
-2. If 0 successes in 24h: CJ-Auth-Token expired → `scripts/cj/get-token.mjs --refresh`
+1. Check `src/app/api/cron/cj-fulfillment/route.ts` last run
+2. If 0 successes in 24h: CJ-Auth-Token expired → `tooling/scripts/cj/get-token.mjs --refresh`
 3. If CJ-Wallet empty: see issue #31
 4. If CJ 5xx errors: throttle down to 1 req/2s
 

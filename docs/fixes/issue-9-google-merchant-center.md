@@ -12,7 +12,7 @@ Google Merchant Center requires strict product feed compliance: GTIN/MPN/HAN, br
 | # | Sub-task | Owner | Status |
 |---|----------|-------|--------|
 | 9.1 | Decide: own-brand-only feed vs. mixed (CPL-aware) | product | TODO |
-| 9.2 | `app/api/merchant-feed/route.ts` — already exists, see #57 | code | ✅ |
+| 9.2 | `src/app/api/merchant-feed/route.ts` — already exists, see #57 | code | ✅ |
 | 9.3 | GTIN column on `shop.products` (nullable) | data | TODO |
 | 9.4 | Brand column on `shop.products` (default `ShopSIN`) | data | TODO |
 | 9.5 | `restock_date` + `availability_date` semantics | data | TODO |
@@ -23,7 +23,7 @@ Google Merchant Center requires strict product feed compliance: GTIN/MPN/HAN, br
 ## SQL — add the missing columns
 
 ```sql
--- scripts/supabase/setup-merchant-feed.sql
+-- tooling/scripts/supabase/setup-merchant-feed.sql
 BEGIN;
 ALTER TABLE shop.products
   ADD COLUMN IF NOT EXISTS gtin          TEXT,
@@ -38,7 +38,7 @@ COMMIT;
 ## Filter logic (CPL-safe subset)
 
 ```ts
-// in app/api/merchant-feed/route.ts
+// in src/app/api/merchant-feed/route.ts
 const compliant = (products ?? []).filter(
   (p) =>
     p.is_active &&

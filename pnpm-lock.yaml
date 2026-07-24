@@ -125,18 +125,18 @@ importers:
         specifier: ^5.3.0
         version: 5.8.3
 
-  workers/edge: {}
+  platform/workers/edge: {}
 
-  workers/n8n: {}
+  platform/workers/n8n: {}
 
-  workers/spm-a2a:
+  platform/workers/spm-a2a:
     dependencies:
       '@a2a-js/sdk':
         specifier: ^0.3.10
         version: 0.3.13(express@5.2.1)
       '@simone/spm-core':
         specifier: workspace:*
-        version: link:../../packages/spm-core
+        version: link:../../../packages/spm-core
       express:
         specifier: ^5.1.0
         version: 5.2.1
@@ -144,14 +144,14 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
 
-  workers/spm-secret-sync-mcp:
+  platform/workers/spm-secret-sync-mcp:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.27.1
         version: 1.29.0(zod@3.25.76)
       '@simone/spm-core':
         specifier: workspace:*
-        version: link:../../packages/spm-core
+        version: link:../../../packages/spm-core
       express:
         specifier: ^5.1.0
         version: 5.2.1

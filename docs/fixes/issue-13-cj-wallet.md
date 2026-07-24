@@ -6,7 +6,7 @@
 
 ## Context
 
-Ohne Guthaben auf der CJ-Wallet wird **kein einziges Fulfillment** ausgelöst. Der `app/lib/fulfillment/submit-order.ts` macht `POST /v1/shopping/order/createOrder` — der antwortet mit `code: 1601001, message: "insufficient balance"` wenn die Wallet leer ist.
+Ohne Guthaben auf der CJ-Wallet wird **kein einziges Fulfillment** ausgelöst. Der `src/lib/fulfillment/submit-order.ts` macht `POST /v1/shopping/order/createOrder` — der antwortet mit `code: 1601001, message: "insufficient balance"` wenn die Wallet leer ist.
 
 Aktuelle Bestellungen mit `fulfillment_status: 'failed'` (Tabelle `shop.orders`):
 
@@ -72,7 +72,7 @@ UPDATE shop.orders
 
 - Wallet-Balance > 0
 - 0 Bestellungen mit `fulfillment_status='failed'` AND `fulfillment_error LIKE '%balance%'`
-- `app/api/cron/cj-fulfillment/route.ts` triggert `OK` (HTTP 200, success rate > 95%)
+- `src/app/api/cron/cj-fulfillment/route.ts` triggert `OK` (HTTP 200, success rate > 95%)
 
 ## Closing
 

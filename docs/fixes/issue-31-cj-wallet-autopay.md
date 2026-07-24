@@ -49,7 +49,7 @@ curl -H "CJ-Access-Token: $CJ_TOKEN" \
 ## Code-Änderungen (optional, aber empfohlen)
 
 ```ts
-// app/lib/cj/wallet-monitor.ts (NEU)
+// src/lib/cj/wallet-monitor.ts (NEU)
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const LOW_BALANCE_THRESHOLD_USD = 10
@@ -94,7 +94,7 @@ export async function checkCjWalletBalance(): Promise<{
 }
 ```
 
-Add a daily cron: `app/api/cron/cj-wallet-check/route.ts` (schedule `0 8 * * *`).
+Add a daily cron: `src/app/api/cron/cj-wallet-check/route.ts` (schedule `0 8 * * *`).
 
 ## Acceptance
 
