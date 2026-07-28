@@ -1,0 +1,12 @@
+{
+  "name": "@simone/workers-edge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ../../../tooling/scripts/check-workers-edge.mjs",
+    "lint": "node ../../../tooling/scripts/check-workers-edge.mjs",
+    "typecheck": "node ../../../tooling/scripts/check-workers-edge.mjs",
+    "test": "node ../../../tooling/scripts/check-workers-edge.mjs"
+  }
+}

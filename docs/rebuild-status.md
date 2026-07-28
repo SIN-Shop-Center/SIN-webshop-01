@@ -9,7 +9,7 @@ Architecture decision remains fixed:
 - `apps/web` -> Next.js UI shell
 - `apps/api` -> Go domain API
 - Supabase/Postgres -> source of truth
-- `workers/edge` + `workers/n8n` + `apps/api/cmd/worker` -> micro-process layer
+- `platform/workers/edge` + `platform/workers/n8n` + `apps/api/cmd/worker` -> micro-process layer
 - `packages/contracts` -> API/event contracts
 
 ## Phase Status
@@ -56,7 +56,7 @@ Architecture decision remains fixed:
 - Admin control plane now includes onboarding gate with auto-open, manual restart, and analytics event hooks
 - Docker compose alignment for monorepo paths and dedicated Go API service
 - CI baseline workflow (`.github/workflows/ci.yml`)
-- Monolith guardrails with baseline hard-null (`scripts/guard-lines-baseline.json` = `{}`)
+- Monolith guardrails with baseline hard-null (`tooling/scripts/guard-lines-baseline.json` = `{}`)
 - `apps/web` lint + typecheck + build pass in migrated workspace layout
 - `apps/api` tests pass (`go test ./...`)
 - Security hardening:

@@ -12,11 +12,11 @@ Stripe Checkout is live. The fake-card form was replaced by a real Stripe Sessio
 ```sh
 # 1. Stripe Session-Erstellung im Code
 cd /Users/jeremy/dev/SIN-webshop-01
-grep -A 5 "checkout.sessions.create" app/lib/actions/checkout.ts | head -10
+grep -A 5 "checkout.sessions.create" src/lib/actions/checkout.ts | head -10
 # Expected: code creating a Stripe Session with mode='payment', line_items, etc.
 
 # 2. Webhook-Handler
-cat app/api/stripe/webhook/route.ts | head -40
+cat src/app/api/stripe/webhook/route.ts | head -40
 # Expected: verifies signature, handles checkout.session.completed
 
 # 3. Live-Test (use Stripe test card)
@@ -29,8 +29,8 @@ grep "sk_live" /home/ubuntu/SIN-webshop-01/.env.local
 
 ## Was läuft
 
-- `app/lib/actions/checkout.ts` → `getStripe().checkout.sessions.create({...})`
-- `app/api/stripe/webhook/route.ts` verifiziert `stripe-signature` Header
+- `src/lib/actions/checkout.ts` → `getStripe().checkout.sessions.create({...})`
+- `src/app/api/stripe/webhook/route.ts` verifiziert `stripe-signature` Header
 - `shop.orders.stripe_session_id` UNIQUE-Constraint (#30) verhindert Doppelverarbeitung
 - `processed_events` Tabelle dedupliziert Webhook-Events (#54)
 - CJ-Fulfillment-Polling alle 30 min für `fulfillment_status='pending'`

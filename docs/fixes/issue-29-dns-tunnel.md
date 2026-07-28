@@ -139,7 +139,7 @@ curl -sI https://supabase.delqhi.com:8006/auth/v1/health
 Falls der cloudflared-Tunnel aus irgendeinem Grund nicht aufgesetzt werden kann, alternativ ein Cloudflare Worker, der alle Paths proxied:
 
 ```ts
-// workers/supabase-proxy/src/index.ts
+// platform/workers/supabase-proxy/src/index.ts
 export default {
   async fetch(req: Request): Promise<Response> {
     const url = new URL(req.url)
