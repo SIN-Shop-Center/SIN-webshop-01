@@ -80,7 +80,7 @@ NEXT_PUBLIC_SENTRY_DSN=https://...@....ingest.sentry.io/...
 ## Step 3 — Resend cron-health alert
 
 ```ts
-// app/api/cron/cron-health/route.ts
+// src/app/api/cron/cron-health/route.ts
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -132,7 +132,7 @@ export async function GET(req: Request) {
 ```
 
 ```sql
--- scripts/supabase/setup-cron-runs.sql
+-- tooling/scripts/supabase/setup-cron-runs.sql
 CREATE TABLE IF NOT EXISTS shop.cron_runs (
   name TEXT PRIMARY KEY,
   last_run_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS shop.cron_runs (
 
 ## Step 4 — wire Sentry into API routes
 
-In `app/lib/observability/sentry.ts` (NEW):
+In `src/lib/observability/sentry.ts` (NEW):
 
 ```ts
 import * as Sentry from '@sentry/nextjs'
