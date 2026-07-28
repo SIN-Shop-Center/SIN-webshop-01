@@ -37,13 +37,13 @@ a video exists."
 Add a `video_url` column to `shop.products`, store the URL (HLS .m3u8 preferred, MP4 fallback), and render `<video controls>` above the product gallery.
 
 ```sql
--- scripts/supabase/setup-pdp-video.sql
+-- tooling/scripts/supabase/setup-pdp-video.sql
 ALTER TABLE shop.products
   ADD COLUMN IF NOT EXISTS video_url TEXT;
 ```
 
 ```tsx
-// app/components/product/product-video.tsx
+// src/components/product/product-video.tsx
 interface Props {
   src: string | null
   poster?: string
@@ -64,7 +64,7 @@ export function ProductVideo({ src, poster }: Props) {
 }
 ```
 
-Render in `app/produkt/[id]/page.tsx` above the gallery:
+Render in `src/app/produkt/[id]/page.tsx` above the gallery:
 
 ```tsx
 <ProductVideo src={product.video_url} poster={product.image_url} />
@@ -72,7 +72,7 @@ Render in `app/produkt/[id]/page.tsx` above the gallery:
 
 ### Step 3 — lazy-load for performance
 
-Add to `app/lib/queries.ts` (or wherever the product query lives):
+Add to `src/lib/queries.ts` (or wherever the product query lives):
 
 ```ts
 // returns product with video_url

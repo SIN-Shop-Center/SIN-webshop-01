@@ -31,9 +31,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Audit for moderate+ vulnerabilities
-        run: pnpm audit --audit-level=moderate
-        continue-on-error: true
+      - name: Block high and critical vulnerabilities
+        run: pnpm audit --audit-level=high
 
   outdated-deps:
     runs-on: ubuntu-latest
@@ -46,6 +45,5 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Check for outdated dependencies
-        run: npx npm-check-updates
-        continue-on-error: true
+      - name: Report outdated dependencies
+        run: pnpm outdated || true

@@ -17,14 +17,14 @@ Seller API Integration (siehe docs/TIKTOK_SHOP_API_INTEGRATION.md).
 ┌─────────────────────────────────────────────────────────────────────┐
 │ STUFE 2: SOURCING (CJ Dropshipping)                                 │
 │ Repo: SIN-Shop-Center/SIN-webshop-01 (existiert)                    │
-│ → scripts/cj/import-products.mjs: CJ-Suche nach Trend-Keywords,     │
+│ → tooling/scripts/cj/import-products.mjs: CJ-Suche nach Trend-Keywords,     │
 │   Import nach Supabase (cj_product_id, cj_cost_price, Bilder)       │
 └──────────────────────────────┬──────────────────────────────────────┘
 ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │ STUFE 3: LISTING (TikTok Shop Seller API — NEU)                     │
 │ Repo: SIN-Shop-Center/SIN-webshop-01                                │
-│ → app/lib/tiktok/* + Crons tiktok-publish (3:30) / tiktok-sync (4:00)│
+│ → src/lib/tiktok/* + Crons tiktok-publish (3:30) / tiktok-sync (4:00)│
 │ → Offizielle Partner API, kein Ban-Risiko, Inventar-Sync inklusive  │
 └──────────────────────────────┬──────────────────────────────────────┘
 ▼
@@ -39,7 +39,7 @@ Seller API Integration (siehe docs/TIKTOK_SHOP_API_INTEGRATION.md).
 │ STUFE 5: FULFILLMENT (Order → CJ)                                   │
 │ Repo: SIN-Shop-Center/SIN-webshop-01                                │
 │ → TikTok-Order via GET /order/202309/orders pollen →                │
-│   bestehende createCjOrder (app/lib/cj/orders.ts) wiederverwenden   │
+│   bestehende createCjOrder (src/lib/cj/orders.ts) wiederverwenden   │
 └─────────────────────────────────────────────────────────────────────┘
 
 ```plaintext
@@ -62,7 +62,7 @@ offizielle API existiert.
 ### Stufe 1 → 2: Trend-Kandidaten
 Das Intelligence-Bundle schreibt Kandidaten als JSON (z.B. trends-output.json):
   { "keyword": "...", "category": "...", "score": 0-100, "source_video_url": "..." }
-Der lokale Agent füttert die Top-Keywords in scripts/cj/import-products.mjs
+Der lokale Agent füttert die Top-Keywords in tooling/scripts/cj/import-products.mjs
 (CJ-Produktsuche). Manuelle Freigabe vor Import empfohlen (Qualität, GPSR).
 
 ### Stufe 2 → 3: Publish-Queue
@@ -79,7 +79,7 @@ liest daraus, welche Produkte er in Videos taggen soll:
 Neuer Cron /api/cron/tiktok-orders (alle 30 min, analog cj-fulfillment):
 1. GET /order/202309/orders/search (Status: AWAITING_SHIPMENT)
 2. Pro Order: seller_sku "SIN-{product.id}" → Supabase-Produkt → cj_variant_id
-3. createCjOrder() aus app/lib/cj/orders.ts aufrufen (bestehende Logik!)
+3. createCjOrder() aus src/lib/cj/orders.ts aufrufen (bestehende Logik!)
 4. Tracking zurück an TikTok: POST /fulfillment/202309/packages/{id}/ship
 
 ## Kostenübersicht (Stand 2026)
@@ -170,7 +170,7 @@ kann das über github.event.schedule unterscheiden.)
 TikTok DE verlangt schnellen Versand — CJ-China-Lieferzeiten (10–20 Tage)
 führen zu Shop-Strafpunkten bis zur Sperrung.
 
-REGEL: In `scripts/cj/import-products.mjs` nur Produkte mit EU/DE-Warehouse-
+REGEL: In `tooling/scripts/cj/import-products.mjs` nur Produkte mit EU/DE-Warehouse-
 Bestand importieren (CJ-API: Warehouse-Filter auf EU setzen, z.B.
 Lagercode "DE"/"EU" in der Variantenabfrage prüfen). Produkte ohne
 EU-Bestand → `tiktok_status = 'skipped'` setzen, NICHT publishen.
