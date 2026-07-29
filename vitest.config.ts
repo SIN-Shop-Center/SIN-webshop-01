@@ -5,18 +5,18 @@ import path from 'node:path'
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['tests/unit/**/*.test.ts', 'tests/integration/**/*.test.ts'],
+    include: ['tooling/tests/unit/**/*.test.ts', 'tooling/tests/integration/**/*.test.ts'],
     testTimeout: 30_000,
     // 'server-only' ist ein Next.js-Wächter der im Vitest-Node-Context crasht.
-    // Wir mocken ihn als no-op damit Tests app/lib/supabase/admin importieren können.
-    setupFiles: ['./tests/integration/setup.ts'],
+    // Wir mocken ihn als no-op damit Tests src/lib/supabase/admin importieren können.
+    setupFiles: ['./tooling/tests/integration/setup.ts'],
     coverage: {
       provider: 'v8',
-      include: ['app/lib/**/*.ts'],
-      exclude: ['app/lib/**/actions/**', 'app/lib/supabase/**'],
+      include: ['src/lib/**/*.ts'],
+      exclude: ['src/lib/**/actions/**', 'src/lib/supabase/**'],
     },
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, '.') },
+    alias: { '@': path.resolve(__dirname, 'src') },
   },
 })

@@ -6,9 +6,9 @@
 
 ## Context
 
-CJ sendet Webhooks für Order-Status-Updates (shipped, delivered, exception). Ohne registrierte Webhook-URL weiß unser System nichts vom Status, sobald CJ versendet hat. Das blockiert die Funktion in `app/lib/fulfillment/tracking-sync.mjs`.
+CJ sendet Webhooks für Order-Status-Updates (shipped, delivered, exception). Ohne registrierte Webhook-URL weiß unser System nichts vom Status, sobald CJ versendet hat. Das blockiert die Funktion in `src/lib/fulfillment/tracking-sync.mjs`.
 
-Aktuell: Webhook-Endpoint existiert lokal: `app/api/cron/cj-fulfillment/route.ts` (alle 30 min via Cron). Aber echte Webhook-Push von CJ hängen am Endpoint.
+Aktuell: Webhook-Endpoint existiert lokal: `src/app/api/cron/cj-fulfillment/route.ts` (alle 30 min via Cron). Aber echte Webhook-Push von CJ hängen am Endpoint.
 
 ## Schritt-für-Schritt (manuell, 5 Min)
 
@@ -38,7 +38,7 @@ Aktuell: Webhook-Endpoint existiert lokal: `app/api/cron/cj-fulfillment/route.ts
 ## Code-Patch (optional — der Endpoint sollte besser heißen)
 
 ```ts
-// app/api/webhooks/cj/route.ts
+// src/app/api/webhooks/cj/route.ts
 import { NextResponse } from 'next/server'
 import crypto from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.shopsin.commerce-worker</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/jeremy/dev/SIN-webshop-01/platform/deploy/launchd/run-commerce.sh</string>
+    <string>worker</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/jeremy/dev/SIN-webshop-01</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>15</integer>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/shopsin-commerce-worker.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/shopsin-commerce-worker.error.log</string>
+</dict>
+</plist>

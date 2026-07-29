@@ -73,7 +73,7 @@ Reines ändern der Variable reicht nicht.
 
 ## 4. Migrationen im Repo
 
-Migrations liegen in `infra/supabase/migrations/`. Dateiname:
+Migrations liegen in `platform/infra/supabase/migrations/`. Dateiname:
 `YYYYMMDDHHMMSS_<thema>.sql`. Immer `IF NOT EXISTS` verwenden, damit
 wiederholtes Ausführen sicher ist.
 
@@ -96,11 +96,11 @@ Ablauf für eine neue Spalte:
 
 ## 6. Supabase-Clients im Code (nicht ändern ohne Grund)
 
-- `app/lib/supabase/data-client.ts` — anon, `persistSession: false`. Für
+- `src/lib/supabase/data-client.ts` — anon, `persistSession: false`. Für
   öffentliche Lesezugriffe. Funktioniert in Cloudflare Workers.
-- `app/lib/supabase/server.ts` — `@supabase/ssr`, nur für auth-gebundene
+- `src/lib/supabase/server.ts` — `@supabase/ssr`, nur für auth-gebundene
   Operationen in Request-Kontexten.
-- `app/lib/supabase/admin.ts` — Service-Role, nur serverseitig.
+- `src/lib/supabase/admin.ts` — Service-Role, nur serverseitig.
 
 ## 7. Smoke-Test nach DB-Änderung
 

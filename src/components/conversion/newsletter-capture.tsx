@@ -1,0 +1,146 @@
+// src/components/conversion/newsletter-capture.tsx
+// Purpose: Zeitgesteuertes Newsletter-Popup — erscheint erst NACH dem
+// Cookie-Consent, nie gleichzeitig mit anderen Overlays.
+// Docs: AGENTS.md
+
+'use client'
+
+import { useEffect, useState, useTransition } from 'react'
+import { X, Mail } from 'lucide-react'
+import { subscribeNewsletter } from '@/actions/newsletter'
+import { useFocusTrap } from '@/lib/hooks/use-focus-trap'
+
+const SEEN_KEY = 'newsletter-popup-seen'
+const DELAY_MS = 25_000
+
+function hasConsent(): boolean {
+  return /(?:^|; )sin-cookie-consent=/.test(document.cookie)
+}
+
+export function NewsletterCapture() {
+  const [show, setShow] = useState(false)
+  const [email, setEmail] = useState('')
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
+  const [isPending, startTransition] = useTransition()
+  const trapRef = useFocusTrap(show, { onEscape: () => dismiss() })
+
+  useEffect(() => {
+    if (localStorage.getItem(SEEN_KEY)) return
+    if (sessionStorage.getItem('exit-offer-shown')) return
+
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const arm = () => {
+      timer = setTimeout(() => setShow(true), DELAY_MS)
+    }
+
+    if (hasConsent()) {
+      arm()
+    } else {
+      const onConsent = () => arm()
+      window.addEventListener('sin:consent', onConsent, { once: true })
+      return () => {
+        window.removeEventListener('sin:consent', onConsent)
+        if (timer) clearTimeout(timer)
+      }
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [])
+
+  function dismiss() {
+    localStorage.setItem(SEEN_KEY, '1')
+    setShow(false)
+  }
+
+  if (!show) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/50 p-4 md:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="nl-title"
+      onClick={dismiss}
+    >
+      <div
+        ref={trapRef}
+        className="relative w-full max-w-sm rounded-xl bg-background p-6 text-center shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={dismiss}
+          aria-label="Schließen"
+          className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-5" aria-hidden="true" />
+        </button>
+
+        <Mail className="mx-auto mb-3 size-10 text-primary" aria-hidden="true" />
+
+        {done ? (
+          <>
+            <h2 id="nl-title" className="mb-2 text-xl font-bold">Bestätigungslink versendet</h2>
+            <p className="text-sm text-muted-foreground">
+              Bitte öffne die E-Mail und bestätige deine Anmeldung. Erst danach ist der Newsletter aktiv.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 id="nl-title" className="mb-1 text-xl font-bold text-balance">
+              Produkt- und Shop-Updates
+            </h2>
+            <p className="mb-4 text-sm text-muted-foreground text-pretty">
+              Erhalte ausgewählte Produktneuigkeiten und wesentliche Shop-Updates. Die Anmeldung wird erst nach deiner Bestätigung aktiv.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                startTransition(async () => {
+                  setError('')
+                  const fd = new FormData()
+                  fd.append('email', email)
+                  fd.append('website', '')
+                  const result = await subscribeNewsletter({ ok: false, message: '' }, fd)
+                  if (!result.ok) {
+                    setError(result.message)
+                    return
+                  }
+                  localStorage.setItem(SEEN_KEY, '1')
+                  setDone(true)
+                })
+              }}
+              className="flex flex-col gap-2"
+            >
+              <label htmlFor="nl-capture-email" className="sr-only">
+                E-Mail-Adresse
+              </label>
+              <input
+                id="nl-capture-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="deine@email.de"
+                autoFocus
+                className="rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                disabled={isPending}
+                className="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {isPending ? 'Wird gesendet…' : 'Bestätigungslink senden'}
+              </button>
+            </form>
+            {error ? <p role="alert" className="mt-2 text-xs text-destructive">{error}</p> : null}
+            <p className="mt-2 text-[10px] text-muted-foreground">Abmeldung jederzeit möglich.</p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

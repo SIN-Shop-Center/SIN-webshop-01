@@ -1,4 +1,4 @@
 packages:
   - 'packages/*'
-  - 'workers/*'
-  - 'tests/*'
+  - 'platform/workers/*'
+  - 'platform/agents/a2a/team-shop/*'

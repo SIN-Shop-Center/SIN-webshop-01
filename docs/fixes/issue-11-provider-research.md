@@ -27,12 +27,12 @@ For each candidate supplier, fill:
 
 **Recommendation: do NOT add a 2nd supplier before 500 SKUs and 50 orders/week.** Operational complexity grows linearly with each new supplier, but the addressable market is the same.
 
-If you must add one: **Spocket** has the best EU stock ratio of the serious players, decent REST API, and a "Spocket US/EU warehouse" filter that maps directly onto the EU priority logic in `app/lib/cj/eu-warehouse-filter.mjs`.
+If you must add one: **Spocket** has the best EU stock ratio of the serious players, decent REST API, and a "Spocket US/EU warehouse" filter that maps directly onto the EU priority logic in `src/lib/cj/eu-warehouse-filter.mjs`.
 
 ## Integration pattern (Spocket, when the time comes)
 
 ```ts
-// app/lib/spocket/client.ts
+// src/lib/spocket/client.ts
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const SPOCKET_API = 'https://api.spocket.co/v1'
@@ -67,7 +67,7 @@ export async function importSpocketProducts(keyword: string, limit = 20) {
 
 - `docs/PROVIDERS-EVAL.md` exists with the table above and a written decision.
 - If decision is "stay with CJ only": #11 can be closed.
-- If a 2nd provider is added: the new script lives under `app/lib/{provider}/` and is integrated into `scripts/import-products.mjs`.
+- If a 2nd provider is added: the new script lives under `src/lib/{provider}/` and is integrated into `tooling/scripts/import-products.mjs`.
 
 ## Closing
 

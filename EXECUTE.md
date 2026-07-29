@@ -1,103 +1,144 @@
-# ShopSIN Daten-Reparatur — Komplette Anleitung
+# ShopSIN Goal-to-End Execution Runbook
 
-## Was du brauchst (1x, 5 Minuten)
+Stand: 23. Juli 2026
 
-1. **Supabase SQL Editor** öffnen (https://supabase.delqhi.com/project/sql)
-2. **Ein Script** auf der VM ausführen (`ssh user@92.5.60.87` oder lokal via Docker)
+Dieses Dokument ist die operative Reihenfolge fuer einen sicheren ShopSIN-Release. Es ersetzt alte Einmal-Anweisungen mit festen Produktzahlen oder veralteten Simone-/Vercel-Endpunkten.
 
----
+## 1. Unveraenderliche Sicherheitsregeln
 
-## Schritt 1: SQL im Supabase Editor (2 Minuten)
+- Keine echten Secrets in Git, Logs, Screenshots oder Reports.
+- Supabase oeffentlich ausschliesslich ueber HTTPS und ohne Port `8006`.
+- TikTok bleibt standardmaessig `TIKTOK_SAVE_MODE=AS_DRAFT`.
+- Produktfreigabe, Creative-Freigabe, GPSR/Herstellerdaten und Datenqualitaet duerfen nicht umgangen werden.
+- Destruktive Integrationstests duerfen nur gegen eine isolierte Testdatenbank mit explizitem Opt-in laufen.
+- Kein Produktionsdeploy ohne erfolgreiches `pnpm go-live:today`.
 
-1. Öffne: https://supabase.delqhi.com/project/sql
-2. Kopiere den Inhalt von `scripts/supabase/setup-title-de.sql`:
-
-```sql
-alter table public.products
-  add column if not exists title_de text,
-  add column if not exists description_de text;
-```
-
-3. Klicke **Run**
-4. Erledigt ✅
-
----
-
-## Schritt 2: Alles automatisch ausführen (3 Minuten)
-
-### Option A: Auf der VM (empfohlen)
+## 2. Repository-Preflight
 
 ```bash
-# SSH auf die VM
-ssh user@92.5.60.87
-
-# In das Projektverzeichnis
-cd /opt/shopsin  # oder wo das Projekt liegt
-
-# Alles ausführen
-./scripts/execute-all.sh
-```
-
-### Option B: Lokal (falls du den DB-Port tunnelst)
-
-```bash
-# DB-Port tunneln
-ssh -L 5432:localhost:5432 user@92.5.60.87
-
-# Im anderen Terminal:
 cd /Users/jeremy/dev/SIN-webshop-01
-./scripts/execute-all.sh
+node --version
+pnpm --version
+git status --short
+pnpm install --frozen-lockfile
 ```
 
-### Option C: Schritt für Schritt manuell
+Erwartung:
+
+- Node entspricht `package.json#engines`.
+- Aenderungen sind verstanden und gehoeren zum aktuellen Auftrag.
+- Lockfile wird nicht implizit neu geschrieben.
+
+## 3. Konfiguration
+
+Nutze `.env.example` lokal und `.env.live.example` als Produktionsvertrag. Reale Werte gehoeren in den Secret Manager beziehungsweise die Deployment-Umgebung.
 
 ```bash
-# 1. Env laden
-source .env.local
-
-# 2. Backfill (Varianten + Bilder)
-node scripts/cj/backfill-product-data.mjs
-
-# 3. Deutsche Titel übersetzen (braucht AI_GATEWAY_API_KEY)
-export AI_GATEWAY_API_KEY="vck_..."
-node scripts/cj/translate-products.mjs
-
-# 4. Bewertungen importieren
-export CRON_SECRET="..."
-node scripts/cj/trigger-reviews.mjs
+pnpm check:env:template
+pnpm check:env:live
+pnpm pipeline:verify
 ```
 
----
+Vor TikTok-OAuth muessen mindestens `TIKTOK_SERVICE_ID`, `TIKTOK_APP_KEY` und `TIKTOK_APP_SECRET` gesetzt sein. Der Seller startet die Verbindung authentifiziert unter `/admin/tiktok`; Tokens werden in `tiktok_auth` gespeichert.
 
-## Was passiert automatisch?
+## 4. Datenbank und Migrationen
 
-| Schritt | Was passiert | Dauer |
-|---------|-------------|-------|
-| SQL | `title_de` + `description_de` Spalten | 2 Sek |
-| Backfill | 51 Produkte: Varianten + Bilder | 2 Min |
-| Übersetzung | 51 Titel: Englisch → Deutsch | 3 Min |
-| Reviews | CJ-Bewertungen importieren | 1 Min |
+```bash
+pnpm check:migrations
+pnpm db:migrate
+```
 
----
+Vor produktiven Migrationen:
 
-## Was danach noch fehlt (manuell)
+1. Datenbank-Backup erstellen und Wiederherstellung testen.
+2. Migrationen gegen Staging/Test ausfuehren.
+3. RLS-, Idempotenz-, Queue- und Fulfillment-Constraints pruefen.
+4. Erst danach Produktion migrieren.
 
-1. **CJ-Wallet aufladen** (#31) — bei cjdropshipping.com → Mein Konto → Wallet
-2. **Resend-Domain verifizieren** (#33) — bei resend.com → Domains
-3. **Sortiment erweitern** — mehr Produkte importieren
+## 5. Vollstaendiges lokales Release-Gate
 
----
+```bash
+pnpm run ci
+```
 
-## Troubleshooting
+Das Gate umfasst:
 
-**Fehler: "column products.title_de does not exist"**
-→ SQL aus Schritt 1 wurde nicht ausgeführt. Im Supabase SQL Editor ausführen.
+- Governance- und Dokumentationsvertrag
+- TypeScript
+- Route-, Migrations-, Environment- und Architektur-Gates
+- Unit- und sichere Integrationstests
+- Produktionsbuild
+- Scan auf Legacy-/Placeholder-Fallbacks
+- Start des gebauten Next.js-Servers und Runtime-Smoke
 
-**Fehler: "CJ auth failed"**
-→ CJ-API-Key ist abgelaufen. Im CJ Dashboard neuen Key generieren.
+Destruktive Datenbanktests laufen nur mit isolierten Test-Credentials:
 
-**Fehler: "API Gateway error"**
-→ `AI_GATEWAY_API_KEY` fehlt. Bei Vercel AI Gateway holen.
+```bash
+ALLOW_DESTRUCTIVE_INTEGRATION_TESTS=true \
+TEST_SUPABASE_URL=https://YOUR_TEST_SUPABASE \
+TEST_SUPABASE_SERVICE_ROLE_KEY=YOUR_TEST_SERVICE_ROLE_KEY \
+pnpm test:integration
+```
 
-**Fehler: "CRON_SECRET fehlt"**
-→ In `.env.local` nach `CRON_SECRET` suchen und exportieren.
+Webhook-E2E benoetigt zusaetzlich einen laufenden Testserver, einen Test-Webhook-Key und `ALLOW_DESTRUCTIVE_WEBHOOK_TESTS=true`. Niemals gegen die Produktionsdatenbank ausfuehren.
+
+## 6. Browser- und Produktionssimulation
+
+```bash
+pnpm exec playwright install chromium
+E2E_USE_PRODUCTION=true pnpm build
+E2E_USE_PRODUCTION=true pnpm test:e2e
+```
+
+Mindestens pruefen:
+
+- Startseite und Katalog
+- Produktdetail
+- Warenkorb und leerer Checkout
+- Login/Admin-MFA
+- Rechtstexte
+- Mobile Darstellung
+- Checkout mit Stripe-Testmodus in einer isolierten Umgebung
+
+## 7. TikTok Shop Goal-to-End
+
+1. Development Shop und benoetigte Scopes im TikTok Partner Center aktivieren.
+2. Redirect URL auf `https://shopsin.delqhi.com/api/tiktok/oauth/callback` setzen.
+3. Als MFA-geschuetzter Admin `/admin/tiktok` oeffnen und die sichere Verbindung starten.
+4. Mindestens ein vollstaendig verifiziertes Produkt durch die Pipeline fuehren.
+5. Zuerst Draft erzeugen und im Seller Center pruefen.
+6. Order, Mehrpositionen, Mengen, CJ-Fulfillment, Tracking, Storno und Retoure im Development Shop testen.
+7. Erst nach dokumentierter Abnahme `TIKTOK_SAVE_MODE=LISTING` setzen.
+
+## 8. Produktionsfreigabe
+
+```bash
+pnpm go-live:today
+```
+
+Dieses Gate verlangt echte Live-Credentials, einen erfolgreichen Produktionsbuild, strikte Datenbankbereitschaft und externe HTTPS-Smokes. Ein Fehler ist ein Release-Stopper.
+
+Manuelle Freigaben, die Code nicht ersetzen kann:
+
+- Unternehmens-, Steuer- und Kontaktangaben fachlich bestaetigt
+- Rechtstexte anwaltlich/fachlich geprueft
+- Stripe Live-Account, Webhook und Auszahlungsstatus aktiv
+- Resend-Domain verifiziert
+- CJ-Konto, Versandprodukte und Webhook real getestet
+- TikTok App/Development Shop/Scopes genehmigt
+- GPSR-, Hersteller- und EU-Verantwortlichen-Daten je Produkt belegt
+- Backup, Monitoring, Alerts und Incident-Verantwortung aktiv
+
+## 9. Beweise und Abschluss
+
+Jeder Release-Bericht muss enthalten:
+
+- Commit beziehungsweise Diff-Umfang
+- ausgefuehrte Commands und Exit-Codes
+- Test-/Build-/Smoke-Ergebnisse
+- migrierte Datenbankversion
+- gepruefte Produktions-URLs
+- bekannte Rest-Risiken und Owner
+- Rollback-Schritte
+
+Ein Bericht ohne ausgefuehrte Gates ist kein Release-Nachweis.

@@ -22,7 +22,7 @@ print('react:', p.get('dependencies', {}).get('react'))
 "
 # Expected: next 16.x, react 19.x
 
-ls app/ | head
+ls src/app/ | head
 # Expected: page.tsx, layout.tsx, components/, lib/, api/, etc.
 ```
 

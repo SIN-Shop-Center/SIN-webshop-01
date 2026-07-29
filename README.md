@@ -3,7 +3,8 @@
 E-Commerce-Storefront auf Next.js 16, deployed auf Cloudflare Workers (OpenNext),
 mit self-hosted Supabase als Backend und Stripe für Zahlungen.
 
-**Live:** https://shopsin.delqhi.com
+**Produktionsziel:** https://shopsin.delqhi.com
+**Aktueller Audit:** [docs/CEO_AUDIT_2026-07-23.md](./docs/CEO_AUDIT_2026-07-23.md)
 
 ## Architektur
 
@@ -25,12 +26,39 @@ Browser
   Shop-Daten (Produkte, Kategorien) haben explizite public-read-Policies.
 - **Supabase Studio** ist hinter Cloudflare Access gesperrt.
 
+## Repository-Struktur
+
+Der Code ist in sechs sichtbare Hauptbereiche gegliedert: `src`, `packages`,
+`platform`, `tooling`, `docs` und `public`. `src/app` enthält ausschließlich die
+Next.js-Routingstruktur; wiederverwendbare Komponenten, Server Actions und
+Domänenlogik liegen daneben. Die vollständigen Grenzen und die CI-Regel stehen
+in [docs/REPOSITORY_STRUCTURE.md](./docs/REPOSITORY_STRUCTURE.md).
+
+```bash
+pnpm check:structure
+```
+
 ## Supabase-Client-Pattern
 
 | Client | Datei | Verwendung |
 |---|---|---|
-| Data-Client (`supabase-js`, `persistSession: false`) | `app/lib/supabase/data-client.ts` | Öffentliche Lesezugriffe (Produkte, Kategorien) — funktioniert in jedem Worker-Kontext |
-| SSR-Client (`@supabase/ssr`) | `app/lib/supabase/server.ts` | Auth-gebundene Operationen (Login, Wishlist, Orders) — braucht Request-Kontext mit Cookies |
+| Data-Client (`supabase-js`, `persistSession: false`) | `src/lib/supabase/data-client.ts` | Öffentliche Lesezugriffe (Produkte, Kategorien) — funktioniert in jedem Worker-Kontext |
+| SSR-Client (`@supabase/ssr`) | `src/lib/supabase/server.ts` | Auth-gebundene Operationen (Login, Wishlist, Orders) — braucht Request-Kontext mit Cookies |
+
+Die kanonischen TypeScript-Typen liegen in `src/types/database.generated.ts` und
+werden ausschließlich aus dem lokal mit allen versionierten Migrationen
+aufgebauten Supabase-Stack erzeugt:
+
+```bash
+pnpm db:local:start
+pnpm db:types:generate
+pnpm db:types:check
+pnpm db:local:stop
+```
+
+`db:types:check` vergleicht den eingebetteten Schema-Fingerprint mit allen
+Migrationen und ist Teil von `pnpm run ci`. Eine Zielinstanz bleibt zusätzlich vor
+Migrationen mit `pnpm db:migrate:status` zu auditieren.
 
 Warum: `@supabase/ssr` nutzt `cookies()` aus `next/headers`, was in
 Cloudflare Workers außerhalb von Request-Kontexten fehlschlägt. Details in
@@ -39,7 +67,7 @@ Cloudflare Workers außerhalb von Request-Kontexten fehlschlägt. Details in
 ## Lokale Entwicklung
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 cp .env.example .env.local   # Werte eintragen (siehe unten)
 pnpm dev
 ```
@@ -56,7 +84,8 @@ Siehe [.env.example](./.env.example). Wichtig:
 Deployed via OpenNext auf Cloudflare Workers:
 
 ```bash
-pnpm run deploy:cloudflare   # baut und deployed via wrangler
+pnpm go-live:today           # vollstaendiges Release-Gate
+pnpm run deploy:cloudflare   # erst danach bauen und via Wrangler deployen
 ```
 
 Secrets verwaltet über `wrangler secret` bzw. das Cloudflare-Dashboard.
@@ -65,7 +94,7 @@ Tunnel — siehe AGENTS.md, Regel 3).
 
 ## Infrastruktur (VM)
 
-Supabase läuft self-hosted via Docker Compose auf der VM (92.5.60.87),
+Supabase läuft self-hosted via Docker Compose auf der Produktions-VM,
 öffentlich gemacht über einen Cloudflare Tunnel (`cloudflared`). Ingress-Config:
 
 ```yaml
@@ -83,11 +112,12 @@ ingress:
   - service: http_status:404
 ```
 
-Betriebs-Runbook, Smoke-Tests und Debugging-Tabelle: [AGENTS.md](./AGENTS.md).
+Betriebs-Runbook und Release-Reihenfolge: [EXECUTE.md](./EXECUTE.md).
+Agentenregeln und Infrastrukturhinweise: [AGENTS.md](./AGENTS.md).
 
 ## Sicherheit
 
-- RLS default-deny auf allen Tabellen (letzter Audit: 2026-06-13, `public.openai_tokens` public-ALL-Policy entfernt)
+- RLS default-deny ist die Zielvorgabe; der aktuelle Stand muss durch Migration-/Policy-Audit belegt werden
 - `SERVICE_ROLE_KEY` nur serverseitig, nie im Client-Bundle
 - Secrets rotiert (keine Supabase-Docker-Defaults)
 - Postgres-Port 5432 nicht öffentlich
