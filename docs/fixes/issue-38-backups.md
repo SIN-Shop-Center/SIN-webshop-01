@@ -7,8 +7,8 @@
 ## Status
 
 Im Repo bereits vorhanden (in PR #69):
-- `scripts/ops/backup-shop-db.sh` — pg_dump → OCI Object Storage + 30d Retention + Resend-Alert
-- `scripts/ops/offsite-copy-r2.sh` — 3-2-1 wöchentlich nach R2
+- `tooling/scripts/ops/backup-shop-db.sh` — pg_dump → OCI Object Storage + 30d Retention + Resend-Alert
+- `tooling/scripts/ops/offsite-copy-r2.sh` — 3-2-1 wöchentlich nach R2
 
 Auf der OCI-VM `92.5.60.87` sind die Scripts deployt (`/opt/sin-shop/ops/`), cron läuft täglich 02:00 und sonntags 03:00. Fehlend: OCI/R2-Credentials und Resend-Domain-Verifizierung (Alerts landen sonst im Reject).
 
@@ -16,8 +16,8 @@ Auf der OCI-VM `92.5.60.87` sind die Scripts deployt (`/opt/sin-shop/ops/`), cro
 
 ```sh
 # 1. Script kopieren
-scp scripts/ops/backup-shop-db.sh ubuntu@92.5.60.87:/tmp/
-scp scripts/ops/offsite-copy-r2.sh ubuntu@92.5.60.87:/tmp/
+scp tooling/scripts/ops/backup-shop-db.sh ubuntu@92.5.60.87:/tmp/
+scp tooling/scripts/ops/offsite-copy-r2.sh ubuntu@92.5.60.87:/tmp/
 
 # 2. Auf der VM:
 ssh ubuntu@92.5.60.87

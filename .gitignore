@@ -5,16 +5,14 @@ node_modules/
 .pnpm-store/
 
 # Build
+.cache/
 .next/
 out/
 build/
 dist/
 .turbo/
-apps/*/.next/
-apps/*/dist/
-apps/*/build/
 packages/*/dist/
-workers/*/dist/
+platform/workers/*/dist/
 .open-next/
 .open-next-deploy/
 
@@ -25,10 +23,10 @@ workers/*/dist/
 .env.test.local
 .env.production
 .env.production.local
-secrets/*.dec.env
-secrets/*.plain.env
-secrets/*.tmp.env
-secrets/*.runtime.env
+platform/secrets/*.dec.env
+platform/secrets/*.plain.env
+platform/secrets/*.tmp.env
+platform/secrets/*.runtime.env
 
 # Debug
 npm-debug.log*
@@ -60,15 +58,12 @@ output/
 /.tools/
 /.notebooklm-mcp-cli/
 /.npm-cache/
-apps/web/.npm-cache/
 /tmp/
 /live-*.png
 /mid-scroll-*.png
 /package-lock.json
 
 # Go test temp dirs
-apps/api/.go-tmp-exec/
-apps/api/.gotmp/
 
 # Python artifacts
 __pycache__/

@@ -10,7 +10,7 @@ Die bestehende Lösung ist monolithisch und koppelt UI, API und Automation zu st
 - `apps/web`: Next.js App Router als UI/BFF-Proxy.
 - `apps/api`: Go Domain-API für orchestrierte Business-Endpunkte.
 - Supabase/Postgres bleibt persistente Wahrheit.
-- Worker werden separiert in `workers/edge`, `workers/n8n`, `apps/api/cmd/worker`.
+- Worker werden separiert in `platform/workers/edge`, `platform/workers/n8n`, `apps/api/cmd/worker`.
 
 ## Consequences
 - Klare Domänengrenzen, testbare Services, geringere Kopplung.

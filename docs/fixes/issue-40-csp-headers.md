@@ -33,7 +33,7 @@ Cross-Origin-Resource-Policy: same-site
 ```
 
 ```ts
-// app/api/csp-report/route.ts
+// src/app/api/csp-report/route.ts
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 ```
 
 ```sql
--- scripts/supabase/setup-csp-violations.sql
+-- tooling/scripts/supabase/setup-csp-violations.sql
 CREATE TABLE IF NOT EXISTS shop.csp_violations (
   id BIGSERIAL PRIMARY KEY,
   document_uri TEXT,

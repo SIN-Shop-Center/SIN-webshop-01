@@ -11,11 +11,11 @@ After ~50 PRs and 6 months of development, there is dead code, TODOs, inconsiste
 
 ```sh
 # 1. TODOs and FIXMEs
-grep -RIn --color=never -E 'TODO|FIXME|XXX|HACK' app/ components/ 2>/dev/null \
+grep -RIn --color=never -E 'TODO|FIXME|XXX|HACK' src/app/ components/ 2>/dev/null \
   | head -50
 
 # 2. console.log statements
-grep -RIn --color=never -E 'console\.(log|debug)' app/ 2>/dev/null \
+grep -RIn --color=never -E 'console\.(log|debug)' src/app/ 2>/dev/null \
   | grep -v '__tests__' | head -30
 
 # 3. Dead imports
@@ -26,10 +26,10 @@ pnpm dlx depcheck
 
 # 5. Hard-coded URLs (should be env)
 grep -RIn --color=never -E 'https?://(localhost|127\.0\.0\.1|shopsin\.delqhi\.com|supabase\.delqhi\.com)' \
-  app/ components/ 2>/dev/null | grep -v 'env.example' | head -20
+  src/app/ components/ 2>/dev/null | grep -v 'env.example' | head -20
 
 # 6. Inconsistent naming (productId vs product_id vs productID)
-grep -RIn --color=never -E '\bproductId\b|\bProductID\b' app/ 2>/dev/null | head -10
+grep -RIn --color=never -E '\bproductId\b|\bProductID\b' src/app/ 2>/dev/null | head -10
 
 # 7. Long files (>400 lines)
 find app components -name '*.ts' -o -name '*.tsx' | xargs wc -l 2>/dev/null \
@@ -40,8 +40,8 @@ find app components -name '*.ts' -o -name '*.tsx' | xargs wc -l 2>/dev/null \
 
 | Pattern | Action |
 |---------|--------|
-| `app/lib/legacy/` | Delete dir, `grep` for imports, fix all callers |
-| `app/lib/utils/old-helpers.ts` | Same |
+| `src/lib/legacy/` | Delete dir, `grep` for imports, fix all callers |
+| `src/lib/utils/old-helpers.ts` | Same |
 | `*.doc.md` without matching code file | Delete (orphan doc) |
 | Hard-coded `http://localhost:3000` | Replace with `process.env.NEXT_PUBLIC_APP_URL` |
 | Inline `style={{...}}` in >10 places | Extract to `tailwind.config`/`globals.css` |
@@ -52,12 +52,12 @@ find app components -name '*.ts' -o -name '*.tsx' | xargs wc -l 2>/dev/null \
 ## Polish pass (script)
 
 ```ts
-// scripts/lint-cleanup.sh
+// tooling/scripts/lint-cleanup.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
 echo "=== console.log in production ==="
-grep -RIn --include="*.ts" --include="*.tsx" -E 'console\.(log|debug)' app/ 2>/dev/null \
+grep -RIn --include="*.ts" --include="*.tsx" -E 'console\.(log|debug)' src/app/ 2>/dev/null \
   | grep -v '__tests__' \
   | head -50 \
   || echo "  (clean)"
@@ -65,8 +65,8 @@ grep -RIn --include="*.ts" --include="*.tsx" -E 'console\.(log|debug)' app/ 2>/d
 echo ""
 echo "=== TODOs in critical paths ==="
 grep -RIn --include="*.ts" --include="*.tsx" -E 'TODO|FIXME' \
-  app/lib/actions/cart.ts app/lib/actions/checkout.ts \
-  app/lib/fulfillment/ app/api/stripe/ 2>/dev/null \
+  src/lib/actions/cart.ts src/lib/actions/checkout.ts \
+  src/lib/fulfillment/ src/app/api/stripe/ 2>/dev/null \
   || echo "  (clean)"
 
 echo ""
@@ -76,18 +76,18 @@ find app -name '*.ts' -o -name '*.tsx' | xargs wc -l 2>/dev/null \
 
 echo ""
 echo "=== Long functions (>100 lines) ==="
-grep -RIn -E '^export (async )?function [a-zA-Z]+' app/ 2>/dev/null | head -5
+grep -RIn -E '^export (async )?function [a-zA-Z]+' src/app/ 2>/dev/null | head -5
 ```
 
 ## Specific deletions (likely)
 
 ```sh
 # Remove orphan docs
-rm -f app/lib/LEGACY.md app/lib/legacy-README.md
-rm -rf app/legacy/ components/old/ 2>/dev/null
+rm -f src/lib/LEGACY.md src/lib/legacy-README.md
+rm -rf src/app/legacy/ components/old/ 2>/dev/null
 
 # Remove duplicate Supabase client
-ls app/lib/supabase/
+ls src/lib/supabase/
 # Should be: admin.ts, client.ts, data-client.ts, middleware.ts, queries.ts, server.ts
 # Delete any duplicates (e.g. old-client.ts, new-server.ts)
 ```
@@ -95,7 +95,7 @@ ls app/lib/supabase/
 ## Specific rewrites
 
 ```ts
-// app/lib/utils/env.ts (new)
+// src/lib/utils/env.ts (new)
 export const env = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL!,
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -119,7 +119,7 @@ Replace `process.env.X` direct reads with this.
 - `pnpm dlx depcheck` → 0 unused deps
 - `npx ts-prune` → 0 unused exports
 - 0 `console.log` in production
-- 0 hard-coded localhost / production URLs in `app/`
+- 0 hard-coded localhost / production URLs in `src/app/`
 - 0 files > 500 lines
 - `pnpm typecheck && pnpm build` green
 
