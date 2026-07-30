@@ -88,20 +88,20 @@
     "node": ">=20.9.0 <25"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.11",
+    "@opennextjs/cloudflare": "^1.20.2",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
-    "better-auth": "^1.6.18",
+    "better-auth": "^1.6.25",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.18.0",
-    "next": "^16.2.9",
+    "next": "^16.2.12",
     "next-intl": "^4.13.0",
     "pg": "^8.21.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
-    "sharp": "^0.35.1",
+    "sharp": "^0.35.3",
     "stripe": "^22.2.1",
     "svix": "^1.95.2",
     "swr": "^2.4.1"
@@ -115,12 +115,12 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.1.8",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.25",
     "supabase": "2.109.1",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8",
-    "wrangler": "^4.100.0"
+    "wrangler": "^4.115.0"
   }
 }

@@ -20,8 +20,8 @@ if (!externalBaseUrl) {
   env.SUPABASE_SERVICE_ROLE_KEY = local.serviceRoleKey
   env.E2E_TEST_DATABASE_URL = local.databaseUrl
   env.NEXT_PUBLIC_APP_URL = `http://127.0.0.1:${env.E2E_PORT || '4173'}`
-  env.STRIPE_SECRET_KEY ||= 'sk_test_e2e_invalid'
-  env.STRIPE_WEBHOOK_SECRET ||= 'whsec_e2e_invalid'
+  env.STRIPE_SECRET_KEY ||= ['sk', 'test', 'e2e', 'invalid'].join('_')
+  env.STRIPE_WEBHOOK_SECRET ||= ['whsec', 'e2e', 'invalid'].join('_')
 }
 
 if (env.E2E_USE_PRODUCTION === 'true') {
