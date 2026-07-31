@@ -7,6 +7,7 @@
     "prebuild": "node tooling/scripts/ensure-supported-node.mjs",
     "pretypecheck": "node tooling/scripts/ensure-supported-node.mjs",
     "dev": "next dev",
+    "dev:admin": "ADMIN_LOCAL_PREVIEW=true next dev",
     "build": "next build",
     "build:cf": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",
