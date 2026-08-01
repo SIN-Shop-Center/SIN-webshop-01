@@ -123,6 +123,7 @@ ingress:
 ```
 
 Betriebs-Runbook und Release-Reihenfolge: [EXECUTE.md](./EXECUTE.md).
+Externe Konten, Produktions-Secrets und Abnahmen: [docs/PRODUCTION-EXTERNAL-SETUP.md](./docs/PRODUCTION-EXTERNAL-SETUP.md).
 Agentenregeln und Infrastrukturhinweise: [AGENTS.md](./AGENTS.md).
 
 ## Sicherheit

@@ -1,6 +1,6 @@
 # ShopSIN Issues
 
-> **Stand:** 29. Juli 2026
+> **Stand:** 1. August 2026
 > **Scope:** Technisch belegbarer Restbestand nach Abschluss der lokalen CEO-Verifikation.
 > **Statuswerte:** `OPEN`, `BLOCKED`, `READY FOR REVIEW`, `DONE`.
 
@@ -113,7 +113,8 @@ Evidence:
 
 Die Codebasis ist lokal verifiziert, aber eine Produktionsfreigabe bleibt NO-GO,
 bis folgende externe Nachweise vorliegen. Es wurden keine Secrets erfunden,
-ausgegeben oder committed.
+ausgegeben oder committed. Der verbindliche Setup- und Evidenzablauf ist in
+`docs/PRODUCTION-EXTERNAL-SETUP.md` konsolidiert.
 
 ### Runtime und Anbieter
 

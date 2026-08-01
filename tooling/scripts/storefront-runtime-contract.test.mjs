@@ -8,6 +8,10 @@ const migration = readFileSync(
 )
 const cartAction = readFileSync('src/lib/actions/cart.ts', 'utf8')
 const stripeWebhook = readFileSync('src/app/api/stripe/webhook/route.ts', 'utf8')
+const emailWebhook = readFileSync('src/app/api/email/webhook/route.ts', 'utf8')
+const localEnvTemplate = readFileSync('.env.example', 'utf8')
+const liveEnvTemplate = readFileSync('.env.live.example', 'utf8')
+const liveEnvSchema = readFileSync('tooling/scripts/live-env-schema.mjs', 'utf8')
 
 for (const functionName of [
   'shop.add_cart_item',
@@ -34,6 +38,13 @@ test('variant-aware cart uniqueness is null-safe and guest-scoped', () => {
 test('Stripe order idempotency is authoritative before audit marking', () => {
   assert.match(stripeWebhook, /orders\.stripe_session_id UNIQUE constraint is the source of truth/)
   assert.match(stripeWebhook, /Nothing is marked processed before this durable write succeeds/)
+})
+
+test('Resend webhook signing secret is part of every environment contract', () => {
+  assert.match(emailWebhook, /process\.env\.RESEND_WEBHOOK_SECRET/)
+  assert.match(localEnvTemplate, /^RESEND_WEBHOOK_SECRET=/m)
+  assert.match(liveEnvTemplate, /^RESEND_WEBHOOK_SECRET=/m)
+  assert.match(liveEnvSchema, /'RESEND_WEBHOOK_SECRET'/)
 })
 
 test('legacy cart and idempotency setup scripts are disabled', () => {

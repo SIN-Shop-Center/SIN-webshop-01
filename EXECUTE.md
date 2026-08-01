@@ -31,7 +31,7 @@ Erwartung:
 
 ## 3. Konfiguration
 
-Nutze `.env.example` lokal und `.env.live.example` als Produktionsvertrag. Reale Werte gehoeren in den Secret Manager beziehungsweise die Deployment-Umgebung.
+Nutze `.env.example` lokal und `.env.live.example` als Produktionsvertrag. Reale Werte gehoeren in den Secret Manager beziehungsweise die Deployment-Umgebung. Der verbindliche Anbieter-, Secret- und Abnahmeleitfaden steht in `docs/PRODUCTION-EXTERNAL-SETUP.md`.
 
 ```bash
 pnpm check:env:template
