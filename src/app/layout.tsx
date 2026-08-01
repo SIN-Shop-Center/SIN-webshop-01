@@ -70,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages({ locale })
 
   return (
-    <html lang={locale} className={`${inter.className} bg-background`}>
+    <html lang={locale} className={`${inter.className} bg-background`} data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"

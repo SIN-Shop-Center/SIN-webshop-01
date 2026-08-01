@@ -59,12 +59,15 @@ test.describe('Cart', () => {
       .locator('a[href*="/produkt/"]')
       .first()
     await firstProduct.waitFor({ state: 'visible', timeout: 15_000 })
-    await firstProduct.click()
+    const productHref = await firstProduct.getAttribute('href')
+    expect(productHref).toBeTruthy()
+    await Promise.all([
+      page.waitForURL((url) => url.pathname === productHref),
+      firstProduct.click(),
+    ])
 
-    // Add-to-Cart Button
-    const addButton = page.getByRole('button', {
-      name: /in den warenkorb/i,
-    })
+    // Only interact with the PDP control after client-side navigation completed.
+    const addButton = page.getByTestId('add-to-cart-button')
     await expect(addButton).toBeVisible()
     await addButton.click()
     await expect(page.getByTestId('add-to-cart-button')).toHaveAttribute('data-state', 'added')

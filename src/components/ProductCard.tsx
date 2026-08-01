@@ -70,6 +70,7 @@ export function ProductCard({ product, index }: { product: Product; index?: numb
                 : []
           }
           alt={product.title}
+          priority={index === 0}
         />
 
         <ProductImageOverlay badges={badges} size="sm" />
