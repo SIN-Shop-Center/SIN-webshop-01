@@ -3,7 +3,7 @@
 
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getProductById, getAllProductIdsForBuild } from '@/lib/queries'
+import { getProductById } from '@/lib/queries'
 import { getProductBadges } from '@/lib/product-badges'
 import { canUserReview } from '@/actions/reviews'
 import { toCents } from '@/lib/format'
@@ -32,17 +32,8 @@ import {
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
-export const revalidate = 300
-export const dynamicParams = true
-
-export async function generateStaticParams() {
-  try {
-    const ids = await getAllProductIdsForBuild()
-    return ids.map((id) => ({ id }))
-  } catch {
-    return []
-  }
-}
+// This route includes request-bound auth/review state and must not be rendered as ISR.
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,

@@ -9,16 +9,19 @@ export function QueueOperationButton({
   operation,
   label,
   variant = 'primary',
+  disabledReason,
 }: {
   operation: CommerceOperation
   label: string
   variant?: 'primary' | 'outline' | 'ghost'
+  disabledReason?: string
 }) {
   const [pending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
   const [ok, setOk] = useState(false)
 
   function run() {
+    if (disabledReason) return
     setMessage(null)
     startTransition(async () => {
       const result = await enqueueCommerceOperation(operation)
@@ -33,7 +36,9 @@ export function QueueOperationButton({
       <button
         type="button"
         onClick={run}
-        disabled={pending}
+        disabled={pending || Boolean(disabledReason)}
+        title={disabledReason}
+        aria-disabled={disabledReason ? true : undefined}
         className={`btn btn-${variant} btn-md`}
       >
         {pending ? (
@@ -43,6 +48,7 @@ export function QueueOperationButton({
         )}
         {pending ? 'Wird eingeplant…' : label}
       </button>
+      {disabledReason ? <span className="sr-only">{disabledReason}</span> : null}
       {message ? (
         <div
           role="status"
