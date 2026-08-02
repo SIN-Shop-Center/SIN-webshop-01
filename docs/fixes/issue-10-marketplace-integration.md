@@ -30,7 +30,7 @@ Both:
 ## Implementation pattern (Kaufland)
 
 ```ts
-// app/lib/kaufland/client.ts
+// src/lib/kaufland/client.ts
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const KAUFLAND_API = 'https://api.kaufland.de/v1'
@@ -75,7 +75,7 @@ export async function syncProductsToKaufland() {
 }
 ```
 
-Cron: `app/api/cron/kaufland-sync/route.ts` (daily, 50/batch).
+Cron: `src/app/api/cron/kaufland-sync/route.ts` (daily, 50/batch).
 
 ## Acceptance
 

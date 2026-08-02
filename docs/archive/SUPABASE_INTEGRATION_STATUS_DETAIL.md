@@ -77,14 +77,14 @@ useEffect(() => {
 
 ### Development Mode (Testing)
 ```bash
-node scripts/supabase/seed-products.mjs --dev
+node tooling/scripts/supabase/seed-products.mjs --dev
 ```
 
 ### Production Mode
 ```bash
 export SUPABASE_URL="https://your-project.supabase.co"
 export SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
-node scripts/supabase/seed-products.mjs
+node tooling/scripts/supabase/seed-products.mjs
 ```
 
 ### Frontend
@@ -98,7 +98,7 @@ The frontend will now load products from Supabase with:
 
 ### Created
 1. `apps/web/src/lib/supabase/client.ts` - Supabase client configuration
-2. `scripts/supabase/seed-products.mjs` - Seed script (executable)
+2. `tooling/scripts/supabase/seed-products.mjs` - Seed script (executable)
 3. `SUPABASE_INTEGRATION_SUMMARY.md` - Comprehensive documentation
 
 ### Modified

@@ -22,7 +22,7 @@ ShopSIN currently has no social presence. The 51–136 products are sellable but
 ## Phase 1 — auto-pin new products to Pinterest (no manual work)
 
 ```ts
-// app/api/cron/pinterest-sync/route.ts
+// src/app/api/cron/pinterest-sync/route.ts
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -97,7 +97,7 @@ Once the catalog is bigger (>50 products), the human task is:
 
 ## Phase 3 — embed in the storefront (code)
 
-Add social-meta to the layout (in `app/layout.tsx`):
+Add social-meta to the layout (in `src/app/layout.tsx`):
 
 ```tsx
 // Add to existing metadata

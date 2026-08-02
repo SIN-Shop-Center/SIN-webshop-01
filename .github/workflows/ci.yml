@@ -5,95 +5,45 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  typecheck:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-      - name: Build (Dependabot)
-        if: github.actor == 'dependabot[bot]'
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: https://supabase.example.com
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1MTkyODU0LCJleHAiOjE4MTAyNTQ4NTR9.h1cPjLOfP4z0X2G9X6y9X4X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9
-          NEXT_PUBLIC_APP_URL: https://shopsin.example.com
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_dummy
-          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2NDUxOTI4NTQsImV4cCI6MTgxMDI1NDg1NH0.dummy
-          STRIPE_SECRET_KEY: sk_test_dummy
-          STRIPE_WEBHOOK_SECRET: whsec_dummy
-      - name: Build (non-Dependabot)
-        if: github.actor != 'dependabot[bot]'
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-      - name: Bundle size check
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Start isolated Supabase
+        shell: bash
         run: |
-          SIZE_BYTES=$(du -sb .next/ | cut -f1)
-          THRESHOLD=52428800
-          SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1048576" | bc)
-          THRESHOLD_MB=$(echo "scale=0; $THRESHOLD / 1048576" | bc)
-          echo "Bundle size: ${SIZE_MB}MB (threshold: ${THRESHOLD_MB}MB)"
-          if [ "$SIZE_BYTES" -gt "$THRESHOLD" ]; then
-            echo "::error::Bundle size ${SIZE_MB}MB exceeds ${THRESHOLD_MB}MB threshold"
+          log_file="$(mktemp)"
+          trap 'rm -f "$log_file"' EXIT
+          if ! pnpm db:local:start >"$log_file" 2>&1; then
+            echo "Local Supabase failed to start; redacted diagnostics follow." >&2
+            sed -E               -e 's#postgres(ql)?://[^[:space:]]+#<redacted-database-url>#g'               -e 's#(sb_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9._-]+)#<redacted-local-token>#g'               "$log_file" >&2
             exit 1
           fi
-
-  security-audit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
+      - run: pnpm run ci
+      - run: CI=true pnpm test:e2e:chromium
+      - run: CI=true pnpm test:e2e:mobile
+      - if: failure()
+        uses: actions/upload-artifact@v7
         with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Security audit (moderate+)
-        run: pnpm audit --audit-level=moderate
-        continue-on-error: true
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+      - if: always()
+        run: pnpm db:local:stop

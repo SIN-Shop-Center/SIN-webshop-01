@@ -7,17 +7,17 @@
 
 CJ prices are in USD, ShopSIN sells in EUR. The current conversion is a hard-coded `FX_RATE=1.0` in `.env.local`, which is **wrong** (real EUR/USD ≈ 0.92 today). This silently reduces margin by ~8%.
 
-There IS a `app/api/cron/fx-update/route.ts` already, and it presumably calls Frankfurter API to update `pricing-fx.ts`. Check first.
+There IS a `src/app/api/cron/fx-update/route.ts` already, and it presumably calls Frankfurter API to update `pricing-fx.ts`. Check first.
 
 ## Step 1 — audit
 
 ```sh
 cd /Users/jeremy/dev/SIN-webshop-01
-cat app/api/cron/fx-update/route.ts 2>/dev/null | head -30
+cat src/app/api/cron/fx-update/route.ts 2>/dev/null | head -30
 echo "---"
-cat app/lib/pricing-fx.ts 2>/dev/null | head -30
+cat src/lib/pricing-fx.ts 2>/dev/null | head -30
 echo "---"
-grep -RIn "FX_RATE\|fx_rate" app/ 2>/dev/null | head -10
+grep -RIn "FX_RATE\|fx_rate" src/app/ 2>/dev/null | head -10
 ```
 
 ## Step 2 — Env-Var in `.env.local`
@@ -38,7 +38,7 @@ gh secret set FX_RATE --repo SIN-Shop-Center/SIN-webshop-01
 ## Step 3 — cron code (already exists, fix if broken)
 
 ```ts
-// app/api/cron/fx-update/route.ts
+// src/app/api/cron/fx-update/route.ts
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -72,7 +72,7 @@ export async function GET(req: Request) {
 ```
 
 ```sql
--- scripts/supabase/setup-pricing-fx.sql
+-- tooling/scripts/supabase/setup-pricing-fx.sql
 CREATE TABLE IF NOT EXISTS shop.pricing_fx (
   currency_pair TEXT PRIMARY KEY,
   rate NUMERIC NOT NULL,
@@ -114,7 +114,7 @@ SELECT * FROM shop.pricing_fx;
 ## Step 6 — update pricing to use the live rate
 
 ```ts
-// app/lib/pricing-fx.ts (new or update)
+// src/lib/pricing-fx.ts (new or update)
 import { createClient } from '@supabase/server'
 
 export async function getUsdToEurRate(): Promise<number> {
@@ -136,12 +136,12 @@ export async function getUsdToEurRate(): Promise<number> {
 }
 ```
 
-Then in `app/lib/actions/cart.ts` or wherever prices are calculated, use `getUsdToEurRate()` instead of `process.env.FX_RATE`.
+Then in `src/lib/actions/cart.ts` or wherever prices are calculated, use `getUsdToEurRate()` instead of `process.env.FX_RATE`.
 
 ## Acceptance
 
 - `shop.pricing_fx` table exists and has fresh `fetched_at`
-- `app/api/cron/fx-update/route.ts` returns valid rate
+- `src/app/api/cron/fx-update/route.ts` returns valid rate
 - `FX_RATE` env var matches latest fetched rate (within 1%)
 - Product prices on /produkte reflect the live rate
 

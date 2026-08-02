@@ -22,7 +22,7 @@ Store as:
 ## Phase 2 — product sync (agent code)
 
 ```ts
-// app/lib/tiktok-shop/client.ts
+// src/lib/tiktok-shop/client.ts
 const TIKTOK_API = 'https://open-api.tiktokglobalshop.com/api/v1'
 
 export async function tiktokGet(path: string) {
@@ -84,7 +84,7 @@ ALTER TABLE shop.products ADD COLUMN IF NOT EXISTS tiktok_product_id TEXT;
 ## Phase 3 — order webhook (TikTok → ShopSIN backoffice)
 
 ```ts
-// app/api/webhooks/tiktok-shop/route.ts
+// src/app/api/webhooks/tiktok-shop/route.ts
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 

@@ -1,8 +1,12 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type DEPLOY_PRODUCTION to authorize a production deployment'
+        required: true
+        type: string
 
 concurrency:
   group: deploy-production
@@ -21,9 +25,12 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ inputs.confirmation == 'DEPLOY_PRODUCTION' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    outputs:
+      deployed: ${{ steps.cloudflare_deploy.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -33,7 +40,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:cf
-      - uses: cloudflare/wrangler-action@v4
+      - id: cloudflare_deploy
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: deploy
@@ -53,7 +61,7 @@ jobs:
 
   rollback:
     needs: deploy
-    if: failure()
+    if: ${{ always() && needs.deploy.result == 'failure' && needs.deploy.outputs.deployed == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production

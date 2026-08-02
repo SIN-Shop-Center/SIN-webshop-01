@@ -9,10 +9,10 @@
 Ohne Domain-Verifizierung landen alle E-Mails (Bestellbestätigung, Newsletter, etc.) im Spam- oder Promotions-Tab. Schlimmster Fall: Gmail/Outlook lehnen komplett ab.
 
 **Betroffene Mails:**
-- `app/api/stripe/webhook/route.ts` (Bestellbestätigung via Resend)
-- `app/lib/newsletter-send.ts` (Newsletter)
-- `app/lib/cj/wallet-monitor.ts` (Wallet-Alerts)
-- `app/api/cron/cleanup-reservations/route.ts` (zukünftig)
+- `src/app/api/stripe/webhook/route.ts` (Bestellbestätigung via Resend)
+- `src/lib/newsletter-send.ts` (Newsletter)
+- `src/lib/cj/wallet-monitor.ts` (Wallet-Alerts)
+- `src/app/api/cron/cleanup-reservations/route.ts` (zukünftig)
 
 > **Update 2026-06-13:** Resend nutzt für Cloudflare **TXT-Records** (nicht CNAME) für DKIM. Das CNAME-Format in der alten Doku ist veraltet. Die genauen Werte für DKIM und MX müssen aus dem Resend-Dashboard kopiert werden (region-abhängig).
 
@@ -79,7 +79,7 @@ wrangler secret put RESEND_FROM_EMAIL
 gh secret set RESEND_FROM_EMAIL --repo SIN-Shop-Center/SIN-webshop-01
 ```
 
-In `app/lib/email.ts` und `app/lib/newsletter-send.ts` muss `RESEND_FROM_EMAIL` jetzt die verifizierte Domain nutzen.
+In `src/lib/email.ts` und `src/lib/newsletter-send.ts` muss `RESEND_FROM_EMAIL` jetzt die verifizierte Domain nutzen.
 
 ## Acceptance
 
