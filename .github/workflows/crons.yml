@@ -1,5 +1,6 @@
 # Purpose: $0-Ersatz für Vercel Crons (Hobby-Plan erlaubt nur 2)
-# Secrets im Repo setzen: CRON_SECRET, APP_URL (z.B. https://sin-shop.example.com)
+# Secret im Repo setzen: CRON_SECRET. APP_URL ist eine optionale öffentliche
+# Repository-Variable; ohne sie wird die kanonische ShopSIN-Domain verwendet.
 
 name: scheduled-crons
 
@@ -21,6 +22,9 @@ on:
 jobs:
   trigger:
     runs-on: ubuntu-latest
+    env:
+      APP_URL: ${{ vars.APP_URL || 'https://shopsin.delqhi.com' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
     steps:
       - name: Determine endpoints for this schedule
         id: pick
@@ -36,13 +40,33 @@ jobs:
             *)              echo "endpoints=${{ github.event.inputs.endpoint }}" >> "$GITHUB_OUTPUT" ;;
           esac
 
+      - name: Validate cron configuration
+        run: |
+          set -eu
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Missing required repository secret CRON_SECRET"
+            exit 1
+          fi
+          case "$APP_URL" in
+            https://*) ;;
+            *)
+              echo "::error::APP_URL must be an absolute https:// URL"
+              exit 1
+              ;;
+          esac
+
       - name: Call cron endpoints
         run: |
-          set -e
-          for ep in ${{ steps.pick.outputs.endpoints }}; do
+          set -eu
+          endpoints="${{ steps.pick.outputs.endpoints }}"
+          if [ -z "$endpoints" ]; then
+            echo "::error::No cron endpoint selected"
+            exit 1
+          fi
+          for ep in $endpoints; do
             echo "Triggering /api/cron/$ep"
             curl -fsS --max-time 290 \
-              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-              "${{ secrets.APP_URL }}/api/cron/$ep"
+              -H "Authorization: Bearer $CRON_SECRET" \
+              "$APP_URL/api/cron/$ep"
             echo
           done

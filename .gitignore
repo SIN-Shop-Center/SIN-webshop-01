@@ -27,6 +27,9 @@ platform/secrets/*.dec.env
 platform/secrets/*.plain.env
 platform/secrets/*.tmp.env
 platform/secrets/*.runtime.env
+# Keep the required directory in clean clones; only the empty placeholder is tracked.
+!platform/secrets/
+!platform/secrets/.gitkeep
 
 # Debug
 npm-debug.log*

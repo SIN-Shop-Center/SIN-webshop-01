@@ -12,6 +12,7 @@ const emailWebhook = readFileSync('src/app/api/email/webhook/route.ts', 'utf8')
 const localEnvTemplate = readFileSync('.env.example', 'utf8')
 const liveEnvTemplate = readFileSync('.env.live.example', 'utf8')
 const liveEnvSchema = readFileSync('tooling/scripts/live-env-schema.mjs', 'utf8')
+const cronWorkflow = readFileSync('.github/workflows/crons.yml', 'utf8')
 
 for (const functionName of [
   'shop.add_cart_item',
@@ -45,6 +46,13 @@ test('Resend webhook signing secret is part of every environment contract', () =
   assert.match(localEnvTemplate, /^RESEND_WEBHOOK_SECRET=/m)
   assert.match(liveEnvTemplate, /^RESEND_WEBHOOK_SECRET=/m)
   assert.match(liveEnvSchema, /'RESEND_WEBHOOK_SECRET'/)
+})
+
+test('scheduled crons use a public base URL and fail closed without auth', () => {
+  assert.match(cronWorkflow, /APP_URL: \$\{\{ vars\.APP_URL \|\| 'https:\/\/shopsin\.delqhi\.com' \}\}/)
+  assert.doesNotMatch(cronWorkflow, /secrets\.APP_URL/)
+  assert.match(cronWorkflow, /Missing required repository secret CRON_SECRET/)
+  assert.match(cronWorkflow, /APP_URL must be an absolute https:\/\/ URL/)
 })
 
 test('legacy cart and idempotency setup scripts are disabled', () => {

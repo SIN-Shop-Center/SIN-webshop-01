@@ -331,3 +331,15 @@
     opacity: 1;
   }
 }
+
+/*
+ * Unlayered on purpose: this accessibility invariant must override text-size
+ * utility classes so iOS Safari never zooms text-entry controls on focus.
+ */
+@media (max-width: 48rem) {
+  input:not([type='checkbox'], [type='radio'], [type='range']),
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+}

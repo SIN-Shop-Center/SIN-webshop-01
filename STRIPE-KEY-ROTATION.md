@@ -1,9 +1,11 @@
 # Stripe Key Rotation — Schritt-für-Schritt Guide
 
-## Status: 🔴 KRITISCH — Stripe Secret Key abgelaufen
+## Status: Externe Verifizierung erforderlich
 
-**Symptom:** Jeder Checkout bricht mit "Beim Starten der Zahlung ist ein Fehler aufgetreten" ab.
-**Ursache:** `StripeAuthenticationError` — `api_key_expired`.
+Die Gültigkeit der aktuell hinterlegten Stripe-Schlüssel wurde in diesem Lauf
+nicht mit einem autorisierten Stripe-Konto geprüft. Dieses Runbook gilt, wenn ein
+freigegebener Test oder ein Provider-Ereignis `StripeAuthenticationError` mit
+`api_key_expired` bestätigt.
 
 ---
 
@@ -73,9 +75,9 @@ Falls der Webhook neu angelegt werden muss:
 
 | Feld | Wert |
 |---|---|
-| Endpoint URL | `https://shopsin.delqhi.com/api/webhooks/stripe` |
+| Endpoint URL | `https://shopsin.delqhi.com/api/stripe/webhook` |
 | Events | `checkout.session.completed` |
-| API Version | 2024-10-28 (oder aktuellste) |
+| API Version | Im Stripe-Dashboard für den konkreten Endpoint verifizieren |
 
 Nach Erstellung: Signing secret kopieren und in `STRIPE_WEBHOOK_SECRET` eintragen.
 

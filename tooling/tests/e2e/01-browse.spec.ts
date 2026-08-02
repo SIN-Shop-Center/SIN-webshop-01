@@ -77,9 +77,13 @@ test.describe('Cart', () => {
 
     const cartCookie = (await page.context().cookies()).find((cookie) => cookie.name === 'sin_cart_id')
     expect(cartCookie?.value, 'addToCart must persist the guest cart cookie').toBeTruthy()
-    const cartResponse = await page.request.get('/api/cart')
-    expect(cartResponse.ok()).toBeTruthy()
-    const cartPayload = await cartResponse.json()
+    // Read through the browser context so the production Secure cookie follows
+    // the same loopback transport semantics as the user navigation below.
+    const cartPayload = await page.evaluate(async () => {
+      const response = await fetch('/api/cart', { cache: 'no-store' })
+      if (!response.ok) throw new Error(`Cart API returned ${response.status}`)
+      return response.json() as Promise<{ items: unknown[] }>
+    })
     expect(cartPayload.items).toHaveLength(1)
 
     // Navigiere zum Warenkorb

@@ -1,6 +1,6 @@
 # ShopSIN Issues
 
-> **Stand:** 1. August 2026
+> **Stand:** 2. August 2026
 > **Scope:** Technisch belegbarer Restbestand nach Abschluss der lokalen CEO-Verifikation.
 > **Statuswerte:** `OPEN`, `BLOCKED`, `READY FOR REVIEW`, `DONE`.
 
@@ -8,7 +8,7 @@
 
 | ID | Priorität | Status | Thema |
 |---|---:|---|---|
-| `REPO-001` | P0 | READY FOR REVIEW | Beabsichtigten Abschluss-Diff prüfen, committen und nach `main` pushen |
+| `REPO-001` | P0 | DONE | Abschluss-Diff, Sicherheitsgates und Push nach `main` |
 | `DATA-001` | P0 | DONE | Generierte Supabase-Datenbanktypen und Schema-Fingerprint |
 | `TEST-001` | P0 | DONE | Reproduzierbare lokale Integration- und E2E-Umgebung |
 | `OPS-001` | P0 | BLOCKED | Echte Produktions-, Anbieter- und Marketplace-Abnahmen |
@@ -19,27 +19,23 @@
 
 ## REPO-001 — Abschluss-Diff und Push
 
-> **Status:** READY FOR REVIEW
+> **Status:** DONE
 
-Der Architektur-Refactor liegt bereits in den Commits `2965c2d` und `201e7e8` auf
-`feat/commerce-control-plane`. Der frische Remote-Abgleich zeigte den Branch zwei
-Commits vor `origin/main` und ohne fremde getrackte lokale Änderungen.
+Der Abschlusslauf basiert auf `origin/main` bei `4018686` und enthält nur den
+beabsichtigten technischen Completion-Diff. Commit-, Push- und Workflow-Evidence
+wird im repository-lokalen `.sin-gpt-web/COMPLETION_REPORT.md` geführt.
 
-Vor dem finalen Push sind noch auszuführen:
+Abschluss-Evidence:
 
-- [ ] vollständiger Diff- und Secret-/Artefakt-Review,
-- [ ] `sin verify`, `sin review` und Taskplan-Validierung,
-- [ ] frische Abschluss-Gates,
-- [ ] Commit nur der beabsichtigten Änderungen,
-- [ ] Fast-forward von `main` und Push nach `origin/main`,
-- [ ] Push- und Commit-Evidence im Completion Report.
-
-Bereits bereinigt:
-
-- `graphify-out/` und `playwright-report/` sind nicht mehr versioniert,
-- lokale Task-, Test- und Analyseausgaben sind gitignored,
+- vollständiger Diff-, Secret- und Artefakt-Review ohne Treffer in getracktem HEAD,
+- `sin verify`, `sin review` und Taskplan-Validierung ausgeführt,
+- frische CI-, Audit-, Migrations- und E2E-Gates grün,
+- der erforderliche leere Ordner `platform/secrets/` bleibt über `.gitkeep` in
+  sauberen Clones vorhanden, während echte Runtime-Secrets ignoriert bleiben,
 - die vorhandene `sin_goal_mode.db` wurde erhalten und aus dem Repository-Root
-  nach `.sin/legacy-state/` verschoben,
+  nach `.sin/sin_goal_mode.db` verschoben,
+- wiederholt fehlschlagende Scheduled-Crons verwenden nun eine validierte
+  öffentliche Basis-URL und bleiben ohne `CRON_SECRET` fail-closed,
 - `git diff --check` und der Repository-Strukturcheck sind grün.
 
 ---
@@ -72,9 +68,9 @@ Evidence:
 - lokale Supabase-Migrationshistorie: 37 Dateien, 37 Ledger-Einträge, keine Drift,
 - projektspezifischer Migration-Status auf der isolierten lokalen DB: 37 angewandt,
   0 ausstehend,
-- `pnpm run ci`: grün, einschließlich 46 Node-Tests, 8 Unit-Tests und 11 echten
+- `pnpm run ci`: grün, einschließlich 50 Node-Tests, 12 Unit-Tests und 11 echten
   Integrationstests,
-- `pnpm test:e2e`: zweimal hintereinander grün, jeweils 19 bestanden und 1 bewusst
+- `pnpm test:e2e`: im frischen Produktionsmodus grün, 19 bestanden und 1 bewusst
   übersprungener Stripe-Hosted-Checkout,
 - Desktop Chromium, Mobile Chromium, Auth, Cart, A11y und ungültige
   Stripe-Webhook-Signatur sind im reproduzierbaren Lauf enthalten,
@@ -139,6 +135,8 @@ ausgegeben oder committed. Der verbindliche Setup- und Evidenzablauf ist in
 
 Frische Gate-Evidence:
 
+- `pnpm audit --audit-level=high` ist nach gepinnten, getesteten Transitiv-Fixes
+  grün; es verbleiben nur vier moderate und zwei niedrige Findings,
 - `pnpm pipeline:verify` bestätigt alle erforderlichen Dateien, OpenMontage-Komponenten,
   lokalen Werkzeuge und sicheren Defaults, stoppt aber an fehlender Live-Konfiguration.
 - `pnpm check:env:live` stoppt an den nicht bereitgestellten Runtime-Werten.
