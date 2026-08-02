@@ -44,6 +44,34 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           WEB_PRODUCTION_ENV_FALLBACK_URL: https://shopsin.delqhi.com
+      - name: Diagnose Cloudflare token and R2 access
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          VERIFY=$(curl -s https://api.cloudflare.com/client/v4/user/tokens/verify \
+            -H "Authorization: Bearer $CF_TOKEN")
+          STATUS=$(echo "$VERIFY" | jq -r '.result.status // .success')
+          echo "Token status: $STATUS"
+          if [ "$STATUS" != "active" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is not active: $(echo "$VERIFY" | jq -c '.errors')"
+            exit 1
+          fi
+          PERMS=$(echo "$VERIFY" | jq -r '[.result.scopes[].permissions | to_entries[].key] | unique | join(", ")')
+          echo "Token permissions: $PERMS"
+          ACCOUNTS=$(curl -s https://api.cloudflare.com/client/v4/accounts \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            | jq -r '[.result[].id] | join(", ")')
+          echo "Token sees accounts: $ACCOUNTS"
+          if ! echo "$ACCOUNTS" | grep -q "$CF_ACCOUNT"; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID ($CF_ACCOUNT) is not reachable with this token"
+            exit 1
+          fi
+          BUCKETS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            | jq -r '.success, (.errors | tostring)')
+          echo "R2 list success: $(echo "$BUCKETS" | head -1)"
+          echo "R2 list errors: $(echo "$BUCKETS" | tail -1)"
       - id: cloudflare_deploy
         uses: cloudflare/wrangler-action@v4
         with:
