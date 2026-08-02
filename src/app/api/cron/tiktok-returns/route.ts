@@ -21,7 +21,19 @@ export async function GET(request: Request) {
   }
 
   const supabase = createAdminClient()
-  const returns = await getPendingReturns()
+
+  let returns: Awaited<ReturnType<typeof getPendingReturns>> = []
+  try {
+    returns = await getPendingReturns()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'unknown'
+    console.error('[tiktok-returns] Retouren-Abruf fehlgeschlagen:', message)
+    await sendPipelineAlert({
+      subject: 'tiktok-returns: Retouren-Abruf fehlgeschlagen',
+      errors: [message],
+    }).catch(() => {})
+    return NextResponse.json({ autoApproved: 0, needsReview: [], errors: [message] })
+  }
 
   let autoApproved = 0
   const needsReview: string[] = []

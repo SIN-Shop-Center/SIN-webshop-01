@@ -23,7 +23,19 @@ export async function GET(request: Request) {
   }
 
   const supabase = createAdminClient()
-  const orders = await getAwaitingShipmentOrders()
+
+  let orders: Awaited<ReturnType<typeof getAwaitingShipmentOrders>> = []
+  try {
+    orders = await getAwaitingShipmentOrders()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'unknown'
+    console.error('[tiktok-orders] Order-Abruf fehlgeschlagen:', message)
+    await sendPipelineAlert({
+      subject: 'tiktok-orders: Order-Abruf fehlgeschlagen',
+      errors: [message],
+    }).catch(() => {})
+    return NextResponse.json({ checked: 0, forwarded: 0, shipped: 0, errors: [message] })
+  }
 
   let forwarded = 0
   let shipped = 0

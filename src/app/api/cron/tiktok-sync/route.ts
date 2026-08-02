@@ -40,7 +40,19 @@ export async function GET(request: Request) {
 
   let synced = 0
   const errors: string[] = []
-  const warehouseId = await getDefaultWarehouseId()
+
+  let warehouseId: string
+  try {
+    warehouseId = await getDefaultWarehouseId()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'unknown'
+    console.error('[tiktok-sync] Warehouse-Abruf fehlgeschlagen:', message)
+    await sendPipelineAlert({
+      subject: 'tiktok-sync: Warehouse-Abruf fehlgeschlagen',
+      errors: [message],
+    }).catch(() => {})
+    return NextResponse.json({ synced: 0, errors: [message] })
+  }
   const currency = process.env.TIKTOK_CURRENCY ?? 'EUR'
 
   for (const product of products ?? []) {
