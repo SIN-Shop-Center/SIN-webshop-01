@@ -57,7 +57,7 @@ jobs:
             echo "::error::CLOUDFLARE_API_TOKEN is not active: $(echo "$VERIFY" | jq -c '.errors')"
             exit 1
           fi
-          PERMS=$(echo "$VERIFY" | jq -r '[.result.scopes[].permissions | to_entries[].key] | unique | join(", ")')
+          PERMS=$(echo "$VERIFY" | jq -r '[.result.scopes[]?.permissions | to_entries[].key] | unique | join(", ") // "unknown"')
           echo "Token permissions: $PERMS"
           ACCOUNTS=$(curl -s https://api.cloudflare.com/client/v4/accounts \
             -H "Authorization: Bearer $CF_TOKEN" \
