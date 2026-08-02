@@ -15,7 +15,7 @@
    - Scopes: Product Management, Logistics, (später: Order Management)
    - Redirect-URL: https://DEINE-DOMAIN/api/tiktok/oauth/callback
 3. TIKTOK_APP_KEY + TIKTOK_APP_SECRET als Env-Vars setzen
-4. SQL-Migration ausführen: infra/supabase/migrations/20260611120000_tiktok_shop.sql
+4. SQL-Migration ausführen: platform/infra/supabase/migrations/20260611120000_tiktok_shop.sql
 5. Autorisierungs-Link aus dem Partner Center öffnen, mit Seller-Account autorisieren
    → Callback speichert Tokens automatisch in Supabase (tiktok_auth)
 
@@ -23,7 +23,7 @@
 
 CJ → Supabase (existiert) → TikTok Shop (neu):
 
-1. scripts/cj/import-products.mjs importiert CJ-Produkte nach Supabase (existiert)
+1. tooling/scripts/cj/import-products.mjs importiert CJ-Produkte nach Supabase (existiert)
 2. Admin markiert Produkte: tiktok_status = 'pending' (queueForTikTok action)
    oder klickt "Zu TikTok" für Sofort-Publish
 3. Cron /api/cron/tiktok-publish (täglich 3:30) published pending-Produkte:
@@ -54,5 +54,5 @@ CJ → Supabase (existiert) → TikTok Shop (neu):
 - GPSR/EU-Compliance: Seit 2025 verlangt TikTok EU "Responsible Person"-Angaben
   pro Produkt — im Seller Center hinterlegen.
 - Order-Fulfillment (Phase 2): TikTok-Orders via GET /order/202309/orders pollen
-  oder Webhooks, dann an createCjOrder (app/lib/cj/orders.ts) weiterleiten —
+  oder Webhooks, dann an createCjOrder (src/lib/cj/orders.ts) weiterleiten —
   gleiche Logik wie der Stripe-Flow.

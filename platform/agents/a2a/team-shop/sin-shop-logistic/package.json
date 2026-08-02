@@ -1,0 +1,14 @@
+{
+  "name": "@shopsin/sin-shop-logistic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/contracts.mjs && node --check src/server.mjs && python3 -m py_compile browser-automator/automator.py"
+  },
+  "engines": {
+    "node": ">=20.9.0 <25"
+  }
+}

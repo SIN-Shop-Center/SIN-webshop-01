@@ -23,18 +23,18 @@ SELECT
 
 # 2. Kein localStorage im Code
 cd /Users/jeremy/dev/SIN-webshop-01
-grep -RIn 'localStorage' app/ components/ 2>/dev/null || echo "✓ kein localStorage"
+grep -RIn 'localStorage' src/app/ components/ 2>/dev/null || echo "✓ kein localStorage"
 
 # 3. Keine hardcoded product-Listen
-grep -RIn 'products\.json\|fixtures' app/ components/ 2>/dev/null || echo "✓ keine hardcoded fixtures"
+grep -RIn 'products\.json\|fixtures' src/app/ components/ 2>/dev/null || echo "✓ keine hardcoded fixtures"
 ```
 
 ## Was stattdessen läuft
 
 - **Datenbank**: Self-hosted Supabase auf OCI-VM (92.5.60.87) statt Neon
-- **Produkt-Source**: `app/lib/supabase/queries.ts` nutzt PostgREST über `shop.products_v` View
-- **Cart**: `app/lib/actions/cart.ts` mit atomarer `reserve_stock` RPC
-- **Orders**: `app/lib/actions/checkout.ts` → Stripe → `shop.orders` → Webhook
+- **Produkt-Source**: `src/lib/supabase/queries.ts` nutzt PostgREST über `shop.products_v` View
+- **Cart**: `src/lib/actions/cart.ts` mit atomarer `reserve_stock` RPC
+- **Orders**: `src/lib/actions/checkout.ts` → Stripe → `shop.orders` → Webhook
 - **Schemas**: `shop` (App) + `public` (Supabase core)
 
 ## Closing

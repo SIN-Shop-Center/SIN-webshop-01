@@ -44,7 +44,7 @@ Stand: **26.05.2026**
 
 Run all SQL migrations in:
 
-`infra/supabase/migrations`
+`platform/infra/supabase/migrations`
 
 Newest required file for current features:
 

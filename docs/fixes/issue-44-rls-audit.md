@@ -16,14 +16,14 @@ But the schema evolved over months and some tables may have slipped through. Thi
 ```sh
 # Auf der VM:
 ssh ubuntu@92.5.60.87 "
-docker exec supabase-db psql -U postgres -d postgres < scripts/supabase/audit-rls.sql
+docker exec supabase-db psql -U postgres -d postgres < tooling/scripts/supabase/audit-rls.sql
 " 2>&1
 ```
 
-## Step 2 — the audit script (`scripts/supabase/audit-rls.sql`)
+## Step 2 — the audit script (`tooling/scripts/supabase/audit-rls.sql`)
 
 ```sql
--- scripts/supabase/audit-rls.sql
+-- tooling/scripts/supabase/audit-rls.sql
 -- Findet alle Tabellen OHNE RLS die User-Daten enthalten könnten.
 -- Severity: HIGH wenn name in user/email/order/address etc.; MEDIUM sonst.
 
@@ -105,7 +105,7 @@ CREATE POLICY "<table>_delete_own" ON public.<table>
 ## Step 4 — the generic strict-mode SQL
 
 ```sql
--- scripts/supabase/setup-rls-strict.sql
+-- tooling/scripts/supabase/setup-rls-strict.sql
 -- Enable RLS + FORCE on every user-data table that's not already strict
 
 DO $$

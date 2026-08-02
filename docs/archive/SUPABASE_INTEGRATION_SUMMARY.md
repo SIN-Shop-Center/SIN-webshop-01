@@ -31,7 +31,7 @@ Updated the main App component to:
 - Removed localStorage products sync (replaced by Supabase)
 
 ### 3. Seed Script
-**File:** `/Users/jeremy/dev/SIN-webshop-01/scripts/supabase/seed-products.mjs`
+**File:** `/Users/jeremy/dev/SIN-webshop-01/tooling/scripts/supabase/seed-products.mjs`
 
 Created a robust seed script that:
 - Tests Supabase connection before seeding
@@ -71,7 +71,7 @@ Added `@supabase/supabase-js` dependency to the frontend package.json.
 ### Test Mode
 The seed script supports development/testing mode:
 ```bash
-node scripts/supabase/seed-products.mjs --dev
+node tooling/scripts/supabase/seed-products.mjs --dev
 ```
 
 This simulates the seed process without requiring actual Supabase credentials.
@@ -81,7 +81,7 @@ For actual Supabase integration:
 ```bash
 export SUPABASE_URL="https://your-project.supabase.co"
 export SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
-node scripts/supabase/seed-products.mjs
+node tooling/scripts/supabase/seed-products.mjs
 ```
 
 ## Technical Details

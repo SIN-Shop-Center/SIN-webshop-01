@@ -3,39 +3,48 @@ name: E2E Tests
 on:
   pull_request:
   schedule:
-    - cron: '0 3 * * *' # nightly 3 Uhr
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
-        with: { node-version: '24', cache: pnpm }
+        with:
+          node-version: 24
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Install Playwright Chrome
-        run: |
-          pnpm exec playwright install chromium
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libgbm1 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libpangocairo-1.0-0 libcairo2 libasound2t64
-      - run: pnpm build
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build production storefront
+        run: pnpm build
         env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-      - name: Run E2E
+      - name: Run E2E against production build
         run: pnpm test:e2e
         env:
-          E2E_BASE_URL: http://localhost:3000
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          E2E_USE_PRODUCTION: 'true'
           CI: 'true'
-      - name: Upload Test Results
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:

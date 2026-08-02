@@ -1,9 +1,11 @@
 # Stripe Key Rotation — Schritt-für-Schritt Guide
 
-## Status: 🔴 KRITISCH — Stripe Secret Key abgelaufen
+## Status: Externe Verifizierung erforderlich
 
-**Symptom:** Jeder Checkout bricht mit "Beim Starten der Zahlung ist ein Fehler aufgetreten" ab.
-**Ursache:** `StripeAuthenticationError` — `api_key_expired`.
+Die Gültigkeit der aktuell hinterlegten Stripe-Schlüssel wurde in diesem Lauf
+nicht mit einem autorisierten Stripe-Konto geprüft. Dieses Runbook gilt, wenn ein
+freigegebener Test oder ein Provider-Ereignis `StripeAuthenticationError` mit
+`api_key_expired` bestätigt.
 
 ---
 
@@ -33,7 +35,7 @@ STRIPE_PUBLISHABLE_KEY="pk_live_<PUBLISHABLE_KEY_HIER>"  # bleibt meist gleich
 
 ```bash
 # Alle Secrets auf einmal aktualisieren (aus .env.local lesen)
-node scripts/deploy-cloudflare-secrets.mjs
+node tooling/scripts/deploy-cloudflare-secrets.mjs
 ```
 
 ---
@@ -42,7 +44,7 @@ node scripts/deploy-cloudflare-secrets.mjs
 
 ```bash
 # Alle Secrets auf einmal in GitHub setzen (aus .env.local lesen)
-node scripts/deploy-github-secrets.mjs
+node tooling/scripts/deploy-github-secrets.mjs
 ```
 
 ---
@@ -59,10 +61,10 @@ npx wrangler deploy
 
 ```bash
 # Stripe Key-Test
-node scripts/test-stripe-key.mjs
+node tooling/scripts/test-stripe-key.mjs
 
 # Checkout E2E-Test (falls Playwright Browser installiert)
-node scripts/test-checkout.mjs
+node tooling/scripts/test-checkout.mjs
 ```
 
 ---
@@ -73,9 +75,9 @@ Falls der Webhook neu angelegt werden muss:
 
 | Feld | Wert |
 |---|---|
-| Endpoint URL | `https://shopsin.delqhi.com/api/webhooks/stripe` |
+| Endpoint URL | `https://shopsin.delqhi.com/api/stripe/webhook` |
 | Events | `checkout.session.completed` |
-| API Version | 2024-10-28 (oder aktuellste) |
+| API Version | Im Stripe-Dashboard für den konkreten Endpoint verifizieren |
 
 Nach Erstellung: Signing secret kopieren und in `STRIPE_WEBHOOK_SECRET` eintragen.
 
@@ -92,9 +94,9 @@ Falls der Account eingeschränkt ist (Payout pausiert, etc.):
 
 ## Automatisierte Scripts
 
-- `scripts/deploy-cloudflare-secrets.mjs` — Liest `.env.local` und setzt alle Secrets via Wrangler API
-- `scripts/deploy-github-secrets.mjs` — Liest `.env.local` und setzt alle Secrets via GitHub CLI (`gh`)
-- `scripts/test-stripe-key.mjs` — Testet ob der Key gültig ist
-- `scripts/test-checkout.mjs` — Playwright E2E-Test des Checkouts
+- `tooling/scripts/deploy-cloudflare-secrets.mjs` — Liest `.env.local` und setzt alle Secrets via Wrangler API
+- `tooling/scripts/deploy-github-secrets.mjs` — Liest `.env.local` und setzt alle Secrets via GitHub CLI (`gh`)
+- `tooling/scripts/test-stripe-key.mjs` — Testet ob der Key gültig ist
+- `tooling/scripts/test-checkout.mjs` — Playwright E2E-Test des Checkouts
 
 Alle Scripts lesen aus `.env.local` — dort müssen die NEUEN Keys eingetragen sein.

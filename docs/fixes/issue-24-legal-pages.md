@@ -13,16 +13,16 @@ German law requires these pages on any commercial site. Without them, competitor
 cd /Users/jeremy/dev/SIN-webshop-01
 
 # 1. Pages existieren?
-ls app/impressum/page.tsx
-ls app/agb/page.tsx
-ls app/widerrufsrecht/page.tsx
-ls app/datenschutz/page.tsx
+ls src/app/impressum/page.tsx
+ls src/app/agb/page.tsx
+ls src/app/widerrufsrecht/page.tsx
+ls src/app/datenschutz/page.tsx
 
 # 2. Footer-Links zeigen richtig
-grep -A 1 "impressum\|agb\|widerruf\|datenschutz" app/components/Footer.tsx
+grep -A 1 "impressum\|agb\|widerruf\|datenschutz" src/components/Footer.tsx
 
 # 3. Echte Daten (Jeremy Schulze, Kurfürstenstraße 124, 10785 Berlin)
-grep "Schulze\|Kurfürstenstraße\|10785" app/impressum/page.tsx | head -5
+grep "Schulze\|Kurfürstenstraße\|10785" src/app/impressum/page.tsx | head -5
 ```
 
 ## Was drin sein muss (rechtliche Mindestanforderungen)
