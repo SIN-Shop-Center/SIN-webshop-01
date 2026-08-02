@@ -6,9 +6,11 @@ import { ImageWithFallback } from '@/components/image-with-fallback'
 export function ProductCardImage({
   images,
   alt,
+  priority = false,
 }: {
   images: string[]
   alt: string
+  priority?: boolean
 }) {
   // Ensure we're working with strings, not arrays
   const primary = Array.isArray(images[0]) ? images[0][0] : images[0]
@@ -26,6 +28,7 @@ export function ProductCardImage({
             ? 'group-hover:opacity-0'
             : 'group-hover:scale-105'
         }`}
+        priority={priority}
       />
       {secondary && (
         <ImageWithFallback

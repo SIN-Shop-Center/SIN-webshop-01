@@ -88,7 +88,7 @@ function NavLink({
   )
 }
 
-export function AdminShellNav() {
+export function AdminShellNav({ preview = false }: { preview?: boolean }) {
   return (
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-border bg-background lg:flex lg:flex-col">
@@ -123,7 +123,7 @@ export function AdminShellNav() {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-40" />
               <span className="relative inline-flex size-2 rounded-full bg-success" />
             </span>
-            <span className="text-xs font-medium">Control Plane online</span>
+            <span className="text-xs font-medium">{preview ? 'Local Preview' : 'Control Plane online'}</span>
           </div>
           <Link
             href="/"

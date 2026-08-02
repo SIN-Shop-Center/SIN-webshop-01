@@ -7,6 +7,7 @@
     "prebuild": "node tooling/scripts/ensure-supported-node.mjs",
     "pretypecheck": "node tooling/scripts/ensure-supported-node.mjs",
     "dev": "next dev",
+    "dev:admin": "ADMIN_LOCAL_PREVIEW=true next dev",
     "build": "next build",
     "build:cf": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",
@@ -87,12 +88,20 @@
   "engines": {
     "node": ">=20.9.0 <25"
   },
+  "pnpm": {
+    "overrides": {
+      "fast-uri": "3.1.4",
+      "postcss": "8.5.25",
+      "sharp": "0.35.3"
+    }
+  },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.2",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
     "better-auth": "^1.6.25",
     "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.4",
     "lucide-react": "^1.18.0",
     "next": "^16.2.12",
     "next-intl": "^4.13.0",

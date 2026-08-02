@@ -96,13 +96,8 @@ describeDatabase('Inventory Race-Condition (#37)', () => {
   it('4. release_stock gibt reservierten Stock wieder frei', async () => {
     const productId = await ensureTestProduct(5)
     try {
-      await admin.rpc('reserve_stock', { p_product_id: productId, p_qty: 2 })
-      const { data: afterReserve } = await admin
-        .from('products')
-        .select('stock')
-        .eq('id', productId)
-        .single()
-      expect(afterReserve?.stock).toBe(3)
+      const { data: remainingAfterReserve } = await admin.rpc('reserve_stock', { p_product_id: productId, p_qty: 2 })
+      expect(remainingAfterReserve).toBe(3)
 
       await admin.rpc('release_stock', { p_product_id: productId, p_qty: 2 })
       const { data: afterRelease } = await admin

@@ -101,11 +101,15 @@ if (values.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && !values.NEXT_PUBLIC_STRIPE_PUBL
 if (values.STRIPE_WEBHOOK_SECRET && !values.STRIPE_WEBHOOK_SECRET.startsWith('whsec_')) {
   fail('STRIPE_WEBHOOK_SECRET must be a Stripe webhook signing secret')
 }
+if (values.RESEND_WEBHOOK_SECRET && !values.RESEND_WEBHOOK_SECRET.startsWith('whsec_')) {
+  fail('RESEND_WEBHOOK_SECRET must be a Resend webhook signing secret')
+}
 
 for (const name of [
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
   'RESEND_API_KEY',
+  'RESEND_WEBHOOK_SECRET',
   'CJ_API_KEY',
   'CJ_WEBHOOK_SECRET',
   'CRON_SECRET',

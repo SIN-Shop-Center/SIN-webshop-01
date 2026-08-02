@@ -72,6 +72,16 @@ cp .env.example .env.local   # Werte eintragen (siehe unten)
 pnpm dev
 ```
 
+Das Admin-Dashboard kann ohne Supabase, Anbieterzugänge oder Schreibzugriffe als
+lokale Vorschau gestartet werden:
+
+```bash
+pnpm dev:admin
+```
+
+Der Preview-Modus verwendet deterministische Beispieldaten, deaktiviert alle
+Queue-Schreibaktionen und wird in Produktion sowie CI technisch ignoriert.
+
 ### Benötigte Env-Vars
 
 Siehe [.env.example](./.env.example). Wichtig:
@@ -113,6 +123,7 @@ ingress:
 ```
 
 Betriebs-Runbook und Release-Reihenfolge: [EXECUTE.md](./EXECUTE.md).
+Externe Konten, Produktions-Secrets und Abnahmen: [docs/PRODUCTION-EXTERNAL-SETUP.md](./docs/PRODUCTION-EXTERNAL-SETUP.md).
 Agentenregeln und Infrastrukturhinweise: [AGENTS.md](./AGENTS.md).
 
 ## Sicherheit
