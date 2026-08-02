@@ -40,6 +40,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:cf
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          WEB_PRODUCTION_ENV_FALLBACK_URL: https://shopsin.delqhi.com
       - id: cloudflare_deploy
         uses: cloudflare/wrangler-action@v4
         with:
