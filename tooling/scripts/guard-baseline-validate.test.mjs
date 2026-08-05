@@ -39,6 +39,16 @@ test('guard-lines inspects oversized mjs tooling files', async () => {
   )
 })
 
+test('guard-lines ignores generated OpenNext build output', async () => {
+  const repoDir = await createFixtureRepo()
+  const generatedDir = path.join(repoDir, '.open-next', 'server-functions', 'default')
+  await fs.mkdir(generatedDir, { recursive: true })
+  await fs.writeFile(path.join(generatedDir, 'handler.mjs'), 'const x = 1\n'.repeat(401), 'utf8')
+
+  const result = await execFileAsync('node', [guardLinesScriptPath], { cwd: repoDir })
+  assert.match(result.stdout, /Line guard passed\./)
+})
+
 test('guard-complexity inspects branch-heavy mjs tooling files', async () => {
   const repoDir = await createFixtureRepo()
   const scriptsDir = path.join(repoDir, 'tooling', 'scripts')
@@ -51,6 +61,16 @@ test('guard-complexity inspects branch-heavy mjs tooling files', async () => {
       return true
     },
   )
+})
+
+test('guard-complexity ignores generated OpenNext build output', async () => {
+  const repoDir = await createFixtureRepo()
+  const generatedDir = path.join(repoDir, '.open-next', 'server-functions', 'default')
+  await fs.mkdir(generatedDir, { recursive: true })
+  await fs.writeFile(path.join(generatedDir, 'handler.mjs'), 'if (ready) value += 1\n'.repeat(121), 'utf8')
+
+  const result = await execFileAsync('node', [guardComplexityScriptPath], { cwd: repoDir })
+  assert.match(result.stdout, /Complexity guard passed\./)
 })
 
 test('guard baseline validation fails on stale line and complexity pins', async () => {

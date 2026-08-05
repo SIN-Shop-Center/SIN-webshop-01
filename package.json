@@ -90,16 +90,24 @@
   },
   "pnpm": {
     "overrides": {
-      "fast-uri": "3.1.4",
+      "@hono/node-server": "2.0.10",
+      "body-parser": "2.3.0",
+      "brace-expansion@>=2.0.0 <2.1.4": "2.1.4",
+      "brace-expansion@>=4.0.0 <5.0.9": "5.0.9",
+      "esbuild@>=0.27.3 <0.28.1": "0.28.1",
+      "fast-uri": "3.1.5",
+      "hono": "4.12.34",
+      "ip-address": "10.3.1",
       "postcss": "8.5.25",
-      "sharp": "0.35.3"
+      "sharp": "0.35.3",
+      "undici": "7.29.0"
     }
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.2",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
-    "better-auth": "^1.6.25",
+    "better-auth": "^1.6.26",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.4",
     "lucide-react": "^1.18.0",
@@ -123,13 +131,13 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.10",
     "postcss": "^8.5.25",
     "supabase": "2.109.1",
     "tailwindcss": "^4.3.1",
-    "tsx": "^4.22.4",
+    "tsx": "^4.23.7",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.8",
-    "wrangler": "^4.115.0"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.119.0"
   }
 }

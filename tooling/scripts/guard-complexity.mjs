@@ -5,6 +5,9 @@ const ROOT = process.cwd()
 const IGNORE_DIRS = new Set([
   '.git',
   '.next',
+  '.open-next',
+  '.open-next-deploy',
+  '.wrangler',
   '.notebooklm-mcp-cli',
   '.npm-cache',
   '.serena',

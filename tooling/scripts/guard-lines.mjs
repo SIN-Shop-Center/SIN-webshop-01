@@ -2,7 +2,23 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const ROOT = process.cwd()
-const IGNORE_DIRS = new Set(['.git', 'node_modules', '.next', 'dist', 'build', 'coverage', '.turbo', '.npm-cache', '.notebooklm-mcp-cli', '.serena', 'output', 'tmp'])
+const IGNORE_DIRS = new Set([
+  '.git',
+  'node_modules',
+  '.next',
+  '.open-next',
+  '.open-next-deploy',
+  '.wrangler',
+  'dist',
+  'build',
+  'coverage',
+  '.turbo',
+  '.npm-cache',
+  '.notebooklm-mcp-cli',
+  '.serena',
+  'output',
+  'tmp',
+])
 const BASELINE_PATH = join(ROOT, 'tooling', 'scripts', 'guard-lines-baseline.json')
 const RULES = [
   { ext: '.tsx', max: 180 },
