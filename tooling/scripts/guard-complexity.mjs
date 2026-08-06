@@ -8,7 +8,6 @@ const IGNORE_DIRS = new Set([
   '.open-next',
   '.open-next-deploy',
   '.wrangler',
-  '.notebooklm-mcp-cli',
   '.npm-cache',
   '.serena',
   '.turbo',

@@ -121,7 +121,6 @@ ausgegeben oder committed. Der verbindliche Setup- und Evidenzablauf ist in
 | CJ Dropshipping | Konto, API-Zugang und kontrollierter Testauftrag fehlen | Supplier Operations | Import, Varianten, Quote, Fulfillment, Retry und Statusupdates mit Testauftrag abnehmen |
 | Resend/E-Mail | API-Zugang und Domain-Abnahme fehlen | Messaging Owner | SPF, DKIM, DMARC sowie Bestell-/Versandmails an Testempfänger prüfen |
 | Cloudflare | Preview-/Produktionsbindings und öffentlicher Smoke fehlen | Platform Operations | Preview-Build, Worker, Tunnel, DNS, Secrets, Monitoring und Rollback abnehmen |
-| NotebookLM Live-Governance | Lokale Anmeldung ist abgelaufen | Governance Owner | `nlm login` interaktiv erneuern und Pflichtabfragen einmal ohne Cache mit Citation-Evidence ausführen |
 
 ### Marketplace, Recht und Betrieb
 
