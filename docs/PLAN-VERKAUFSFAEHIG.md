@@ -31,7 +31,6 @@
 - Aufwand: 5 Minuten
 
 ### Noch manuell zu erledigen
-- `nlm login` refreshen für Governance-Check
 - SQL-Scripts gegen Live-DB ausführen (`setup-rls.sql`, `setup-cart.sql`, `setup-orders.sql`, `setup-cj.sql`)
 - `.env.local` via Infisical mit echten Werten befüllen: `infisical run -- pnpm dev`
 - Resend-Domain verifizieren (`delqhi.com`) für Versand-Mails

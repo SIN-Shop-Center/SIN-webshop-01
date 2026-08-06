@@ -1,26 +1,25 @@
 # AGENTS.md — ShopSIN / SIN-webshop-01
 
-Stand: 23. Juli 2026
+Stand: 6. August 2026
 
 Diese Regeln gelten fuer Menschen und autonome Agenten. Vor Aenderungen zuerst
 `README.md`, `EXECUTE.md`, den aktuellen CEO-Audit und die betroffenen Runbooks lesen.
 
-## NotebookLM Judge Protocol
+## Local Governance Authority
 
-Die Projekt-Governance ist an genau das in `platform/governance/project-ssot.mjs` gefuehrte
-Notebook und dessen zentrale Google-Docs-Quelle gebunden. Vor Architektur-,
-Security-, Datenbank- oder Betriebsentscheidungen sind diese Abfragen Pflicht.
+Versionierte Repository-Dateien sind die einzige Projekt-Autoritaet. Die Rangfolge ist:
 
-- `PROJECT_NOTEBOOK_ID=8a11c91e-7ca0-4b0a-9fc0-78a5d6cd0f54`
-- `SOURCE_COUNT_REQUIRED=1`
+1. `AGENTS.md` fuer verbindliche Arbeits-, Sicherheits- und Abbruchregeln,
+2. `docs/adr/` fuer Architekturentscheidungen und begruendete Ausnahmen,
+3. versionierte Migrationen, Schemas und Runtime-Vertraege fuer Datenautoritaet,
+4. Runbooks und Security-Dokumente fuer Betrieb und Wiederherstellung,
+5. `.sin-gpt-web/TASKPLAN.md` und GitHub-Issues fuer Ausfuehrungsstatus,
+6. CI, Tests, Security-Scans und Runtime-Smokes fuer den Abschlussnachweis.
 
-```bash
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche <critical_invariant> und <halt_condition> gelten fuer dieses Projekt?" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Verzeichnisstruktur und Dateien muessen initial angelegt werden (Greenpause, no code)?" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Dokumente sind bis Definition of Done Pflicht (README, Architektur, ADR, RFC, Security, SRE, Standards)?" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche Regeln muessen in AGENTS.md stehen, damit jeder Coder-Agent immer NotebookLM als Richter nutzt?" --json
-nlm notebook query "$PROJECT_NOTEBOOK_ID" "Welche <interaction_invariant> und <security_gate> gelten fuer Browser-Workflows?" --json
-```
+Externe Dokumente duerfen den Repository-Stand nur spiegeln, aber niemals
+ueberschreiben oder Releases blockieren. Architekturentscheidungen erfordern einen
+versionierten ADR und erfolgreiche lokale Gates. Bei Widerspruechen gilt fail-closed:
+Zuerst Repository-Vertraege korrigieren, danach Code oder Betrieb fortsetzen.
 
 ## Zielbild
 

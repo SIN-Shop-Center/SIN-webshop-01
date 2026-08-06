@@ -32,8 +32,8 @@ ignorierten Pfad `.sin/legacy-state/` erhalten.
   scheitert vor dem Package-Script mit `ERR_PNPM_CI_NOT_IMPLEMENTED`.
 - Der ausführbare Repository-Vertrag wurde deshalb in Workflow und Runbooks
   eindeutig auf `pnpm run ci` korrigiert.
-- Das NotebookLM-Live-Governance-Gate bleibt für Go-Live fail-closed; CI und lokale
-  Tests verwenden den bereits vorgesehenen reproduzierbaren Offline-Governance-Modus.
+- Die Projekt-Governance ist vollständig lokal und versioniert; CI und lokale
+  Tests verwenden denselben reproduzierbaren Governance-Preflight ohne externe Abhängigkeit.
 - Der CI-Build verwendet ausschließlich die öffentliche kanonische Shop-URL und
   die isolierte lokale Supabase-Instanz. Es wurden keine Produktionswerte erfunden.
 - `/api/merchant-feed` ist als dynamische Runtime-Route markiert und wird nicht
@@ -135,7 +135,6 @@ wurde der Review ergänzt durch:
 | CJ Dropshipping | Konto/API und kontrollierter Testauftrag fehlen | Supplier Operations | Import, Varianten, Quote, Fulfillment, Retry und Statusupdates abnehmen |
 | Resend/E-Mail | API- und Domain-Abnahme fehlt | Messaging Owner | SPF, DKIM, DMARC sowie Bestell- und Versandmails prüfen |
 | Cloudflare | Preview-/Produktionsbindings und öffentlicher Smoke fehlen | Platform Operations | Preview, Worker, Tunnel, DNS, Secrets, Monitoring und Rollback abnehmen |
-| NotebookLM Live-Governance | Lokale Sitzung abgelaufen | Governance Owner | Interaktiv neu anmelden und Pflichtabfragen ohne Cache mit Citation-Evidence ausführen |
 | TikTok Shop | App, Development Shop, Scopes und Seller-OAuth fehlen | Marketplace Owner | Draft-, Listing-, Order-, Tracking-, Storno- und Retourenfluss im Development Shop abnehmen |
 | GPSR und Produktverantwortung | Produktbezogene Nachweise und fachliche Freigabe fehlen | Legal/Compliance Owner | Hersteller-/EU-Verantwortliche-Daten je veröffentlichbarem Produkt dokumentieren und freigeben |
 | Rechtstexte und Unternehmensdaten | Externe fachliche Prüfung nicht belegt | Legal Owner | Impressum, Datenschutz, AGB, Widerruf, Steuer- und Kontaktdaten final prüfen |
