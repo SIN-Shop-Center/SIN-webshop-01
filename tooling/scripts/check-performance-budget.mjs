@@ -73,6 +73,11 @@ async function waitForServer(server) {
 async function inspectPage(browser, entry) {
   const context = await browser.newContext()
   const page = await context.newPage()
+  const cpuThrottle = Number(process.env.PERFORMANCE_CPU_THROTTLE || 0)
+  if (cpuThrottle > 1) {
+    const cdp = await context.newCDPSession(page)
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpuThrottle })
+  }
   const consoleErrors = []
   const pageErrors = []
 
@@ -82,7 +87,7 @@ async function inspectPage(browser, entry) {
   page.on('pageerror', (error) => pageErrors.push(error.message))
 
   await page.addInitScript(() => {
-    window.__shopsinPerformanceBudget = { lcp: 0, cls: 0, longTasks: [] }
+    window.__shopsinPerformanceBudget = { lcp: 0, cls: 0, longTasks: [], layoutShifts: [] }
     try {
       new PerformanceObserver((list) => {
         const entries = list.getEntries()
@@ -93,7 +98,22 @@ async function inspectPage(browser, entry) {
     try {
       new PerformanceObserver((list) => {
         for (const item of list.getEntries()) {
-          if (!item.hadRecentInput) window.__shopsinPerformanceBudget.cls += item.value
+          if (!item.hadRecentInput) {
+            window.__shopsinPerformanceBudget.cls += item.value
+            const sources = Array.from(item.sources || []).map((source) => {
+              const node = source.node
+              const rect = (value) => value ? { x: value.x, y: value.y, width: value.width, height: value.height } : null
+              return {
+                tag: node?.tagName || '',
+                id: node?.id || '',
+                className: typeof node?.className === 'string' ? node.className.slice(0, 160) : '',
+                text: String(node?.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 120),
+                previousRect: rect(source.previousRect),
+                currentRect: rect(source.currentRect),
+              }
+            })
+            window.__shopsinPerformanceBudget.layoutShifts.push({ value: item.value, startTime: item.startTime, sources })
+          }
         }
       }).observe({ type: 'layout-shift', buffered: true })
     } catch {}
@@ -137,6 +157,7 @@ async function inspectPage(browser, entry) {
       cls: Number(Number(budget.cls || 0).toFixed(4)),
       tbtMs: Math.round(tbtMs),
       totalBytes: Math.round(totalBytes),
+      layoutShifts: budget.layoutShifts || [],
       title: document.title.trim(),
       description: document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '',
       lang: document.documentElement.lang.trim(),
@@ -198,6 +219,9 @@ try {
     for (const failure of result.failures) {
       failed = true
       console.error(`FAIL ${result.name}: ${failure}`)
+    }
+    if (result.failures.some((failure) => failure.startsWith('cls:'))) {
+      console.error(`CLS sources ${result.name}: ${JSON.stringify(result.metrics.layoutShifts)}`)
     }
   }
   if (failed) process.exitCode = 1

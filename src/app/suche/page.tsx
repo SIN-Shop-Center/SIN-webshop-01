@@ -47,7 +47,7 @@ export default async function SearchPage({
   const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <main className="container mx-auto max-w-6xl px-4 py-8">
+    <main className="container mx-auto min-h-[calc(100svh-4rem)] max-w-6xl px-4 py-8">
       <h1 className="mb-1 text-2xl font-semibold text-balance">
         {query
           ? `Suchergebnisse für „${query}"`
