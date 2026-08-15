@@ -9,10 +9,12 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
+        with:
+          version: 10.28.2
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -20,34 +22,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
-      - name: Build production storefront
-        run: pnpm build
-        env:
-          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      - name: Start isolated Supabase
+        shell: bash
+        run: |
+          log_file="$(mktemp)"
+          trap 'rm -f "$log_file"' EXIT
+          if ! pnpm db:local:start >"$log_file" 2>&1; then
+            echo "Local Supabase failed to start; redacted diagnostics follow." >&2
+            sed -E \
+              -e 's#postgres(ql)?://[^[:space:]]+#<redacted-database-url>#g' \
+              -e 's#(sb_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9._-]+)#<redacted-local-token>#g' \
+              "$log_file" >&2
+            exit 1
+          fi
       - name: Run E2E against production build
-        run: pnpm test:e2e
-        env:
-          SITE_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          E2E_USE_PRODUCTION: 'true'
-          CI: 'true'
+        run: CI=true E2E_USE_PRODUCTION=true pnpm test:e2e
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
           retention-days: 7
+      - name: Stop isolated Supabase
+        if: always()
+        run: pnpm db:local:stop

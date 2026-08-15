@@ -5,28 +5,45 @@ on:
     branches: [main]
 
 jobs:
-  lighthouse:
+  performance:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
+        with:
+          version: 10.28.2
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
-      - run: npx --yes @lhci/cli@0.14.x autorun
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Start isolated Supabase
+        shell: bash
+        run: |
+          log_file="$(mktemp)"
+          trap 'rm -f "$log_file"' EXIT
+          if ! pnpm db:local:start >"$log_file" 2>&1; then
+            echo "Local Supabase failed to start; redacted diagnostics follow." >&2
+            sed -E \
+              -e 's#postgres(ql)?://[^[:space:]]+#<redacted-database-url>#g' \
+              -e 's#(sb_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9._-]+)#<redacted-local-token>#g' \
+              "$log_file" >&2
+            exit 1
+          fi
+      - name: Build with isolated runtime configuration
+        run: WEB_PRODUCTION_ENV_FALLBACK_URL=https://shopsin.delqhi.com WEB_PRODUCTION_ENV_USE_LOCAL_SUPABASE=true node tooling/scripts/with-web-production-env.mjs pnpm build
+      - name: Run browser performance budget
+        run: PERFORMANCE_PORT=4180 WEB_PRODUCTION_ENV_FALLBACK_URL=https://shopsin.delqhi.com WEB_PRODUCTION_ENV_USE_LOCAL_SUPABASE=true node tooling/scripts/with-web-production-env.mjs node tooling/scripts/check-performance-budget.mjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: lighthouse-results
-          path: .lighthouseci/
+          name: performance-results
+          path: test-results/performance-budget/
+          if-no-files-found: ignore
           retention-days: 14
+      - name: Stop isolated Supabase
+        if: always()
+        run: pnpm db:local:stop
