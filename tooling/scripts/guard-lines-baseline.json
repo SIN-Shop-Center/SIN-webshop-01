@@ -1,7 +1,6 @@
 {
-  "src/components/icons.tsx": 259,
   "src/app/produkt/[id]/page.tsx": 255,
-  "tooling/scripts/check-governance-preflight.mjs": 531,
+  "src/components/icons.tsx": 259,
   "tooling/scripts/pipeline/enrich-products.mjs": 436,
   "tooling/scripts/pipeline/openmontage-shop-bridge.mjs": 804,
   "tooling/scripts/pipeline/select-top-cj-products.mjs": 418,

@@ -132,7 +132,7 @@ Jeder Browser-Workflow muss vor Ausfuehrung ein einzelnes klares Ziel besitzen. 
 Jeder Browser-Workflow ist auf seine freigegebenen Domains, Entry-Pfade, Session-Quellen und Aktionsklassen begrenzt. Sobald ein Flow ausserhalb dieser Begrenzung landet, gilt der Workflow als verlassen und muss beendet werden.
 
 3. execution_boundary
-Der Begriff <execution_boundary> ist die projektspezifische Ersatzbezeichnung fuer dieselbe betriebliche Begrenzung wie <security_gate>. Solange NotebookLM noch den Legacy-Begriff erwartet, muessen beide Begriffe gemeinsam gepflegt und semantisch gleich gehalten werden.
+Der Begriff <execution_boundary> bezeichnet dieselbe betriebliche Begrenzung wie <security_gate>. Beide Begriffe muessen im Repository semantisch gleich gehalten und durch Tests abgesichert werden.
 
 4. halt_condition
 Ein Browser-Workflow endet sofort bei Redirects ausserhalb der erlaubten Domains, fehlenden Pflichtmarkern, unklaren Formularzustaenden, nicht aufloesbaren Dialogen, nicht belegbaren Session-Wechseln oder jedem Zustand, in dem das Ziel nicht mehr mit klarer Evidenz verfolgt werden kann.

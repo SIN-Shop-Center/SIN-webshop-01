@@ -7,8 +7,6 @@ import {
   PROJECT_GOOGLE_DOC_ID,
   PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE,
   PROJECT_GOOGLE_DOC_TITLE,
-  PROJECT_NOTEBOOK_ID,
-  PROJECT_NOTEBOOK_SOURCE_ID,
   PROJECT_SSOT_MARKDOWN_FILES,
 } from '../../platform/governance/project-ssot.mjs'
 import {
@@ -38,19 +36,16 @@ function buildRootTabText(syncedAt) {
     '',
     'Mirror model:',
     '- Local Markdown files remain canonical project artifacts in the repo.',
-    '- This Google Doc mirrors the full canonical Markdown set for collaboration and NotebookLM.',
-    '- NotebookLM must remain bound to exactly one Google Doc source for this project.',
-    '',
-    'Project identity:',
-    `- Notebook ID: ${PROJECT_NOTEBOOK_ID}`,
-    `- Notebook source ID: ${PROJECT_NOTEBOOK_SOURCE_ID}`,
+    '- This Google Doc is an optional collaboration mirror only.',
+    '- Local versioned repository files remain the sole authority.',
+    '- Mirror availability never blocks development, CI, release, or incident response.',
     '',
     'Canonical child-tab set:',
     ...PROJECT_SSOT_MARKDOWN_FILES.map((entry) => `- ${entry}`),
     '',
     'Notes:',
     '- Each child tab mirrors one canonical markdown file as raw markdown text.',
-    '- After updating this Google Doc, sync the NotebookLM Drive source before relying on citations.',
+    '- Resolve disagreements in the repository first, then refresh this mirror.',
   ].join('\n')
 }
 
@@ -104,8 +99,6 @@ async function main() {
       documentId,
       documentTitle: PROJECT_GOOGLE_DOC_TITLE,
       rootTabTitle: PROJECT_GOOGLE_DOC_ROOT_TAB_TITLE,
-      notebookId: PROJECT_NOTEBOOK_ID,
-      sourceId: PROJECT_NOTEBOOK_SOURCE_ID,
       fileCount: PROJECT_SSOT_MARKDOWN_FILES.length,
       files: PROJECT_SSOT_MARKDOWN_FILES,
     }, null, 2)}\n`)

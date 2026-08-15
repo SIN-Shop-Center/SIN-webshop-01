@@ -63,7 +63,6 @@ output/
 /graphify-out/
 /.sin-gpt-web/
 /.tools/
-/.notebooklm-mcp-cli/
 /.npm-cache/
 /tmp/
 /live-*.png

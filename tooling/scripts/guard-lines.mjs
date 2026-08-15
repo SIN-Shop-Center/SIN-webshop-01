@@ -14,7 +14,6 @@ const IGNORE_DIRS = new Set([
   'coverage',
   '.turbo',
   '.npm-cache',
-  '.notebooklm-mcp-cli',
   '.serena',
   'output',
   'tmp',
