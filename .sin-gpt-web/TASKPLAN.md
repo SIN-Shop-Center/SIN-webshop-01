@@ -410,8 +410,8 @@ Governance preflight passed in CI mode (5 mandatory queries parsed, nlm steps sk
 ✔ governance preflight allows nested markdown drift outside AGENTS (1650.957375ms)
 ✔ governance preflight still fails on non-markdown doc drift outside AGENTS (366.541541ms)
 ✔ governance preflight fails when mandatory query evidence is missing (1068.38025ms)
-✔ governance preflight fails when NotebookLM is resource exhausted (1872.057167ms)
-✔ governance preflight uses cached evidence when NotebookLM is resource exhausted (1169.933916ms)
+✔ governance preflight fails when external governance provider is resource exhausted (1872.057167ms)
+✔ governance preflight uses cached evidence when external governance provider is resource exhausted (1169.933916ms)
 ✔ governance preflight falls back to legacy preflight-cache.json when quota is exhausted (1054.053208ms)
 ✔ governance preflight bootstraps a local nlm profile from the readable home store (1762.535583ms)
 ✔ Cloudflare Google sync dry-run reports missing key without failing (768.631416ms)
@@ -504,4 +504,4 @@ Governance preflight passed in CI mode (5 mandatory queries parsed, nlm steps sk
 - 2026-08-15T15:48:49+00:00 — `prime-agent` — `task_added` `T-0009`: Externe Produktions-, Anbieter- und Marketplace-Abnahmen abschließen
 - 2026-08-15T15:48:49+00:00 — `prime-agent` — `task_added` `T-0010`: Tooling-Orchestratoren modularisieren
 - 2026-08-15T15:49:04+00:00 — `prime-agent` — `task_blocked` `T-0009`: External owner evidence is required for production credentials/configuration, provider accounts, marketplace OAuth, legal/GPSR approval and restore/monitoring acceptance; no safe autonomous completion.
-- 2026-08-15T15:49:04+00:00 — `prime-agent` — `audit`: Full SIN-webshop session audit: read all 92 matching OpenCode SQLite sessions (about 5.99M text characters); no matching Prime-Agent session file remains in the local session store. Historical work includes frontend, TikTok, Supabase/RLS, CI/CD, backup/restore, legal, monitoring, i18n, accessibility, security and governance changes. Current canonical branch is chore/remove-notebooklm-governance at 94b13a5, one commit ahead of origin/main. Taskplan was stale at 8 done; added T-0009 for external production/provider/legal/marketplace gates (blocked) and T-0010 for non-release-blocking tooling modularization backlog. Machine/session runtime leftovers are not treated as product work.
+- 2026-08-15T15:49:04+00:00 — `prime-agent` — `audit`: Full SIN-webshop session audit: read all 92 matching OpenCode SQLite sessions (about 5.99M text characters); no matching Prime-Agent session file remains in the local session store. Historical work includes frontend, TikTok, Supabase/RLS, CI/CD, backup/restore, legal, monitoring, i18n, accessibility, security and governance changes. Current canonical branch is governance-cleanup-branch at 94b13a5, one commit ahead of origin/main. Taskplan was stale at 8 done; added T-0009 for external production/provider/legal/marketplace gates (blocked) and T-0010 for non-release-blocking tooling modularization backlog. Machine/session runtime leftovers are not treated as product work.
