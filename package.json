@@ -137,7 +137,7 @@
     "supabase": "2.109.1",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.23.7",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "wrangler": "^4.119.0"
   }
